@@ -1,0 +1,63 @@
+/* HUD design kit (team assets 2026-11-15, see hud-kit.js). Scoped to .hud.vt.kit so it sits on top of visor-theme.css / field-hud.css.
+   Panels use 9-slice border-image with outset, so the existing layout (positions, widths, line breaks) does not move. */
+.hud.vt.kit { --acc: #71eaff; --kit-glow: rgba(113, 234, 255, .55); }
+
+/* icons: kit PNG/WebP icons and the remaining line icons share the kit cyan */
+.hud.vt.kit .hk-ic { width: 1.3em; height: 1.3em; flex: none; vertical-align: -.28em; object-fit: contain; filter: drop-shadow(0 0 4px var(--kit-glow)); }
+.hud.vt.kit .hud-k svg, .hud.vt.kit .hud-row2 svg, .hud.vt.kit .hud-rlegend svg, .hud.vt.kit #hud-commw svg { color: var(--acc); stroke: var(--acc); filter: drop-shadow(0 0 4px var(--kit-glow)); }
+.hud.vt.kit #hud-status .hk-ic { margin-right: .35em; }
+.hud.vt.kit .nv-arrow .hk-arrow { width: 1.35em; height: 1.35em; }
+.hud.vt.kit .hud-wp .hk-ic { width: 2em; height: 2em; margin-top: .4em; filter: drop-shadow(0 0 7px var(--kit-glow)); }
+.hud.vt.kit .hud-rlegend .sw.pin .hk-ic { width: 1.5em; height: 1.5em; }
+
+/* chamfered glow panels (3x panel_info_01 = solid, panel_info_02 = lighter) */
+.hud.vt.kit .hud-bl, .hud.vt.kit .hud-br {
+  border: 0 solid transparent; border-image: url(/assets/hud/panel_info_02.webp) 66 fill / 24px / 1.1em 1.25em stretch; }
+.hud.vt.kit .hud-card, .hud.vt.kit .hud-detail, .hud.vt.kit .fx-brief, .hud.vt.kit .fx-note, .hud.vt.kit .fx-voice, .hud.vt.kit .hud-cue {
+  background: none; border: 0 solid transparent; border-left: 0; border-radius: 0;
+  border-image: url(/assets/hud/panel_info_01.webp) 66 fill / 22px / .5em .6em stretch; }
+.hud.vt.kit .fx-brief { border-image-source: url(/assets/hud/panel_info_02.webp); }
+.hud.vt.kit .hud-cue { border-image-source: url(/assets/hud/panel_info_02.webp); } /* the caution icon and text keep their yellow */
+
+/* top status band and bottom key bar */
+.hud.vt.kit .hud-status { border: 0 solid transparent; border-image: url(/assets/hud/top_bar.webp) 68 80 fill / 50% 2.4em / .6em 1.9em stretch; }
+.hud.vt.kit .hud-legend .lg-k { border: 0 solid transparent; border-image: url(/assets/hud/bottom_bar.webp) 97 160 fill / 50% 3em / .85em 2.6em stretch; }
+
+/* compass arc */
+.hud.vt.kit .hud-tc::before { content: ""; position: absolute; left: 50%; top: -1.15em; width: min(42vw, 720px); height: 6.4em; transform: translateX(-50%);
+  background: url(/assets/hud/compass_arc.webp) center top / contain no-repeat; opacity: .8; pointer-events: none; }
+.hud.vt.kit .hud-needle { border-bottom-color: var(--acc); filter: drop-shadow(0 0 4px var(--kit-glow)); }
+
+/* compass: route outside the scale = glow side arrows instead of ◀ ▶ text (data-dir set by field-hud.js) */
+.hud.vt.kit #hud-route[data-dir] { color: transparent; width: 1.5em; height: 1.5em; bottom: .7em; background: center / contain no-repeat; text-shadow: none; }
+.hud.vt.kit #hud-route[data-dir="left"] { background-image: url(/assets/hud/arrow_left.webp); }
+.hud.vt.kit #hud-route[data-dir="right"] { background-image: url(/assets/hud/arrow_right.webp); }
+
+/* selected menu item and action chip in the kit cyan */
+.hud.vt.kit .hud-item.sel { border-color: var(--acc); background: rgba(113, 234, 255, .14); box-shadow: 0 0 10px rgba(113, 234, 255, .25) inset; }
+.hud.vt.kit #hud-act { border-color: var(--acc); box-shadow: 0 0 10px rgba(113, 234, 255, .3); }
+
+/* 이동 중 안내 auto line: cyan with the kit path chevron (yellow is reserved for cautions) */
+.hud.vt.kit .fx-brief #hud-brief-auto { color: var(--acc); display: flex; align-items: center; justify-content: center; gap: .45em; }
+.hud.vt.kit .fx-brief #hud-brief-auto::before { content: ""; width: 1.1em; height: 1.15em; flex: none; background: url(/assets/hud/path_chevron.webp) center / contain no-repeat; animation: hk-chev 1s ease-in-out infinite; }
+@keyframes hk-chev { 50% { transform: translateY(-.15em); opacity: .7; } }
+
+/* 촬영 shutter corners in the kit cyan */
+.hud.vt.kit .fx-shutter .c { border-color: var(--acc); filter: drop-shadow(0 0 6px var(--kit-glow)); }
+.hud.vt.kit .fx-shutter .thumb { border-color: var(--acc); }
+@media (prefers-reduced-motion: reduce) { .hud.vt.kit .fx-brief #hud-brief-auto::before { animation: none; } }
+/* compass: the kit arc is the bezel. Its centre triangle is the heading pointer, so the moving tick marks, the base line and the old needle are hidden;
+   the heading numbers, cardinal letters and the route / base markers still move as before */
+.hud.vt.kit .hud-strip .tk, .hud.vt.kit .hud-compass::after, .hud.vt.kit .hud-needle { display: none; }
+.hud.vt.kit .hud-tc::before { top: -1.1em; } /* the arc triangle sits between the numbers and the heading readout */
+/* requested removals: no close (X) button on the task card / its views (the crew uses the suit buttons), no time-compression line in the status band */
+.hud.vt.kit .hud-x, .hud.vt.kit #hud-warp { display: none !important; }
+/* BASE row: kit triangle pointing toward the base relative to the head */
+.hud.vt.kit .hk-basearrow { width: 1.15em; height: 1.15em; margin-right: .35em; transition: transform .15s linear; }
+.hud.vt.kit .hud-br .hud-row2 b#hud-base { display: inline-flex; align-items: center; }
+/* the key bar at the bottom already lists every input: no per-card key lines (작업, 도착 알림, 계획·경보 cards) */
+.hud.vt.kit .hud-card .hud-keys, .hud.vt.kit .hud-detail .hud-keys { display: none; } /* incl. the detail layer ("음성 V 상세" no longer applies: V is the memo) */
+/* 우주복·임무 상태 layer: rows used to be cut by the fixed height. Smaller type and the free height down to LIFE SUPPORT, never a half row */
+.hud.vt.kit .hud-detail { font-size: .82em; line-height: 1.28; top: 19.5%; max-height: calc(100vh - 19.5vh - 26.5vh - 13em); }
+.hud.vt.kit .hud-detail dl { gap: .08em .5em; }
+.hud.vt.kit .hud-detail.fit1 .hud-credit { display: none; }

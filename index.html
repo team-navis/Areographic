@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Areographic — demo</title>
+<meta name="application-name" content="Areographic" />
+<meta name="description" content="화성 기지의 관제 패드에서 탐사를 계획·관제하고, 현장 대원의 시야로 탐사를 이어가는 Areographic 데모(모의)." />
+<link rel="icon" type="image/png" sizes="64x64" href="/assets/brand/mark-64.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/mark-32.png" />
+<link rel="apple-touch-icon" href="/assets/brand/mark-180.png" />
+<link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+<div id="app">
+  <div id="gl"></div>
+  <div id="terminal-overlay" aria-label="선택한 관제 모니터"></div>
+  <div id="overlay">
+    <div id="landing" class="hidden">
+      <div class="brand"><span class="eyebrow">화성 선외활동 내비게이션 · 데모</span><h1><img class="brand-logo" src="/assets/brand/logo-light.webp" alt="Areographic" width="1200" height="286" draggable="false" /></h1><p>Jezero field station</p></div>
+      <div class="pick"><p>인물을 클릭해 역할을 고르세요 <small>· 키보드 1 관제자 · 2 현장 대원</small></p>
+        <div class="pick-row hidden" aria-hidden="true"><button id="btn-pad" class="role"><b>관제자</b><span>기지 모니터 · PAD</span></button><button id="btn-hud" class="role"><b>현장 대원</b><span>기지 내부 걷기 · WASD</span></button></div></div>
+      <div class="legal">3D 가상 기지 · 보관된 실측 지형 · 모의 임무 <a href="%BASE_URL%CREDITS.txt" target="_blank" rel="noopener" style="color:inherit">자료 출처와 이용 고지</a></div>
+    </div>
+    <div id="topbar" class="hidden"><button id="btn-switch">역할 전환</button><button id="btn-focus" class="hidden">모니터 확대 (F)</button><span id="phase"></span></div>
+    <section id="room-ui" class="hidden" aria-label="기지 관제실">
+      <div class="room-context"><span class="eyebrow"><img class="brand-mini" src="/assets/brand/logo-light.webp" alt="Areographic" /> / 관제</span><h2 id="room-title">Areographic</h2><p id="room-breadcrumb" aria-live="polite">기지 관제실 / 좌석 시야</p></div>
+      <div class="room-tools"><button id="btn-room" class="hidden">← 관제석으로</button><button id="btn-motion" aria-pressed="true">시선 움직임 켜짐</button></div>
+      <div class="monitor-switch" id="monitor-switch" role="group" aria-label="관제 모니터 전환"><button id="mon-prev" type="button" aria-label="이전 모니터">‹</button><div class="ms-label"><span id="ms-num"></span><b id="ms-title"></b></div><button id="mon-next" type="button" aria-label="다음 모니터">›</button></div>
+      <nav class="monitor-dock" aria-label="관제 모니터 선택">
+        <button data-monitor="planner"><span>MISSION CONTROL</span><b>관제 패드</b><small>지도 / 탐사지역 분석 / 관제</small></button>
+      </nav>
+      <div class="room-footer"><span id="room-help">마우스로 둘러보기 · 모니터 클릭 · 휠로 접근</span><span id="room-telemetry"></span><button id="btn-eva">에어록 · 탐사자 시야 →</button></div>
+    </section>
+    <section id="walk-ui" class="hidden" aria-label="기지 내부 보행">
+      <div class="walk-context"><span class="eyebrow" id="walk-location">기지 내부 (가상)</span><p>기지 내부 · EVA 출발 전</p></div>
+      <div class="walk-reticle" aria-hidden="true"></div>
+      <div class="walk-controls"><button id="walk-monitor" class="hidden">F · 모니터 열기</button><p><b>WASD</b> 이동 · 마우스 드래그 / 방향키로 둘러보기 · <b>Esc</b> 처음 화면</p><small>왼쪽 에어록을 지나면 외부 탐사로 이어집니다.</small></div>
+    </section>
+    <div id="sheen"></div>
+    <div id="loading"><div class="brand"><h1><img class="brand-logo" src="/assets/brand/logo-light.webp" alt="Areographic" width="1200" height="286" draggable="false" /></h1><p id="service-line">'생명 존재 가능성 탐색'을 위해 관련 데이터를 레이어링하고 가중치 기반으로 탐사 지점과 경로를 추천하며, 헬멧 HUD로 현장 탐사를 보조하는 서비스</p><div id="load-bar" role="progressbar" aria-label="불러오는 중" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div><p id="load-label">지형과 기지를 불러오는 중… <b id="load-pct">0%</b></p><button id="start-btn" type="button" disabled><kbd>Enter</kbd> 눌러서 시작</button><p id="loading-msg" role="status">지형과 기지를 불러오는 중…</p></div></div>
+  </div>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{
+ "pia26368_cheyava_falls.jpg": {
+  "title": "Perseverance Finds a Rock With 'Leopard Spots' (PIA26368)",
+  "what": "WATSON image of the rock nicknamed Cheyava Falls, taken July 18, 2024 (sol 1212), Bright Angel, Jezero Crater",
+  "page": "https://www.jpl.nasa.gov/images/pia26368-perseverance-finds-a-rock-with-leopard-spots/",
+  "original": "https://d2pn8kiwq2w21t.cloudfront.net/original_images/1-PIA26368-Perseverance_Finds_a_Rock_with_Leopard_Spots.png",
+  "original_sha256": "02a6c0d201d58d0623f5f546f7e0748d9cafdddf90aa6994cd29e5e64b21ce9f",
+  "original_size": "1648x1200 PNG, 5,387,154 bytes",
+  "local": "resized to 824x600 JPEG (quality 86); no other edits",
+  "credit": "NASA/JPL-Caltech/MSSS",
+  "terms": "NASA/JPL image use policy (credit required; not CC0)"
+ },
+ "pia26640_pixl_cheyava_falls.jpg": {
+  "title": "Perseverance's PIXL Finds Vivianite, Greigite in 'Cheyava Falls' Sample (PIA26640)",
+  "what": "PIXL mineral map on the rock nicknamed Cheyava Falls; caption: vivianite (purple and pink) and greigite (dull yellow and green); 1 mm scale bar is part of the image; the image itself carries no legend",
+  "page": "https://science.nasa.gov/photojournal/perseverances-pixl-finds-vivianite-greigite-in-cheyava-falls-sample/",
+  "image_addition_date": "2025-09-10",
+  "original_sha256": "7125992eabb74e5b226456e87d7c8e19037974a24a46390f12134ef03abda303",
+  "original_size": "915x1037 JPEG, 96,620 bytes",
+  "local": "published JPEG, unmodified",
+  "credit": "NASA/JPL-Caltech",
+  "terms": "NASA/JPL image use policy (credit required; not CC0)",
+  "verification": "credit, date and caption read from the Photojournal page text saved during the 2026-11-15 design review; the page was not re-opened for this commit. Registration between this map and PIA26368 is unverified; the product draws no link between them."
+ },
+ "fhaz_1215_workspace.bin / .jpg / .json": {
+  "title": "Mars 2020 front Hazcam workspace terrain mesh, sol 1215 (2024-07-21, coring day of sample 25 'Sapphire Canyon')",
+  "product_id": "FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01",
+  "bundle": "mars2020_hazcam_ops_mesh (PDS Imaging Node), data/sol/01215/ids/rdr/mesh/",
+  "urls": [
+   "https://d1ejlg980osaur.cloudfront.net/m20/r11/mars2020_hazcam_ops_mesh/data/sol/01215/ids/rdr/mesh/FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01.obj",
+   "https://d1ejlg980osaur.cloudfront.net/m20/r11/mars2020_hazcam_ops_mesh/data/sol/01215/ids/rdr/mesh/FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01.png"
+  ],
+  "canonical": "https://pds-imaging.jpl.nasa.gov/api/data/atlas:pds4:mars_2020:perseverance:/mars2020_hazcam_ops_mesh/data/sol/01215/ids/rdr/mesh/FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01::11",
+  "instrument": "FRONT_HAZCAM_LEFT_A, start 2024-07-21T06:40:52.193, rover motion counter (site 56, drive 0, pose 276)",
+  "frame": "SITE_FRAME index 56: +X north, +Y east, +Z down, metres; origin = rover position at site 56 / drive 0",
+  "original": {
+   "obj_bytes": 38135858,
+   "obj_sha256": "d20fa35f32d949b907cd638c558035afcd037c52dfde774ebdb0b0622f92edb0",
+   "png_bytes": 31123798,
+   "png_sha256": "68a4c25e7d3fcdad6b1250b1564f79e1443b0d9753755c58a7f3350c177734c1",
+   "vertices": 165569,
+   "triangles": 324617,
+   "texture_px": [
+    5120,
+    2880
+   ]
+  },
+  "local": "cropped to 1.5 m around N -0.555 m, E -2.295 m; vertex clustering (8 mm inside 0.75 m, 20 mm outside) -> 35065 vertices / 70118 triangles; texture cropped to the kept faces and resized to 2048x1118 JPEG q86. Script: tools/terrain/build_workspace_mesh.py",
+  "local_sha256": {
+   "bin": "5b8e06545e9a2ed4fda5552129bf37367bad2e726a83c5a6e6e321d02e8fce4c",
+   "jpg": "01b4445c1c4c6681032fee008bae51209c2ea4c8b8dbfa854d055a212f563afa"
+  },
+  "credit": "NASA/JPL-Caltech (PDS Imaging Node)",
+  "limits": "single-view stereo mesh: surfaces hidden from the left front Hazcam are missing; decimated. In the scene a constant vertical shift and an edge blend put it on the HiRISE 1 m DTM.",
+  "sampling_points": "A (Apollo Temple abrasion patch) and B (Cheyava Falls natural target / Sapphire Canyon core area) are estimates computed from raw WATSON camera metadata, not official target coordinates. A is snapped to the bright patch visible in the texture (moved 0.022 m). Source frames (Mars 2020 raw images feed https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json&sol=<sol>): A from SIF_1217_0774993507_945EBY_N0560000SRLC02503_0000LMJ (sol 1217, abrasion patch visible in frame), rover frame about (2.29, 0.19, 0.01) m; B from SIF_1212_0774536492_390EBY_N0560000SRLC08048_0000LMJ (sol 1212, natural-surface close-up), rover frame about (2.44, 0.11, 0.03) m. Computed from the camera position and pointing in the feed metadata with assumed standoffs of 4.5 / 6.5 cm; the A = Apollo Temple and B = Cheyava Falls / core-area labels follow the Nature paper caption (inference). The images themselves are not included."
+ },
+ "navcam_1176_s53.bin / .jpg / .json": {
+  "title": "Mars 2020 Navcam terrain mesh, sol 1176 (2024-06-11), rover at site 53 / drive 130",
+  "product_id": "NLG_1176_0771346345M727RAS_N0530130SCAM06176_0A01LLJ01",
+  "bundle": "mars2020_navcam_ops_mesh (PDS Imaging Node), data/sol/01176/ids/rdr/mesh/",
+  "urls": [
+   "https://d1ejlg980osaur.cloudfront.net/m20/r11/mars2020_navcam_ops_mesh/data/sol/01176/ids/rdr/mesh/NLG_1176_0771346345M727RAS_N0530130SCAM06176_0A01LLJ01.obj",
+   "https://d1ejlg980osaur.cloudfront.net/m20/r11/mars2020_navcam_ops_mesh/data/sol/01176/ids/rdr/mesh/NLG_1176_0771346345M727RAS_N0530130SCAM06176_0A01LLJ01.png"
+  ],
+  "instrument": "NAVCAM_LEFT, 2024-06-11T03:07:42.851, rover motion counter (site 53, drive 130)",
+  "frame": "SITE_FRAME index 53: +X north, +Y east, +Z down, metres; origin = M20 waypoint site 53 / drive 0",
+  "original": {
+   "obj_bytes": 15228114,
+   "obj_sha256": "21d7a437b50287d722cf19df902720744243a8ccd12c8bf25b2052d029ae6d4d",
+   "png_bytes": 1153556,
+   "png_sha256": "5cbbab417f30906bd78690d924b59214dd405c9a0efb6a5efa3e802e4024dbe7",
+   "vertices": 67911,
+   "triangles": 131872,
+   "texture_px": [
+    1280,
+    960
+   ]
+  },
+  "local": "vertex clustering 5 cm, triangles with an edge over 0.6 m dropped -> 22957 vertices / 45513 triangles; texture resized to 1024x768 JPEG q84. Script: tools/terrain/build_route_mesh.py",
+  "local_sha256": {
+   "bin": "ef3eb4c5f6ed359aed2fda9e85e3fa647403c35125f4ee8ab54f3c308628bde8",
+   "jpg": "abcc1436357fbc828bf7f9c9e5bf75b2a1bdd1119cea01780f6de03d1614fcc1"
+  },
+  "credit": "NASA/JPL-Caltech (PDS Imaging Node)",
+  "coverage": "about 12 m x 18 m south-east of the rover position at site 53 / drive 130 (N 16.9..29.2, E -3.4..14.9 m in SITE_FRAME 53); it lies beside the demo route, not across it",
+  "limits": "single-view stereo; single-band (grey) image, tinted in the scene as 연출; constant vertical shift and a 0.8 m rim blend onto the HiRISE 1 m DTM; horizontal placement from the M20 waypoint (checked to about 1-2 m by the research notes, not re-measured here)."
+ }
+}

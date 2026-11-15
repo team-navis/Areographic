@@ -1,0 +1,261 @@
+{
+ "title": "Areographic HUD design assets",
+ "supplied": "team design assets shared in the session on 2026-11-15 (mars_hud_assets.zip = 1x line set, hud_png_assets_3x.zip = 3x glow set)",
+ "creator": "our team, generated with OpenAI image generation (user confirmed 2026-11-15); OpenAI Terms of Use: the user owns the Output, OpenAI assigns its rights to the extent permitted by law",
+ "processing": "resized (LANCZOS) to about twice the largest on-screen size, WebP with alpha quality 90 (method 6); no redraw or recolour",
+ "unused": [
+  "1x: hud_bottom_toolbar, hud_compass_scale, hud_direction_arrow_left/right, hud_focus_reticle, hud_frame_border, hud_info_panel_01/02, hud_route_chevrons, hud_target_pointer, hud_top_status_panel (3x glow versions used instead), icon_temperature (no temperature readout in the HUD)",
+  "3x: icon_camera, icon_mic, icon_pin (white glow; the 1x cyan line icons are used for one icon style), ui_frame_border (blue visor frame removed on request)"
+ ],
+ "drawn": {
+  "files": [
+   "icon_target.svg",
+   "icon_base.svg",
+   "icon_buddy.svg",
+   "icon_turnback.svg"
+  ],
+  "note": "drawn for this project in the kit line style (cyan line, rounded caps) because the kits have no target / base / buddy / turn-back icons; not part of the supplied kits"
+ },
+ "files": {
+  "panel_info_01.webp": {
+   "kit": "3x",
+   "source": "ui_panel_info_01.png",
+   "source_sha256": "18a28952236f794adba1c9fc6bf52b2b0bec130efa4934afed7bfce8e696e782",
+   "source_px": [
+    1122,
+    618
+   ],
+   "px": [
+    560,
+    308
+   ],
+   "bytes": 48992,
+   "sha256": "3e7e747b9e8a821c28a739b4642dce646fa988639aac35a041db72ac1970b413"
+  },
+  "panel_info_02.webp": {
+   "kit": "3x",
+   "source": "ui_panel_info_02.png",
+   "source_sha256": "063a8ec0d77202444fd89c21ed4f0f6fe11e6d0c9ae317148df30ecfd3cdefca",
+   "source_px": [
+    1116,
+    621
+   ],
+   "px": [
+    560,
+    312
+   ],
+   "bytes": 48958,
+   "sha256": "b9ad50c4c339dd39258529b5463c9cfe3287b16a841fa2fd21f7745a479f0e38"
+  },
+  "top_bar.webp": {
+   "kit": "3x",
+   "source": "ui_top_bar.png",
+   "source_sha256": "5d86556d5cf3022b5dd3fced31e4455b4d0a3405c330be240b80a9750a117404",
+   "source_px": [
+    1989,
+    273
+   ],
+   "px": [
+    1000,
+    137
+   ],
+   "bytes": 44948,
+   "sha256": "d4a444b14db756787498bc7652d75887c94155b13c7e76f37090b6ac8ee4caa8"
+  },
+  "bottom_bar.webp": {
+   "kit": "3x",
+   "source": "ui_bottom_bar.png",
+   "source_sha256": "68755694df23932024eee2e728ac4a38ce47cffe8182f45928012a1d8a68e960",
+   "source_px": [
+    2040,
+    390
+   ],
+   "px": [
+    1020,
+    195
+   ],
+   "bytes": 83978,
+   "sha256": "847b0de7ac90948df7448fc010dee0c1a46073bfca27c9e0940bee3d3814477f"
+  },
+  "compass_arc.webp": {
+   "kit": "3x",
+   "source": "ui_compass_arc.png",
+   "source_sha256": "86ddf060175c4bb3f95fea59f91eb6aad80bde77ca63c4f852994f41845105c6",
+   "source_px": [
+    1251,
+    327
+   ],
+   "px": [
+    840,
+    220
+   ],
+   "bytes": 77936,
+   "sha256": "5d9a0410ae5508bf296158ea52e18b27b3b261af974d47d98851a178e5d71149"
+  },
+  "arrow_left.webp": {
+   "kit": "3x",
+   "source": "ui_arrow_left.png",
+   "source_sha256": "1a175d03d44f1cf99d768f160fcdb12d18d4de47847b59448ae3163d56414347",
+   "source_px": [
+    327,
+    318
+   ],
+   "px": [
+    110,
+    107
+   ],
+   "bytes": 7842,
+   "sha256": "d8ec0324776e8492fd81e03b87b5d7722d7667aa3b9bcae8250b72545ae8a2bf"
+  },
+  "arrow_right.webp": {
+   "kit": "3x",
+   "source": "ui_arrow_right.png",
+   "source_sha256": "15e77f6abe6d2d7cb26cf57465040b7001efffc6cc108f3c49dd9e24b4ee72fa",
+   "source_px": [
+    342,
+    363
+   ],
+   "px": [
+    110,
+    117
+   ],
+   "bytes": 9172,
+   "sha256": "f84d464045c2d67b0cb35a181e9877a92ac57e02155f3b0aaab6cad18ff55059"
+  },
+  "arrow_triangle.webp": {
+   "kit": "3x",
+   "source": "ui_arrow_triangle.png",
+   "source_sha256": "c3ac3e5cedfe3a155e70b3c822998c76c25805031c08fd9eecb07269f7247838",
+   "source_px": [
+    471,
+    363
+   ],
+   "px": [
+    150,
+    116
+   ],
+   "bytes": 12106,
+   "sha256": "7a64d6588c639c14ea33e7ed09510e68cef5e886f85eaf65e1ec1aad81e8e82c"
+  },
+  "reticle_circle.webp": {
+   "kit": "3x",
+   "source": "ui_reticle_circle.png",
+   "source_sha256": "033fb1f18d4fdadc00108ae4d4a2280a5957680e0d93d54fe1ec1bb0942faa5a",
+   "source_px": [
+    1269,
+    1038
+   ],
+   "px": [
+    420,
+    344
+   ],
+   "bytes": 88016,
+   "sha256": "11f828c0957fbbca00ac86599412f6f24b23b3d3cb461f64dc7975b99dfeedcb"
+  },
+  "path_chevron.webp": {
+   "kit": "3x",
+   "source": "ui_path_chevron.png",
+   "source_sha256": "45648584c6adff3dbb1755dd15852aee25b5a09467a0fd891146a2864cc9289e",
+   "source_px": [
+    996,
+    1035
+   ],
+   "px": [
+    160,
+    166
+   ],
+   "bytes": 19590,
+   "sha256": "9745a540a6f525914aaa8ec58d1abb0c209c166835149b082c7719963da93b3e"
+  },
+  "icon_oxygen.webp": {
+   "kit": "1x",
+   "source": "icon_oxygen.png",
+   "source_sha256": "90a27cf630349cfe90bb4508645e90b9562f78870a90cdb26f122b36ccd17957",
+   "source_px": [
+    90,
+    90
+   ],
+   "px": [
+    90,
+    90
+   ],
+   "bytes": 4972,
+   "sha256": "0bd7124bdc35b8d34dc0da311a4b641d02f6c7e467dc9df5854c45c9c50f59da"
+  },
+  "icon_radiation.webp": {
+   "kit": "1x",
+   "source": "icon_radiation.png",
+   "source_sha256": "5c4004fb5251e3f5bbb3e9f67aecc219480591ab808792907daf51f382b0be31",
+   "source_px": [
+    90,
+    90
+   ],
+   "px": [
+    90,
+    90
+   ],
+   "bytes": 2768,
+   "sha256": "2fc5319f6f118fa1f49f82481610eb4762b6ee9c22dd8157a87cda1337136913"
+  },
+  "icon_mission.webp": {
+   "kit": "1x",
+   "source": "icon_mission.png",
+   "source_sha256": "a016460f4b4b56b8b1aa4867b2868bc026917508389d7e469294318a045f788a",
+   "source_px": [
+    90,
+    90
+   ],
+   "px": [
+    90,
+    90
+   ],
+   "bytes": 1570,
+   "sha256": "cbee14fd6d636ced1bedd25ec85223f5fc75bd64dae76f709f7b07155c24c6a1"
+  },
+  "icon_pin.webp": {
+   "kit": "1x",
+   "source": "icon_pin.png",
+   "source_sha256": "76edb37ef18b7cb01615e56d78922b64799fe9618e0ef4019bb1e3a520c767c6",
+   "source_px": [
+    90,
+    90
+   ],
+   "px": [
+    90,
+    90
+   ],
+   "bytes": 3724,
+   "sha256": "1987a04cbcf7adb333d92551fa27d9be30e11521a0f6d6bdf217c4c9a0173bfb"
+  },
+  "icon_camera.webp": {
+   "kit": "1x",
+   "source": "icon_camera.png",
+   "source_sha256": "7e5d0a2b5a0b00161b733d0700c74f8e97120ba02d3570f7c3c43b7eb180bd05",
+   "source_px": [
+    90,
+    90
+   ],
+   "px": [
+    90,
+    90
+   ],
+   "bytes": 2616,
+   "sha256": "fe647ac76fbe13ba77f0e7ec7a0bc74b1bee5414c6f0b6a884dab7c8c965ea49"
+  },
+  "icon_voice_memo.webp": {
+   "kit": "1x",
+   "source": "icon_voice_memo.png",
+   "source_sha256": "75ddbb16617a18c32f1b70e3fd4c9c6e385f15a3d942452437a007f3cc20a63e",
+   "source_px": [
+    90,
+    90
+   ],
+   "px": [
+    90,
+    90
+   ],
+   "bytes": 2656,
+   "sha256": "cc7c777f34731d076e9c16afe270ddd901f8b6cad73a20bda3d64f3f246f1c0c"
+  }
+ }
+}

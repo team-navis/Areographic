@@ -1,0 +1,58 @@
+{
+  "source": "Latest user-supplied Areographic light and dark logo artwork; team OpenAI image generation as previously confirmed.",
+  "source_files": {
+    "light_sha256": "eeb9d1132aadc0c44aed331c13add9a43846841d42ca88791c2ca1a5dacee4e9",
+    "dark_sha256": "6d451ebdbe883544e90ce7d0bd15a51b41715c8bbe0d4f4da9ba140446213a64"
+  },
+  "processing": "Supplied colors and lettering preserved. Transparent margins trimmed, resized, A symbol extracted for favicons, visible SI mark added for Space Apps disclosure.",
+  "files": [
+    {
+      "file": "public/assets/brand/logo-light.webp",
+      "width": 1200,
+      "height": 286,
+      "sha256": "9aafb87789af7b15a03dee7eefcc36f3a56b81d43a341fc071362dbc820761b9",
+      "bytes": 143846,
+      "visibleWatermark": "SI"
+    },
+    {
+      "file": "public/assets/brand/logo.webp",
+      "width": 1200,
+      "height": 284,
+      "sha256": "3639a7840453d387404b2ee6c3bffc850bf1914a947f713fbf8b1ae7439639b7",
+      "bytes": 136498,
+      "visibleWatermark": "SI"
+    },
+    {
+      "file": "pad/assets/logo.png",
+      "width": 1800,
+      "height": 426,
+      "sha256": "24bb3d7a885f658a464384056fb87b599a2d5da7ba600531982fc55954b5a4f6",
+      "bytes": 389973,
+      "visibleWatermark": "SI"
+    },
+    {
+      "file": "public/assets/brand/mark-32.png",
+      "width": 32,
+      "height": 32,
+      "sha256": "177022196ce14954db3c0d5a29c98df495a79808a035a6e18f791cc9e0b103cc",
+      "bytes": 2032,
+      "visibleWatermark": "SI"
+    },
+    {
+      "file": "public/assets/brand/mark-64.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "bf0fbaa0bcc3e84ed3b60dbfdc775bc2bea6ed3ee319b4481479b4f64b021d6c",
+      "bytes": 5457,
+      "visibleWatermark": "SI"
+    },
+    {
+      "file": "public/assets/brand/mark-180.png",
+      "width": 180,
+      "height": 180,
+      "sha256": "50ad7f63e1c699fe6ee2bfcd856aad5ec646b64bf0a9970c5634d5d267dfaf21",
+      "bytes": 25912,
+      "visibleWatermark": "SI"
+    }
+  ]
+}

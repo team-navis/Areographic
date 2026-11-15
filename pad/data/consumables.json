@@ -1,0 +1,10 @@
+{
+  "_note": "EVA 소모품 — 복귀 한계는 이 중 제일 먼저 바닥나는 것. 출처: 아폴로 15-17 PLSS(8h), EMU PLSS",
+  "nominal_metabolic_W": 273,
+  "consumables": [
+    { "key": "o2", "name": "산소",        "capacity_min": 480, "scales_with_metabolic": true,  "rate_factor": 1.00, "unit_ref": "O2 1430 psi" },
+    { "key": "fw", "name": "냉각수",      "capacity_min": 450, "scales_with_metabolic": true,  "rate_factor": 1.05, "unit_ref": "feedwater 5.2 L" },
+    { "key": "co", "name": "CO2 스크러버", "capacity_min": 500, "scales_with_metabolic": true,  "rate_factor": 0.95, "unit_ref": "LiOH 3.12 lb" },
+    { "key": "ba", "name": "배터리",      "capacity_min": 420, "scales_with_metabolic": false, "rate_factor": 1.00, "unit_ref": "390 Wh" }
+  ]
+}
