@@ -66,7 +66,7 @@ export function createHud(mission, terrain, hooks = {}) {
     <div class="hud-bl hud-plate"><div class="hud-k">${ICON.pulse} LIFE SUPPORT <small>simulated</small></div>
       <div class="ls-body"><div class="hud-bar vbar" aria-hidden="true"><i id="hud-o2bar"></i></div><div class="ls-rows">
       <div class="hud-row"><span class="o2l">O<sub>2</sub></span><b id="hud-o2"></b></div>
-      <div class="hud-row2"><span>${ICON.turn} TURNAROUND <small>time left to start return</small></span><b id="hud-turn"></b></div>
+      <div class="hud-row2"><span>${ICON.turn} TURNAROUND <small id="hud-turnk">time left to start return</small></span><b id="hud-turn"></b></div>
       <div class="hud-row2"><span>${ICON.rad} RADIATION <small>assumption · total</small></span><b id="hud-rad"></b></div></div></div></div>
     <div class="hud-br hud-plate"><div class="hud-k">${ICON.pin} NAVIGATION <small id="hud-navk">Nav</small></div>
       <div class="nv-top"><span class="nv-arrow" id="hud-navarrow">${ICON.arrow}</span><b id="hud-brg"></b><i class="nv-sep"></i><small>NEXT</small><b id="hud-next"></b></div>
@@ -262,7 +262,8 @@ export function createHud(mission, terrain, hooks = {}) {
       // ---- H1 life ----
       set('#hud-o2', st.o2.toFixed(1) + '%'); $('#hud-o2bar').style.height = st.o2 + '%'; // vertical gauge (visor theme)
       const tl = mission.turnaroundLeft(), started = st.returnStartedAt !== null;
-      setH('#hud-turn', started ? `Return started T+${fmtT(st.returnStartedAt)}` : (tl >= 0 ? fmtT(tl) : 'over ' + fmtT(-tl)) + `<span class="hud-turn-x"> · by T+${fmtT(PLAN.turnaroundSec)}</span>`); // deadline kept in the text, not drawn by the visor theme
+      { const k = $('#hud-turnk'), t = started ? 'return started' : 'time left to start return'; if (k && k.textContent !== t) k.textContent = t; } // the long sentence used to overflow the box once the return started
+      setH('#hud-turn', started ? `T+${fmtT(st.returnStartedAt)}` : (tl >= 0 ? fmtT(tl) : 'over ' + fmtT(-tl)) + `<span class="hud-turn-x"> · by T+${fmtT(PLAN.turnaroundSec)}</span>`); // deadline kept in the text, not drawn by the visor theme
       const turnLvl = started ? '' : tl < 0 ? 'warning' : tl < 120 ? 'caution' : ''; $('#hud-turn').className = turnLvl;
       setH('#hud-rad', `${PLAN.doseMsvPerDay} mSv/day<span class="hud-rad-x"> · ${st.doseUsv.toFixed(2)} µSv total</span>`);
       // ---- H1 nav / H5 return ----

@@ -49,3 +49,4 @@
 .hud .mc-target[data-side="left"] .mc-tlabel, .hud .mc-target[data-side="left"] .mc-tdist { transform: none; left: -28px; }
 .hud .mc-target[data-side="right"] .mc-tlabel, .hud .mc-target[data-side="right"] .mc-tdist { transform: translateX(-100%); left: 28px; }
 .hud .mc-target .mc-tdist { white-space: nowrap; }
+.hud.vt .hud-bl .hud-row2 b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
