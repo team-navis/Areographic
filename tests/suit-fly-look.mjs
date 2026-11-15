@@ -1,0 +1,14 @@
+// Role selection -> first person: sample the continuous camera flight (4 frames + per-frame continuity numbers). MW_URL / MW_OUT as usual.
+import { chromium } from 'playwright-core';
+const URL = process.env.MW_URL || 'http://127.0.0.1:5173/', OUT = process.env.MW_OUT || 'docs/captures/stage3-v02-field';
+const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--ignore-gpu-blocklist'] });
+const page = await browser.newPage({ viewport: { width: 1600, height: 900 } }); page.on('pageerror', (e) => console.log('PAGEERR', String(e).slice(0, 300)));
+await page.goto(URL); await page.waitForFunction(() => window.__mw && window.__mw.ready, null, { timeout: 180000 }); await page.waitForTimeout(1200);
+const p = await page.evaluate(() => { const m = window.__mw, v = m.astro.hit.getWorldPosition(new m.camera.position.constructor()).project(m.camera); return [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]; });
+// record the camera every animation frame to measure continuity (largest per-frame jump in position, direction and FOV)
+await page.evaluate(() => { const m = window.__mw, log = (window.__fly = []); const tick = () => { const d = m.camera.getWorldDirection(new m.camera.position.constructor()); log.push([performance.now(), m.camera.position.x, m.camera.position.y, m.camera.position.z, d.x, d.y, d.z, m.camera.fov, m.astro.model.visible ? 1 : 0, +document.getElementById('sheen').style.opacity || 0, m.mode]); if (log.length < 900) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
+await page.mouse.click(p[0], p[1]); const t0 = Date.now();
+for (const [i, at] of [[1, 500], [2, 1300], [3, 2150], [4, 2800]]) { await page.waitForTimeout(Math.max(0, at - (Date.now() - t0))); await page.screenshot({ path: `${OUT}/40-suit-fly-${i}.png` }); }
+await page.waitForFunction(() => window.__mw.mode === 'habitat', null, { timeout: 15000 }); await page.waitForTimeout(300); await page.screenshot({ path: `${OUT}/40-suit-fly-5-first-person.png` });
+const r = await page.evaluate(() => { const L = window.__fly.filter((x) => x[10] === 'toHabitat'); let dp = 0, da = 0, df = 0; for (let i = 1; i < L.length; i++) { const a = L[i - 1], b = L[i]; dp = Math.max(dp, Math.hypot(b[1] - a[1], b[2] - a[2], b[3] - a[3])); da = Math.max(da, Math.acos(Math.min(1, a[4] * b[4] + a[5] * b[5] + a[6] * b[6])) * 180 / Math.PI); df = Math.max(df, Math.abs(b[7] - a[7])); } const hide = L.find((x) => x[8] === 0); return { frames: L.length, seconds: +((L[L.length - 1][0] - L[0][0]) / 1000).toFixed(2), maxStepM: +dp.toFixed(3), maxTurnDeg: +da.toFixed(2), maxFovStepDeg: +df.toFixed(2), maxTint: Math.max(...L.map((x) => x[9])), suitHiddenAtS: hide ? +((hide[0] - L[0][0]) / 1000).toFixed(2) : null, mode: window.__mw.mode }; });
+console.log(JSON.stringify(r)); await browser.close();

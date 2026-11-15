@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Areographic - Habitat Planning Display</title>
+<link rel="icon" type="image/png" href="../assets/brand/mark-64.png"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="data/grid.js"></script>
+<script src="data/sites.js"></script>
+<style>
+  :root{
+    --ink:#dce7fa; --paper:#0b1026; --card:#111a3d; --card2:#0d1430; --line:#28356b; --dim:#8295c2;
+    --blue:#2b6fd4; --cyan:#45cfee;
+    --orange:#f5a623; --orange-bg:#2b2410; --ok:#35c58f; --ok-bg:#0e2e22;
+    --warn:#f5a623; --warn-bg:#2b2410; --danger:#ff5d6c; --danger-bg:#381524;
+    --mono:"SF Mono",Menlo,monospace; --shadow:0 4px 20px rgba(2,6,20,.55);
+    --navw:212px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--paper);color:var(--ink);
+    font-family:-apple-system,"Apple SD Gothic Neo","Pretendard",sans-serif;font-size:13px;line-height:1.5}
+  #map{position:absolute;inset:0;background:#070b1d}
+  .leaflet-container{background:#070b1d;font:inherit}
+  button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:8px 14px;cursor:pointer;font:inherit}
+  button:hover{border-color:#3d4f92}
+  button.pri{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:700}
+  button.cta{background:var(--orange);color:#131a38;border-color:var(--orange);font-weight:700}
+  button.pri:disabled,button.cta:disabled{opacity:.35;cursor:default}
+  button.sm{padding:4px 10px;font-size:12px;border-radius:7px}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+  /* Top bar */
+  #topbar{position:absolute;top:0;left:0;right:0;height:49px;z-index:1200;display:flex;align-items:center;gap:14px;
+    padding:8px 16px;background:#ffffff;border-bottom:1px solid #dfe3ec}
+  #logoChip{display:flex;align-items:center}
+  #logo{height:42px;margin:-5px 0;display:block}
+  #screenTitle{font-weight:800;font-size:14px;flex:1;color:#1c2733}
+  .pill{border-radius:99px;padding:2px 11px;font-size:12px;font-weight:700}
+  .pill.ok{background:var(--ok-bg);color:var(--ok)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn)}
+  .pill.danger{background:var(--danger-bg);color:var(--danger)}
+  .pill.dim{background:#1a2450;color:var(--dim)}
+  .modebadge{border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-weight:700;color:var(--dim);white-space:nowrap}
+  .modebadge.ctrl{background:var(--cyan);border-color:var(--cyan);color:#071022}
+
+  /* Left nav (dock / collapse) */
+  #nav{position:absolute;top:49px;left:0;bottom:0;width:var(--navw);z-index:1150;display:flex;flex-direction:column;
+    background:var(--card);border-right:1px solid var(--line);padding:10px 8px;transition:width .18s}
+  #nav.min{width:58px}
+  #nav .mi{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:9px;cursor:pointer;color:var(--ink);white-space:nowrap;overflow:hidden}
+  #nav .mi:hover{background:#18224c}
+  #nav .mi.on{background:rgba(69,207,238,.13);color:var(--cyan);font-weight:700}
+  #nav .mi.dis{opacity:.42}
+  #nav .mi .ic{width:20px;text-align:center;flex-shrink:0}
+  #nav.min .mi .tx{display:none}
+  #nav hr{border:none;border-top:1px solid var(--line);margin:8px 2px;width:auto}
+  #nav .spacer{flex:1}
+  #navToggle{margin:6px 4px 2px;text-align:center}
+
+  /* KPI strip (habitat) */
+  #kpibar{position:absolute;top:49px;left:var(--navw);right:0;z-index:1140;display:none;align-items:center;gap:16px;
+    padding:7px 18px;background:rgba(9,13,32,.94);border-bottom:1px solid var(--line);transition:left .18s}
+  #kpibar .ev{font-weight:800}
+  .kpi{color:var(--dim);white-space:nowrap}
+  .kpi b{color:var(--ink);font-family:var(--mono);font-weight:600}
+  #kpiTrack{width:120px;height:5px;border-radius:3px;background:#1a2450;overflow:hidden}
+  #kpiFill{height:5px;border-radius:3px;background:var(--cyan);width:0%;display:block}
+
+  /* Flow panel */
+  #panel{position:absolute;top:62px;left:calc(var(--navw) + 14px);bottom:14px;width:372px;z-index:1100;display:none;flex-direction:column;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;transition:left .18s}
+  #panelHead{padding:13px 16px 11px;border-bottom:1px solid var(--line)}
+  #panelHead h2{margin:0;font-size:16px;font-weight:800}
+  #panelHead p{margin:3px 0 0;color:var(--dim)}
+  #panelBody{flex:1;overflow-y:auto;padding:14px 16px}
+  #panelFoot{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;background:var(--card)}
+
+  .sec{margin:0 0 15px}
+  .sec h3{margin:0 0 8px;font-size:12px;color:var(--dim);font-weight:700;letter-spacing:.03em}
+  .cardbox{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+  .note{color:var(--dim);font-size:11.5px;line-height:1.55}
+  .kv{display:flex;justify-content:space-between;margin:4px 0;gap:10px}
+  .kv span:first-child{color:var(--dim)}
+  .kv b{font-family:var(--mono);font-weight:600}
+
+  /* Indicator priority */
+  .indrow{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-bottom:6px;cursor:grab}
+  .indrow.dragging{opacity:.45;border-style:dashed}
+  .indrow.dragover{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan)}
+  .indrow .grip{color:var(--dim);font-size:13px;cursor:grab;flex-shrink:0}
+  .indrow .rk{width:21px;height:21px;border-radius:99px;background:var(--blue);color:#fff;font-weight:800;font-size:11.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .indrow .nm{flex:1}
+  .indrow .nm small{display:block;color:var(--dim);font-size:10.5px;line-height:1.35}
+  .indrow .wv{font-family:var(--mono);color:var(--orange);font-weight:700;font-size:12px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chips button{flex:1;font-size:12px;padding:6px 6px;border-radius:8px;white-space:nowrap}
+  .chips button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .lockbox{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:10px 13px}
+  .lockbox .kv b{font-family:inherit}
+  .lockbox .ttl{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:5px}
+
+  /* Candidate site cards */
+  .cand{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;cursor:pointer}
+  .cand:hover{border-color:#3d4f92}
+  .cand.sel{border-color:var(--orange);box-shadow:0 0 0 1px var(--orange)}
+  .cand.lock{opacity:.6;cursor:default;background:var(--card2)}
+  .cand .r1{display:flex;align-items:center;gap:8px}
+  .cand .rank{width:22px;height:22px;border-radius:99px;background:var(--blue);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cand .r1 b{flex:1;font-size:13.5px}
+  .cand .dist{color:var(--dim);font-family:var(--mono);font-size:12px}
+  .cand .sc{font-family:var(--mono);font-weight:800;font-size:16px;color:var(--orange)}
+  .tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+  .tag{border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--dim);background:var(--paper)}
+  .tag.sci{color:var(--cyan);border-color:#1f4a6e;background:#0e2238}
+  .tag.warn2{color:var(--warn);border-color:#54430f;background:var(--warn-bg)}
+
+  .chk{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:7px}
+  .chk .ic2{flex:0 0 21px;width:21px;height:21px;border-radius:99px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800}
+  .ic2.ok{background:var(--ok)} .ic2.warn{background:var(--warn)} .ic2.danger{background:var(--danger)}
+  .chk span{flex:1}
+  .bar{height:7px;border-radius:4px;background:#1a2450;overflow:hidden;margin:4px 0 2px}
+  .fill{height:100%;background:var(--cyan);transition:width .4s}
+
+  /* Layer panel */
+  #layerbox{position:absolute;right:62px;bottom:14px;z-index:1210;width:282px;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;display:none}
+  .hintbtn{width:18px;height:18px;border-radius:99px;border:1px solid var(--line);background:var(--card2);color:var(--cyan);
+    font-size:11px;font-weight:800;padding:0;cursor:pointer;flex-shrink:0;line-height:1;display:inline-flex;align-items:center;justify-content:center;vertical-align:1px}
+  .hintbtn:hover{border-color:var(--cyan)}
+  #tip{position:absolute;z-index:1650;display:none;max-width:270px;background:#1a2450;border:1px solid var(--cyan);
+    border-radius:9px;padding:9px 12px;font-size:11.5px;line-height:1.55;color:var(--ink);box-shadow:var(--shadow)}
+  .presetdesc{margin-top:7px;padding:7px 11px;border-radius:8px;background:rgba(69,207,238,.09);border:1px solid #1f4a6e;color:var(--cyan);font-size:11.5px}
+  .leaflet-bar a.on{background:var(--cyan)!important;color:#071022!important}
+  #layerBtn{font-size:21px;line-height:28px;font-weight:700;background:var(--orange)!important;color:#131a38!important}
+  #layerBtn.on{background:var(--cyan)!important;color:#071022!important}
+  #layerbox h3{margin:0 0 7px;font-size:12.5px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+  .legend{height:8px;border-radius:4px;margin:2px 0 1px;background:linear-gradient(90deg,#4a7fc1,#3fae6a,#d7c427,#e8872a,#dd4a1e)}
+  .legend-lab{display:flex;justify-content:space-between;color:var(--dim);font-size:10.5px;margin-bottom:5px}
+  .lrow{display:flex;align-items:center;gap:7px;margin:5px 0}
+  .lrow input[type=checkbox]{accent-color:var(--orange)}
+  .lrow label{flex:1;cursor:pointer;font-size:12.5px}
+  #presets{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
+  #presets button{flex:1;font-size:11.5px;padding:5px 4px;border-radius:7px;white-space:nowrap}
+  #presets button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+  /* Full-screen pages (status / analysis) */
+  #page{position:absolute;top:49px;left:var(--navw);right:0;bottom:0;z-index:1050;display:none;overflow-y:auto;
+    background:var(--paper);padding:22px 28px;transition:left .18s}
+  #page h2{font-size:18px;font-weight:800}
+  .pagegrid{display:grid;grid-template-columns:400px minmax(0,1fr);gap:18px;max-width:1120px;align-items:start}
+  @media (max-width:980px){.pagegrid{grid-template-columns:1fr}}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;max-width:1120px}
+  .pagecard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 17px}
+  .pagecard h3{margin:0 0 10px;font-size:12.5px;font-weight:800;color:var(--dim);letter-spacing:.03em}
+  .arcitem{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:7px;background:var(--card2)}
+
+  /* Crew summary at nav bottom */
+  #crewbox{border-top:1px solid var(--line);margin:8px 2px 0;padding-top:8px;cursor:pointer}
+  .cmini{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px}
+  .cmini:hover{background:#18224c}
+  .cmini .av{width:24px;height:24px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#071022;flex-shrink:0}
+  .cmini .cinfo{flex:1;min-width:0}
+  .cmini .cinfo b{display:block;font-size:12px;line-height:1.3}
+  .cmini .cinfo small{color:var(--dim);font-size:10.5px;font-family:var(--mono)}
+  #nav.min .cmini .cinfo{display:none}
+
+  /* Data source (top, no background) */
+  #datasrc{position:absolute;top:57px;right:16px;z-index:1040;color:#fff;font-size:10.5px;letter-spacing:.01em;
+    text-shadow:0 1px 4px rgba(0,0,0,.7), 0 0 2px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap}
+
+  /* Map legend */
+  #maplegend{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:1040;display:flex;gap:14px;align-items:center;
+    background:rgba(13,20,46,.88);border:1px solid var(--line);border-radius:99px;padding:6px 16px;font-size:10.5px;color:var(--dim);white-space:nowrap}
+  #maplegend span{display:flex;align-items:center;gap:5px}
+  #maplegend i{display:inline-block;flex-shrink:0}
+  .lg-sq{width:10px;height:10px;border-radius:2px;background:linear-gradient(90deg,#4a7fc1,#d7c427,#dd4a1e)}
+  .lg-dia{width:8px;height:8px;background:#f5a623;transform:rotate(45deg);border:1px solid #071022}
+  .lg-dot{width:10px;height:10px;border-radius:99px;background:#e8872a;border:1.5px solid #fff}
+  .lg-ring{width:11px;height:11px;border-radius:99px;border:1.5px dashed #35c58f}
+  .lg-crew{width:9px;height:9px;border-radius:99px;background:#f5a623;border:1.5px solid #fff;box-shadow:12px 0 0 -1px #2b6fd4, 12px 0 0 0 #fff}
+  @media (max-width:1100px){#maplegend{display:none}}
+
+  /* Habitat cards */
+  #envcard{position:absolute;top:104px;left:58%;transform:translateX(-50%);z-index:1100;width:250px;display:none;
+    background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);padding:12px 14px}
+  #envcard h3{margin:0 0 6px;font-size:12.5px;font-weight:800}
+  #guidecard{position:absolute;top:104px;right:14px;bottom:14px;z-index:1100;width:250px;display:none;flex-direction:column;gap:9px;
+    overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:13px 14px}
+  #guidecard h3{margin:0;font-size:13px;font-weight:800}
+  .act{border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .act.next{border-color:var(--cyan);background:rgba(69,207,238,.1)}
+  .act b{display:block}
+  .act small{color:var(--dim)}
+  .act .ck{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+  .act input{accent-color:var(--ok);margin-top:3px}
+  #ctrlpanel{position:absolute;top:104px;left:calc(var(--navw) + 14px);z-index:1090;width:286px;max-height:52%;overflow-y:auto;display:none;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;transition:left .18s}
+
+  /* Anomaly effects */
+  #alertglow{position:absolute;inset:0;z-index:1240;pointer-events:none;display:none;
+    box-shadow:inset 0 0 130px 34px rgba(255,93,108,.62)}
+  body.alerting #alertglow{display:block;animation:glowpulse 1.1s ease-in-out infinite}
+  @keyframes glowpulse{0%,100%{opacity:.22}50%{opacity:1}}
+  body.alerting #sheet .opt{animation:optblink 1.1s ease-in-out infinite}
+  body.alerting #sheet .opt:hover{animation-play-state:paused;border-color:var(--orange)}
+  @keyframes optblink{0%,100%{border-color:var(--line);box-shadow:none}50%{border-color:var(--danger);box-shadow:0 0 0 2.5px rgba(255,93,108,.4)}}
+  body.alerting #ctrlpanel,body.alerting #envcard,body.alerting #guidecard,
+  body.alerting #layerbox,body.alerting #maplegend{opacity:.3;transition:opacity .3s}
+
+  /* Alerts / sheet / modals */
+  #alertbar{position:absolute;top:88px;left:50%;transform:translateX(-50%);z-index:1300;display:none;
+    background:var(--danger-bg);border:1.5px solid var(--danger);color:var(--danger);border-radius:11px;padding:9px 18px;font-weight:700;box-shadow:var(--shadow)}
+  #sheet{position:absolute;left:calc(var(--navw) + 14px);right:278px;bottom:14px;z-index:1260;display:none;
+    background:var(--card);border:1.5px solid var(--danger);border-radius:14px;box-shadow:var(--shadow);padding:15px 18px;transition:left .18s}
+  #sheet h3{margin:0 0 3px;font-size:14px;color:var(--danger)}
+  #sheet .opts{display:flex;gap:10px;margin-top:11px}
+  #sheet .opt{flex:1;background:var(--card2);border:1.5px solid var(--line);border-radius:11px;padding:11px 13px;cursor:pointer}
+  #sheet .opt:hover{border-color:var(--orange)}
+  #sheet .opt b{display:block;margin-bottom:3px}
+  #toast{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:1400;display:none;
+    background:#1a2450;color:var(--ink);border:1px solid var(--cyan);border-radius:10px;padding:10px 18px;box-shadow:var(--shadow);max-width:70%}
+  .modal{position:absolute;inset:0;z-index:1500;display:none;background:rgba(3,6,18,.66);align-items:center;justify-content:center}
+  .modal .box{width:460px;max-height:82%;overflow-y:auto;background:var(--card);border-radius:16px;padding:22px 26px;box-shadow:var(--shadow)}
+  .modal h2{margin:0 0 10px;font-size:17px}
+  .modal h4{margin:14px 0 7px;font-size:12px;color:var(--dim);letter-spacing:.03em}
+  .set-kv{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:7px 0}
+  .set-kv input[type=number]{width:72px;border:1px solid var(--line);border-radius:7px;padding:4px 8px;font:inherit;text-align:right;background:var(--card2);color:var(--ink)}
+  .set-kv input:disabled{background:#0a0f24;color:var(--dim)}
+
+  .leaflet-tooltip{background:var(--card);border:1px solid var(--line);color:var(--ink);box-shadow:var(--shadow);border-radius:7px}
+  .leaflet-popup-content-wrapper{background:var(--card);color:var(--ink);border-radius:11px;box-shadow:var(--shadow)}
+  .leaflet-popup-tip{background:var(--card)}
+  .leaflet-bar a{background:var(--card);color:var(--ink);border-color:var(--line)}
+  .leaflet-control-scale-line{background:rgba(17,26,61,.8);color:var(--ink);border-color:var(--line)}
+  .leaflet-control-attribution{background:rgba(9,13,32,.8)!important;color:var(--dim)!important}
+  .basepin{background:var(--cyan);color:#071022;border-radius:6px;padding:2px 7px;font-weight:800;font-size:10.5px;white-space:nowrap;box-shadow:var(--shadow)}
+  .crewpin{border-radius:50%;width:15px;height:15px;border:2.5px solid #fff;box-sizing:border-box;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+  #logoAi{font-size:10.5px;font-weight:600;color:var(--dim);border:1px solid var(--line);border-radius:4px;padding:1px 6px;white-space:nowrap}
+  .lrow label .lsrc{display:block;font-size:10.5px;color:var(--dim);line-height:1.25;margin-top:1px}
+</style>
+<link rel="stylesheet" href="blueprint-theme.css"/>
+</head>
+<body>
+<div id="map"></div>
+
+<div id="topbar">
+  <span id="logoChip"><img id="logo" src="assets/logo.png" alt="Areographic"></span><span id="logoAi">AI-generated logo</span>
+  <span id="screenTitle"></span>
+</div>
+
+<div id="nav"></div>
+
+<div id="kpibar">
+  <span class="ev">EVA-01</span><span class="pill ok" id="kpiState">Marswalk in progress</span>
+  <span class="kpi">Elapsed <b id="kpiElapsed">00:00:00</b></span>
+  <span class="kpi">Return time <b id="kpiHome">–</b></span>
+  <span class="kpi">Distance <b id="kpiDist">–</b></span>
+  <span id="kpiTrack"><span id="kpiFill"></span></span>
+  <span class="kpi">Exploration priority here <b id="kpiIdx">–</b></span>
+</div>
+
+<div id="panel">
+  <div id="panelHead"><h2 id="phTitle"></h2><p id="phSub"></p></div>
+  <div id="panelBody"></div>
+  <div id="panelFoot"></div>
+</div>
+
+<div id="page"></div>
+<div id="datasrc">NASA Trek · grid = CRISM / SIM3464 / DEM real data (marswalk_handoff)</div>
+<div id="maplegend">
+  <span><i class="lg-sq"></i>Exploration priority grid (blue low → red high)</span>
+  <span><i class="lg-dot"></i>Candidate site · dashed = excluded for safety</span>
+  <span><i class="lg-dia"></i>Rover finds</span>
+  <span><i class="lg-ring"></i>Return range</span>
+  <span><i class="lg-crew" style="margin-right:12px"></i>Astronauts A·B</span>
+</div>
+<div id="layerbox"></div>
+<div id="ctrlpanel"></div>
+<div id="envcard"></div>
+<div id="guidecard"></div>
+
+<div id="alertglow"></div>
+<div id="alertbar"></div>
+<div id="sheet"></div>
+<div id="toast"></div>
+<div id="tip"></div>
+<div class="modal" id="guideModal"><div class="box" id="guideBox"></div></div>
+<div class="modal" id="setModal"><div class="box" id="setBox"></div></div>
+<div class="modal" id="endModal"><div class="box" id="endBox"></div></div>
+<div class="modal" id="crewModal"><div class="box" id="crewBox"></div></div>
+
+<script>
+'use strict';
+/* ════════ Settings (persisted in localStorage) ════════ */
+const SET_DEFAULT = {
+  preset: 'Science default', order: ['S1', 'S2', 'S4', 'S3', 'S5'], formula: 'ROC',
+  rangeKm: 3.0,
+  crewA: { name: 'Alex Rivera', mass: 65, load: 18 },
+  crewB: { name: 'Sam Lee', mass: 80, load: 22 },
+  safety: { slopeMax: 25, reserve: 0.15, doseBudget: 1.0, unlocked: false }
+};
+let SET;
+try { SET = Object.assign({}, SET_DEFAULT, JSON.parse(localStorage.getItem('areo_set_v2') || '{}')); }
+catch (e) { SET = JSON.parse(JSON.stringify(SET_DEFAULT)); }
+SET.safety = Object.assign({}, SET_DEFAULT.safety, SET.safety || {});
+['crewA', 'crewB'].forEach(k => {   // migrate old format (string name + shared mass)
+  if (typeof SET[k] === 'string') SET[k] = { name: SET[k], mass: SET.mass || 80, load: SET.load || 20 };
+  SET[k] = Object.assign({}, SET_DEFAULT[k], SET[k] || {});
+});
+['crewA', 'crewB'].forEach(k => { if (/[\uAC00-\uD7A3]/.test(SET[k].name)) SET[k].name = SET_DEFAULT[k].name; });   // migrate old Korean default names
+if (SET.preset && !PRESET_RANKS[SET.preset]) SET.preset = SET_DEFAULT.preset;
+if (SET.rangeKm === 3.5) SET.rangeKm = SET_DEFAULT.rangeKm;   // an earlier build widened the default   // migrate old Korean preset key
+function saveSet() { localStorage.setItem('areo_set_v2', JSON.stringify(SET)); }
+
+/* Weights - computed from rank by formula (Barron & Barrett 1996, not hand-picked) */
+function calcWeights(order, formula) {
+  const N = order.length, W = {};
+  order.forEach((k, idx) => {
+    const i = idx + 1;
+    if (formula === 'RS') W[k] = (N + 1 - i) / (N * (N + 1) / 2);
+    else { let s = 0; for (let j = i; j <= N; j++) s += 1 / j; W[k] = s / N; }   // ROC
+  });
+  return W;
+}
+let WEIGHTS = calcWeights(SET.order, SET.formula);
+
+/* ════════ Grid (3,067 real-data cells) ════════ */
+const CELLS = GRID.features.map(f => {
+  const ring = f.geometry.coordinates[0];
+  const xs = ring.map(p => p[0]), ys = ring.map(p => p[1]);
+  return { minx: Math.min(...xs), maxx: Math.max(...xs), miny: Math.min(...ys), maxy: Math.max(...ys), p: f.properties };
+});
+function cellAt(lat, lon) {
+  for (const c of CELLS) if (lon >= c.minx && lon <= c.maxx && lat >= c.miny && lat <= c.maxy) return c.p;
+  return null;
+}
+function cellScore(p) {
+  if (!p) return null;
+  let raw = 0, wsum = 0;
+  for (const k of ['S1', 'S2', 'S3', 'S4', 'S5']) {
+    if (p[k] != null) { raw += WEIGHTS[k] * p[k]; wsum += WEIGHTS[k]; }
+  }
+  return wsum ? Math.round(raw / wsum / 4 * 1000) / 10 : null;
+}
+function scoreColor(v) { return v == null ? '#999' : v < 30 ? '#4a7fc1' : v < 45 ? '#3fae6a' : v < 62 ? '#d7c427' : v < 80 ? '#e8872a' : '#dd4a1e'; }
+
+/* ════════ Map ════════ */
+const MarsCRS = L.Util.extend({}, L.CRS.EPSG4326, { R: 3389500 });
+const map = L.map('map', { crs: MarsCRS, zoomControl: false, attributionControl: false, minZoom: 3, maxZoom: 17 })
+  .setView([BASE.lat + 0.015, BASE.lon - 0.012], 13);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+const LayerCtl = L.Control.extend({
+  options: { position: 'bottomright' },
+  onAdd() {
+    const d = L.DomUtil.create('div', 'leaflet-bar');
+    const a = L.DomUtil.create('a', '', d);
+    a.href = '#'; a.id = 'layerBtn'; a.title = 'Data layers'; a.innerHTML = '≋';
+    L.DomEvent.on(a, 'click', e => { L.DomEvent.stop(e); S.layerOpen = !S.layerOpen; render(); });
+    return d;
+  }
+});
+map.addControl(new LayerCtl());
+L.control.scale({ position: 'bottomright', imperial: false }).addTo(map);
+
+const TREK = 'https://trek.nasa.gov/tiles/Mars/EQ/';
+function trekLayer(id, ext, maxNative, pane, extra) {
+  const opts = Object.assign({ maxNativeZoom: maxNative, maxZoom: 17, noWrap: true }, extra || {});
+  if (pane) opts.pane = pane;
+  return L.tileLayer(TREK + id + '/1.0.0/default/default028mm/{z}/{y}/{x}.' + ext, opts);
+}
+trekLayer('Mars_Viking_MDIM21_ClrMosaic_global_232m', 'jpg', 7).addTo(map);
+map.createPane('p_optical').style.zIndex = 215;
+trekLayer('NES_JEZ_MID_Visible_Mosaic_HiRISE_CTX_HRSC_GCS_MARS_07-10-2018', 'png', 17, 'p_optical',
+  { bounds: [[17.579, 76.791], [18.693, 77.731]] }).addTo(map);
+
+/* 4 grid layers (canvas render) */
+function gridLayer(pane, styleFn) {
+  map.createPane(pane);
+  return L.geoJSON(GRID, { renderer: L.canvas({ pane }), pane, style: styleFn, interactive: false });
+}
+const scoreL = gridLayer('p_score', f => {
+  const v = cellScore(f.properties);
+  return { stroke: false, fillColor: scoreColor(v), fillOpacity: v == null ? 0 : 0.14 + v / 100 * 0.42 };
+});
+const slopeL = gridLayer('p_slope', f => {
+  const s = f.properties.slope_deg;
+  const sig = s > 15;
+  return { stroke: sig, color: '#f5a623', weight: 1, opacity: .85,
+    fillColor: s > 25 ? '#ff5d6c' : s > 15 ? '#f5a623' : '#8295c2', fillOpacity: s > 25 ? .5 : s > 15 ? .35 : .07 };
+});
+const commL = gridLayer('p_comm', f => {
+  const sh = f.properties.comm === 'shadow';
+  return { stroke: sh, color: '#45cfee', weight: 1, opacity: .8, fillColor: '#16335e', fillOpacity: sh ? .42 : 0 };
+});
+const rockL = gridLayer('p_rock', f => {
+  const r = f.properties.rock || 0;
+  return { stroke: r >= 0.3, color: '#c98a4b', weight: 1, opacity: .8, fillColor: '#8a5c33', fillOpacity: r * .5 };
+});
+
+/* Vector / pin layers */
+map.createPane('p_water'); map.createPane('p_pin');
+const waterG = L.layerGroup();
+WATER.polys.forEach(p => L.polygon(p.pts, { pane: 'p_water', color: p.color, weight: 1.5, fillColor: p.color, fillOpacity: .25 })
+  .bindTooltip(p.name + ' · approx.').addTo(waterG));
+WATER.dots.forEach(d => L.circleMarker([d.lat, d.lon], { pane: 'p_water', radius: 5, color: '#fff', weight: 1.5, fillColor: '#3b86d4', fillOpacity: .95 }).bindTooltip(d.name).addTo(waterG));
+const pinG = L.layerGroup();
+PINS.forEach(p => L.marker([p.lat, p.lon], { pane: 'p_pin',
+  icon: L.divIcon({ className: '', html: '<div style="width:11px;height:11px;background:#f5a623;transform:rotate(45deg);border:1.5px solid #071022;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div>', iconSize: [11, 11] }) })
+  .bindPopup('<b>' + p.name + '</b><br><span style="color:#76808c">' + p.desc + '</span>').addTo(pinG));
+
+const OVL = {
+  score:  { name: 'Exploration priority grid (real data)', src: 'CRISM clay/carbonate + USGS SIM3464 sediment/delta · 160 m grid', on: true,  op: 1,  lyr: scoreL, legend: true },
+  water:  { name: 'Water & mineral traces', src: 'Traced from CRISM and USGS SIM3464 (approx.)', on: false, op: .85, lyr: waterG },
+  pins:   { name: 'Rover find pins', src: 'Perseverance (Mars 2020) mission sites · NASA/JPL', on: true,  op: 1,  lyr: pinG },
+  slope:  { name: 'Slope (safety gate)', src: 'DEM (product ID unconfirmed)', on: false, op: .9, lyr: slopeL },
+  comm:   { name: 'Comm shadow (DEM line of sight)', src: 'DEM line of sight (product ID unconfirmed)', on: false, op: .8, lyr: commL },
+  rock:   { name: 'Rock cover (THEMIS thermal inertia)', src: 'Mars Odyssey THEMIS thermal inertia (Edwards & Buz 2021)', on: false, op: .8, lyr: rockL },
+  terrain:{ name: 'Topography MOLA', src: 'MGS MOLA shaded relief · NASA Mars Trek', on: false, op: .7, lyr: (map.createPane('p_terrain'), trekLayer('Mars_MGS_MOLA_ClrShade_merge_global_463m', 'jpg', 7, 'p_terrain')) },
+  thermal:{ name: 'Thermal THEMIS night', src: 'Mars Odyssey THEMIS night IR · NASA Mars Trek', on: false, op: .6, lyr: (map.createPane('p_thermal'), trekLayer('THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018', 'png', 9, 'p_thermal')) }
+};
+const ovlOrder = ['score', 'water', 'pins', 'slope', 'comm', 'rock', 'terrain', 'thermal'];
+const paneOf = { score: 'p_score', water: 'p_water', pins: 'p_pin', slope: 'p_slope', comm: 'p_comm', rock: 'p_rock', terrain: 'p_terrain', thermal: 'p_thermal' };
+ovlOrder.forEach((k, i) => { map.getPane(paneOf[k]).style.zIndex = 250 + i * 10; });
+function applyOvl(k) {
+  const o = OVL[k];
+  if (o.on) o.lyr.addTo(map); else map.removeLayer(o.lyr);
+  map.getPane(paneOf[k]).style.opacity = o.op;
+}
+Object.keys(OVL).forEach(applyOvl);
+
+const LPRESETS = {
+  'Science': ['score', 'water', 'pins'],
+  'Safety': ['slope', 'comm', 'rock'],
+  'Geology': ['terrain', 'water', 'pins'],
+  'Thermal': ['thermal', 'pins']
+};
+let activePreset = 'Science';
+function applyLPreset(name) {
+  activePreset = name;
+  Object.keys(OVL).forEach(k => { OVL[k].on = LPRESETS[name].includes(k); applyOvl(k); });
+  renderLayerbox();
+}
+function renderLayerbox() {
+  const lb = document.getElementById('layerbox');
+  lb.innerHTML = '<h3>Data layers (stacked) <button class="hintbtn" id="lbGuide">?</button></h3>' +
+    ovlOrder.map(k => {
+      const o = OVL[k];
+      return (o.legend && o.on ? '<div class="legend"></div><div class="legend-lab"><span>25</span><span>Exploration priority</span><span>100</span></div>' : '') +
+        '<div class="lrow"><input type="checkbox" id="ck_' + k + '" ' + (o.on ? 'checked' : '') + '>' +
+        '<label for="ck_' + k + '">' + o.name + (o.src ? '<small class="lsrc">' + o.src + '</small>' : '') + '</label></div>';
+    }).join('') +
+    '<div class="note" style="margin-top:6px">Suggested sets</div><div id="presets">' +
+    Object.keys(LPRESETS).map(n => '<button class="' + (activePreset === n ? 'on' : '') + '" data-pre="' + n + '">' + n + '</button>').join('') + '</div>';
+  ovlOrder.forEach(k => {
+    document.getElementById('ck_' + k).onchange = e => { OVL[k].on = e.target.checked; activePreset = null; applyOvl(k); renderLayerbox(); };
+  });
+  lb.querySelectorAll('[data-pre]').forEach(b => b.onclick = () => applyLPreset(b.dataset.pre));
+  document.getElementById('lbGuide').onclick = openGuide;
+}
+
+/* ════════ Common ════════ */
+L.marker([BASE.lat, BASE.lon], { icon: L.divIcon({ className: '', html: '<div class="basepin">🚩 Habitat</div>', iconSize: [60, 16] }) }).addTo(map);
+const wbRing = L.circle([BASE.lat, BASE.lon], { radius: 3000, color: '#35c58f', weight: 1.5, fillColor: '#35c58f', fillOpacity: .04, dashArray: '4 4' })
+  .bindTooltip('Return range (consumables, round trip)').addTo(map);
+const routeG = L.layerGroup().addTo(map);
+const simG = L.layerGroup().addTo(map);
+const siteG = L.layerGroup().addTo(map);
+
+function hint(text) {
+  return '<button class="hintbtn" data-tip="' + text.replace(/"/g, '&quot;') + '">?</button>';
+}
+document.addEventListener('click', e => {
+  const tip = document.getElementById('tip');
+  const b = e.target.closest('.hintbtn');
+  if (b && b.dataset.tip) {
+    tip.textContent = b.dataset.tip;
+    tip.style.display = 'block';
+    const r = b.getBoundingClientRect();
+    const w = Math.min(270, window.innerWidth - 24);
+    let x = Math.min(Math.max(r.left - 20, 10), window.innerWidth - w - 14);
+    tip.style.left = x + 'px';
+    tip.style.top = Math.min(r.bottom + 7, window.innerHeight - 120) + 'px';
+    e.stopPropagation();
+  } else if (!e.target.closest('#tip')) tip.style.display = 'none';
+}, true);
+function toast(msg, ms) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(t._tm); t._tm = setTimeout(() => t.style.display = 'none', ms || 2800);
+}
+const fmtT = m => String(Math.floor(m / 60) % 24).padStart(2, '0') + ':' + String(Math.round(m % 60)).padStart(2, '0');
+const fmtDur = m => m >= 60 ? Math.floor(m / 60) + 'h ' + Math.round(m % 60) + 'min' : Math.round(m) + 'min';
+
+/* ════════ Model (1_model_spec - pure functions) ════════ */
+const SPEED_MS = 0.75, SPEED = SPEED_MS * 60;   // 45 m/min
+const WORKMIN = 90;
+function pandolf(slopeDeg, uphill) {
+  const M = (SET.crewA.mass + SET.crewB.mass) / 2, L = (SET.crewA.load + SET.crewB.load) / 2, v = SPEED_MS;
+  const G = uphill ? Math.tan(slopeDeg * Math.PI / 180) * 100 : 0;   // return (downhill) = 0, conservative
+  return 1.5 * M + 2 * (M + L) * Math.pow(L / M, 2) + MODEL.eta * (M + L) * (1.5 * v * v + 0.35 * v * G * MODEL.gMars);
+}
+function walkRadiusM(minRemainMin) {
+  // return limit: round trip ÷2 + reserve (§3) - walking budget excluding task time
+  const budget = Math.max(minRemainMin - WORKMIN, 0);
+  return budget * SPEED * (1 - SET.safety.reserve) / 2;
+}
+const FULL_RADIUS_KM = walkRadiusM(Math.min(...MODEL.consumables.map(c => c.cap))) / 1000;
+
+/* ════════ State ════════ */
+const S = {
+  screen: 'home', site: null, planB: false, emergOk: false,
+  ctrlTab: 'mon', layerOpen: false, analyzed: false, actions: { sample: false, analysis: false, crew: false },
+  log: [], sim: null, archive: []
+};
+
+/* Site evaluation - score from real grid data, gates from safety limits */
+function distKm(a, b) { return map.distance(a, b) / 1000; }
+function evalSpot(sp) {
+  const cell = cellAt(sp.lat, sp.lon);
+  const sc = cellScore(cell);
+  const d = distKm([BASE.lat, BASE.lon], [sp.lat, sp.lon]);
+  const effRange = Math.min(SET.rangeKm, FULL_RADIUS_KM);
+  const locks = [];
+  if (d > effRange) locks.push('Out of search range (' + d.toFixed(1) + ' km > ' + effRange.toFixed(1) + ' km)');
+  if (cell && cell.slope_deg > SET.safety.slopeMax) locks.push('Slope ' + cell.slope_deg + '° > limit ' + SET.safety.slopeMax + '°');
+  return { sp, cell, sc, d, locks, comm: cell ? cell.comm : null };
+}
+function evalAll() { return SPOTS.map(evalSpot).sort((a, b) => (b.sc || 0) - (a.sc || 0)); }
+
+window.goPin = function (id) {
+  const sp = SPOTS.find(x => x.id === id);
+  if (!sp || !ROUTES[id]) return;
+  S.site = sp; S.planB = false; S.screen = 'route';
+  collapseNav(false); map.closePopup(); render();
+};
+function drawSites() {
+  siteG.clearLayers();
+  const simActive = S.sim && !S.sim.done;
+  evalAll().forEach(ev => {
+    const locked = ev.locks.length > 0;
+    const fit = !locked && ROUTES[ev.sp.id];
+    const popup =
+      '<div style="min-width:198px"><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">' +
+      '<b style="flex:1">' + ev.sp.name + '</b>' +
+      '<span style="font-family:var(--mono);font-weight:800;font-size:17px;color:' + (locked ? '#8295c2' : '#f5a623') + '">' + (ev.sc == null ? '-' : ev.sc + '<small style=\"font-size:11px\"> pts</small>') + '</span></div>' +
+      '<div class="note" style="margin-bottom:6px">Exploration priority (real grid data) · from habitat ' + ev.d.toFixed(1) + ' km</div>' +
+      (fit
+        ? '<span class="pill ok">Suitable</span>' + (ev.comm === 'shadow' ? ' <span class="pill warn">Comm shadow - contingency needed</span>' : '')
+        : '<span class="pill danger">Not suitable</span><div class="note" style="margin-top:5px">' + (ev.locks.join('<br>') || 'No route defined') + '</div>') +
+      (fit && !simActive ? '<button class="cta sm" style="width:100%;margin-top:9px" onclick="goPin(\'' + ev.sp.id + '\')">Plan Marswalk →</button>' : '') +
+      '</div>';
+    L.circleMarker([ev.sp.lat, ev.sp.lon], {
+      radius: 8.5, color: '#fff', weight: 2,
+      fillColor: locked ? '#55658f' : scoreColor(ev.sc), fillOpacity: .95, dashArray: locked ? '2 3' : null
+    }).bindTooltip(ev.sp.name + ' · ' + (ev.sc == null ? 'off grid' : 'Exploration priority ' + ev.sc) + (locked ? ' · locked' : ''))
+      .bindPopup(popup)
+      .addTo(siteG);
+  });
+}
+
+/* ════════ Left nav ════════ */
+function collapseNav(on) {
+  document.body.classList.toggle('navmin', on);
+  document.getElementById('nav').classList.toggle('min', on);
+  document.documentElement.style.setProperty('--navw', on ? '58px' : '212px');
+}
+function navItems() {
+  const simActive = S.sim && !S.sim.done;
+  const items = [['home', '🗺', 'Map home'], ['status', '🗂', 'Marswalk status']];
+  if (!simActive) items.push(['auto', '🧬', 'Site search & analysis']);   // route plan / pre-departure check reachable only via analysis
+  if (S.sim) items.push(['ctrl', '📡', 'Live monitor (2D sim)']);
+  items.splice(1, 0, ['rep', '🛰', 'Cheyava mission (3D)']);   // the representative mission: planned here, carried out in the 3D scene
+  items.push(null, ['settings', '⚙', 'Settings'], ['guide', '❔', 'Guide']);
+  return items;
+}
+function crewVitals() {
+  const m = S.sim;
+  if (m && !m.done) return [
+    { n: SET.crewA.name, hr: Math.round(m.hr), o2: Math.round(Math.min(Math.max(m.rem.o2 / 480 * 100 * 1.03, 0), 100)), c: '#f5a623' },
+    { n: SET.crewB.name, hr: Math.round(m.hr * 0.96), o2: Math.round(Math.min(Math.max(m.rem.o2 / 480 * 100 * 0.97, 0), 100)), c: '#2b6fd4' }];
+  return [{ n: SET.crewA.name, hr: 68, o2: 100, c: '#f5a623' }, { n: SET.crewB.name, hr: 71, o2: 100, c: '#2b6fd4' }];
+}
+function renderNav() {
+  const nav = document.getElementById('nav');
+  nav.innerHTML = navItems().map(it => {
+    if (!it) return '<hr>';
+    const [k, ic, tx] = it;
+    const cur = S.screen === k || (k === 'auto' && ['route', 'check'].includes(S.screen));
+    if (k === 'rep' && !HUD.linked) return '';   // only inside the 3D app
+    return '<div class="mi ' + (cur ? 'on' : '') + '" data-k="' + k + '" title="' + tx + '">' +
+      '<span class="ic">' + ic + '</span><span class="tx">' + tx + '</span></div>';
+  }).join('') +
+    '<div class="spacer"></div>' +
+    '<div id="crewbox">' + crewVitals().map((c, i) =>
+      '<div class="cmini" data-cw="' + (i ? 'crewB' : 'crewA') + '" title="' + 'Edit ' + c.n + '"><span class="av" style="background:' + c.c + '">' + (i ? 'B' : 'A') + '</span>' +
+      '<span class="cinfo"><b>' + c.n + '</b><small id="cv' + i + '">HR ' + c.hr + ' · O₂ ' + c.o2 + '%</small></span></div>').join('') + '</div>' +
+    '<button class="sm" id="navToggle">' + (document.body.classList.contains('navmin') ? '»' : '« Collapse') + '</button>';
+  nav.querySelectorAll('.mi').forEach(el => el.onclick = () => {
+    const k = el.dataset.k;
+    if (k === 'settings') { openSettings(); return; }
+    if (k === 'guide') { openGuide(); return; }
+    collapseNav(k === 'auto');   // auto-collapse only in analysis, otherwise expanded (default)
+    S.screen = k; render();
+  });
+  document.querySelectorAll('#crewbox .cmini').forEach(el => el.onclick = () => openCrewModal(el.dataset.cw));
+  document.getElementById('navToggle').onclick = () => { collapseNav(!document.body.classList.contains('navmin')); renderNav(); };
+}
+
+/* ════════ Edit astronaut info (per astronaut) ════════ */
+function openCrewModal(which) {
+  const c = SET[which]; const label = which === 'crewA' ? 'Astronaut A' : 'Astronaut B';
+  const cb = document.getElementById('crewBox');
+  cb.innerHTML = '<h2>' + label + ' info</h2><div class="note">Edits this astronaut only - kept after save · metabolic rate uses the pair average</div>' +
+    '<div class="set-kv"><span>Name</span><input type="text" id="cw_n" value="' + c.name + '" style="width:120px;border:1px solid var(--line);border-radius:7px;padding:4px 8px;font:inherit;background:var(--card2);color:var(--ink)"></div>' +
+    '<div class="set-kv"><span>Body mass (kg)</span><input type="number" id="cw_m" step="1" min="50" max="120" value="' + c.mass + '"></div>' +
+    '<div class="set-kv"><span>Carried load (kg)</span><input type="number" id="cw_l" step="1" min="0" max="50" value="' + c.load + '"></div>' +
+    '<div class="kv" style="margin-top:8px"><span>Resting / max HR</span><b>70.5 / 186 bpm</b></div>' +
+    '<div class="kv"><span>Sustainable effort</span><b>VO₂peak 35%</b></div>' +
+    '<div class="note">HR model = calibrated on PhysioNet (992 people, measured) · consumables = Apollo PLSS measured</div>' +
+    '<div style="display:flex;gap:8px;margin-top:14px"><button id="cw_close">Close</button><button class="pri" id="cw_save" style="flex:1">Save</button></div>';
+  document.getElementById('crewModal').style.display = 'flex';
+  document.getElementById('cw_close').onclick = () => document.getElementById('crewModal').style.display = 'none';
+  document.getElementById('cw_save').onclick = () => {
+    c.name = document.getElementById('cw_n').value.trim() || label;
+    c.mass = +document.getElementById('cw_m').value || c.mass;
+    c.load = +document.getElementById('cw_l').value || c.load;
+    saveSet(); document.getElementById('crewModal').style.display = 'none';
+    toast(c.name + ' info saved'); render();
+  };
+}
+
+/* ════════ Screen: map home (map only) ════════ */
+function renderHome() { setTitle('Map home'); }
+
+/* ════════ Screen: Marswalk status (record archive) ════════ */
+function renderStatus() {
+  setTitle('Marswalk status');
+  const evs = evalAll();
+  document.getElementById('page').innerHTML =
+    '<h2 style="margin:0 0 3px">Marswalk status</h2><div class="note" style="margin-bottom:16px">Jezero forward habitat · 3,067 real-data grid cells · Marswalk record archive</div>' +
+    '<div class="statgrid">' +
+    '<div class="pagecard"><h3>Weather today (MEDA, simulated)</h3>' +
+    '<div class="kv"><span>Temperature</span><b>' + WEATHER.tempC + ' ℃</b></div>' +
+    '<div class="kv"><span>Wind</span><b>' + WEATHER.wind + ' m/s</b></div>' +
+    '<div class="kv"><span>Dust opacity τ</span><b>' + WEATHER.tau + '</b></div>' +
+    '<div class="kv"><span>Pressure</span><b>' + WEATHER.pressure + ' Pa</b></div>' +
+    '<div class="kv"><span>Space weather</span><span class="pill warn">Caution · DONKI replay</span></div></div>' +
+    '<div class="pagecard"><h3>Candidate sites (exploration priority, real data)</h3>' +
+    evs.map(ev => '<div class="kv"><span>' + ev.sp.name + '</span><span><b>' + (ev.sc == null ? '-' : ev.sc + ' pts') + '</b> ' +
+      (ev.locks.length ? '<span class="pill dim">Locked</span>' : '<span class="pill ok">Open</span>') + '</span></div>').join('') +
+    '<div class="note" style="margin-top:7px">Locked = safety limits applied ' + hint('Safety limits (search range, slope) are hard gates, independent of the score. They can only be changed in Settings.') + '</div></div>' +
+    '<div class="pagecard"><h3>Marswalk record archive</h3>' +
+    (S.archive.length ? S.archive.map(a =>
+      '<div class="arcitem"><span class="pill ok">' + (a.hud ? 'HUD-' : 'EVA-') + String(a.seq).padStart(2, '0') + '</span><span style="flex:1"><b>' + a.site + '</b><br>' +
+      '<small class="note">' + (a.hud ? a.acts : 'Distance ' + a.dist + ' km · dose ' + a.dose + ' mSv · ' + a.acts) + '</small></span></div>').join('')
+      : '<div class="note">No Marswalk completed yet - records are added automatically when one ends</div>') + '</div>' +
+    '<div class="pagecard"><h3>Recent activity log</h3>' +
+    (S.log.length ? S.log.slice(0, 10).map(l => '<div class="kv"><span style="font-family:var(--mono)">' + fmtT(540 + l.t) + '</span><span>' + l.msg + '</span></div>').join('')
+      : '<div class="note">No records - activity during monitoring appears here</div>') + '</div>' +
+    '</div>';
+}
+
+/* ════════ Screen: site search & analysis (full screen, live update) ════════ */
+function renderIndRows() {
+  return SET.order.map((k, i) => {
+    const ind = INDICATORS.find(x => x.key === k);
+    return '<div class="indrow" draggable="true" data-ind="' + k + '"><span class="grip">⠿</span><span class="rk">' + (i + 1) + '</span>' +
+      '<span class="nm">' + ind.name + '</span>' + hint(ind.desc) + '</div>';
+  }).join('');
+}
+let dragKey = null;
+function bindIndRows(rerender) {
+  document.querySelectorAll('.indrow[data-ind]').forEach(el => {
+    el.ondragstart = e => { dragKey = el.dataset.ind; el.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; };
+    el.ondragend = () => { el.classList.remove('dragging'); document.querySelectorAll('.indrow').forEach(x => x.classList.remove('dragover')); };
+    el.ondragover = e => { e.preventDefault(); if (el.dataset.ind !== dragKey) el.classList.add('dragover'); };
+    el.ondragleave = () => el.classList.remove('dragover');
+    el.ondrop = e => {
+      e.preventDefault();
+      const to = el.dataset.ind;
+      if (!dragKey || dragKey === to) return;
+      const from = SET.order.indexOf(dragKey), dest = SET.order.indexOf(to);
+      SET.order.splice(from, 1); SET.order.splice(dest, 0, dragKey);
+      dragKey = null; SET.preset = null; S.analyzed = true; applyWeights(); saveSet(); rerender();
+    };
+  });
+}
+function applyWeights() {
+  WEIGHTS = calcWeights(SET.order, SET.formula);
+  scoreL.setStyle(f => {
+    const v = cellScore(f.properties);
+    return { stroke: false, fillColor: scoreColor(v), fillOpacity: v == null ? 0 : 0.14 + v / 100 * 0.42 };
+  });
+  drawSites();
+}
+function basisTags(cell) {
+  if (!cell) return '';
+  const t = [];
+  if (cell.S1 != null) t.push('<span class="tag sci">S1 clay minerals ' + cell.S1 + '/4 (CRISM)</span>');
+  if (cell.S2 != null) t.push('<span class="tag sci">S2 sediment/delta ' + cell.S2 + '/4 (SIM3464)</span>');
+  if (cell.comm === 'shadow') t.push('<span class="tag warn2">Comm shadow - contingency needed</span>');
+  if (cell.rock >= 0.15) t.push('<span class="tag">Rock cover ' + Math.round(cell.rock * 100) + '%</span>');
+  return t.join('');
+}
+function renderAuto() {
+  setTitle('Site search & analysis');
+  const PRESET_DESC = {
+    'Science default': 'Clay minerals first - iMOST preservation-mineral priority as is (best for organic preservation)',
+    'Follow the water': 'Water activity first - channels and hydrated minerals',
+    'Verified first': 'Rover-measured sites first - confirmed evidence first (gentle weighting)'
+  };
+  const evs = evalAll();
+  const ok = evs.filter(e => !e.locks.length), locked = evs.filter(e => e.locks.length);
+  if (!S.site || !ok.find(e => e.sp.id === S.site.id)) S.site = ok.length ? ok[0].sp : null;
+  document.getElementById('page').innerHTML =
+    '<h2 style="margin:0 0 3px">Site search & analysis</h2>' +
+    '<div class="note" style="margin-bottom:16px">Changing the priority rescores all 3,067 grid cells at once - indicator levels are scored automatically from real data (CRISM, geology, DEM)</div>' +
+    '<div class="pagegrid">' +
+    '<div>' +
+    '<div class="pagecard"><h3>Suggested priorities</h3><div class="chips">' +
+    Object.keys(PRESET_RANKS).map(n => '<button class="' + (S.analyzed && SET.preset === n ? 'on' : '') + '" data-rp="' + n + '">' + n + '</button>').join('') + '</div>' +
+    (S.analyzed ? (SET.preset && PRESET_DESC[SET.preset] ? '<div class="presetdesc">' + PRESET_DESC[SET.preset] + '</div>'
+      : '<div class="note" style="margin-top:7px">Custom order - pick a preset to return to a suggested order</div>')
+      : '<div class="note" style="margin-top:7px">Pick a preset or reorder the indicators below to start the analysis</div>') + '</div>' +
+    '<div class="pagecard" style="margin-top:14px"><h3>Indicator priority (drag to reorder) ' +
+    hint('Indicator levels (0-4) are scored automatically from real grid data. Here you only set which indicators matter most; the weights follow from the rank by formula (Barron ' + SET.formula + ').') + '</h3>' +
+    renderIndRows() + '</div>' +
+    '<div class="pagecard" style="margin-top:14px"><h3>Safety limits (fixed - always applied) 🔒</h3>' +
+    '<div class="kv"><span>Search range</span><b>' + Math.min(SET.rangeKm, FULL_RADIUS_KM).toFixed(1) + ' km (within return range)</b></div>' +
+    '<div class="kv"><span>Slope limit</span><b>' + SET.safety.slopeMax + '° max, locked above</b></div>' +
+    '<div class="kv"><span>Consumables reserve</span><b>' + Math.round(SET.safety.reserve * 100) + '% (round trip ÷2)</b></div>' +
+    '<div class="kv"><span>Dose budget</span><b>' + SET.safety.doseBudget.toFixed(1) + ' mSv/EVA</b></div>' +
+    '<div class="note" style="margin-top:5px">Manual changes only in Settings ' + hint('Safety limits are hard gates, never added to the score. A site outside the limits is not suggested even with a high exploration priority; unlocking needs explicit confirmation in Settings.') + '</div></div>' +
+    '</div>' +
+    '<div><div class="pagecard"><h3>Results - by exploration priority (real data)</h3>' +
+    (!S.analyzed ?
+      '<div style="padding:46px 20px;text-align:center;color:var(--dim)">' +
+      '<div style="font-size:26px;margin-bottom:10px">🧬</div>' +
+      '<b style="color:var(--ink)">Pick a suggested priority to analyze the candidate sites.</b>' +
+      '<div class="note" style="margin-top:7px">Dragging the indicator order also starts the analysis</div></div>' :
+    ok.map((ev, i) =>
+      '<div class="cand' + (S.site && S.site.id === ev.sp.id ? ' sel' : '') + '" data-id="' + ev.sp.id + '">' +
+      '<div class="r1"><span class="rank">' + (i + 1) + '</span><b>' + ev.sp.name + '</b>' + hint(ev.sp.desc) +
+      '<span class="dist">' + ev.d.toFixed(1) + ' km</span><span class="sc">' + ev.sc + '<small style="font-size:11px;font-weight:700"> pts</small></span></div>' +
+      '<div class="tags">' + basisTags(ev.cell) + '</div></div>').join('') +
+    (locked.length ?
+      '<div class="note" style="margin:12px 0 7px;font-weight:700">Excluded by safety limits (' + locked.length + ')</div>' +
+      locked.map(ev =>
+        '<div class="cand lock"><div class="r1"><span class="rank" style="background:#55658f">🔒</span><b>' + ev.sp.name + '</b>' +
+        '<span class="dist">' + ev.d.toFixed(1) + ' km</span><span class="sc" style="color:#8e97a3">' + (ev.sc == null ? '-' : ev.sc + '<small style=\"font-size:11px;font-weight:700\"> pts</small>') + '</span></div>' +
+        '<div class="note">' + ev.locks.join(' · ') + '</div></div>').join('') : '') +
+    '<div class="note" style="margin-top:8px">Rover finds = measured · others = estimated from data ' + hint('Score = Σ(weight × indicator) ÷ available weight ÷ 4 × 100. Only available indicators are renormalized; no fake values are filled in. Safety is applied as a gate, never added to the score.') + '</div>' +
+    '<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="cta" id="goRoute" ' + (S.site ? '' : 'disabled') + '>Plan route to selected site →</button></div>') +
+    '</div></div></div>';
+  bindIndRows(renderAuto);
+  document.querySelectorAll('[data-rp]').forEach(b => b.onclick = () => {
+    const pr = PRESET_RANKS[b.dataset.rp];
+    SET.preset = b.dataset.rp; SET.order = pr.order.slice(); SET.formula = pr.formula;
+    S.analyzed = true; applyWeights(); saveSet(); renderAuto();
+  });
+  document.querySelectorAll('.cand:not(.lock)').forEach(el => el.onclick = () => {
+    S.site = SPOTS.find(x => x.id === el.dataset.id); renderAuto(); drawSites(); renderNav();
+  });
+  const gr = document.getElementById('goRoute');
+  if (gr) gr.onclick = () => { collapseNav(false); S.screen = 'route'; S.planB = false; render(); };
+}
+
+/* ════════ Screen: route plan ════════ */
+function activeWp() {
+  const r = ROUTES[S.site.id];
+  return (S.planB && r.altWp) ? r.altWp : r.wp;
+}
+function routeOneWay() {
+  const wp = activeWp(); let d = 0;
+  for (let i = 1; i < wp.length; i++) d += map.distance(wp[i - 1], wp[i]);
+  return d;
+}
+function planCalc() {
+  const one = routeOneWay();
+  const move = one / SPEED, ret = move * 0.95;
+  return { one, total: one * 2, move, ret, eta: move + WORKMIN + ret, turn: 9 * 60 + move + WORKMIN };
+}
+function drawRoute() {
+  routeG.clearLayers();
+  const r = ROUTES[S.site.id]; if (!r) return;
+  const wp = activeWp();
+  L.polyline(wp, { color: '#45cfee', weight: 3, opacity: .95 }).addTo(routeG);
+  if (!S.planB && r.hiddenSeg != null)
+    L.polyline([r.wp[r.hiddenSeg], r.wp[r.hiddenSeg + 1]], { color: '#ff5d6c', weight: 5, dashArray: '6 7' })
+      .bindTooltip('Comm shadow segment (DEM line of sight, real data) · comm-loss contingency applies').addTo(routeG);
+  if (r.blocked) {
+    const b = r.blocked, d = 0.0032;
+    L.rectangle([[b.lat - d, b.lon - d], [b.lat + d, b.lon + d]],
+      { color: '#f5a623', weight: 1.4, dashArray: '4 4', fillColor: '#f5a623', fillOpacity: .14 }).bindTooltip('⚠ ' + b.note).addTo(routeG);
+  }
+  wp.slice(1, -1).forEach((w, i) => L.circleMarker(w, { radius: 5, color: '#45cfee', fillColor: '#111a3d', fillOpacity: 1, weight: 2 })
+    .bindTooltip('Waypoint (' + (i + 2) + ')').addTo(routeG));
+  L.circleMarker(wp[wp.length - 1], { radius: 9, color: '#fff', fillColor: '#f5a623', fillOpacity: 1, weight: 2.5 })
+    .bindTooltip('Destination (1) · ' + S.site.name, { permanent: true, direction: 'top' }).addTo(routeG);
+  map.fitBounds(L.latLngBounds(wp).pad(.35));
+}
+function renderRoute() {
+  setTitle('Route plan', '');
+  show('panel', true, 'flex');
+  const P = planCalc(); const r = ROUTES[S.site.id]; const wp = activeWp();
+  drawRoute();
+  head('Route plan', 'Destination ' + S.site.name + ' · see details on the route map');
+  const cell = cellAt(S.site.lat, S.site.lon);
+  body(
+    '<div class="sec"><h3>Route summary ' + (S.planB ? '<span class="pill warn">Plan B active</span>' : '') + '</h3><div class="cardbox">' +
+    '<div class="kv"><span>Distance</span><b>' + (P.total / 1000).toFixed(1) + ' km (round trip)</b></div>' +
+    '<div class="kv"><span>Estimated duration</span><b>' + fmtDur(P.eta) + '</b> <span class="note">(incl. ' + WORKMIN + ' min tasks)</span></div>' +
+    '<div class="kv"><span>Waypoints</span><b>' + (wp.length - 2) + '</b></div>' +
+    '<div class="kv"><span>Turnaround time</span><b>' + fmtT(P.turn) + '</b> <span class="note">(departure 09:00)</span></div></div></div>' +
+    '<div class="sec"><h3>Route details (real grid data)</h3><div class="cardbox">' +
+    '<div class="kv"><span>Destination slope</span><b>' + (cell ? cell.slope_deg + '°' : '-') + '</b></div>' +
+    '<div class="kv"><span>Comm link</span><span>' + (S.planB ? 'Good (shadow avoided)' : (r.hiddenSeg != null ? '1 shadow segment - contingency agreed' : (cell && cell.comm === 'shadow' ? 'Destination in shadow' : 'Good'))) + '</span></div>' +
+    '<div class="kv"><span>Rock cover</span><b>' + (cell ? Math.round((cell.rock || 0) * 100) + '%' : '-') + '</b> <span class="note">(weights route cost)</span></div>' +
+    '<div class="kv"><span>Energy use</span><b>~' + Math.round(pandolf(cell ? cell.slope_deg : 5, true) * 0.86 * P.eta / 60) + ' kcal</b> <span class="note">(Pandolf)</span></div></div></div>' +
+    (r.altWp ? '<div class="sec"><button id="planBBtn" style="width:100%">✎ Edit route - ' + (S.planB ? 'Back to plan A' : r.altNote) + '</button></div>' : '')
+  );
+  foot('<button id="backRes">← Analysis</button><button class="cta" id="goCheck">Pre-departure check →</button>');
+  const pb = document.getElementById('planBBtn');
+  if (pb) pb.onclick = () => { S.planB = !S.planB; renderRoute(); };
+  document.getElementById('backRes').onclick = () => { S.screen = 'auto'; render(); };
+  document.getElementById('goCheck').onclick = () => { S.screen = 'check'; render(); };
+}
+
+/* ════════ Screen: pre-departure check ════════ */
+function renderCheck() {
+  setTitle('Pre-departure check', '');
+  show('panel', true, 'flex');
+  const P = planCalc();
+  head('Pre-departure check', 'Check equipment and conditions, then start the Marswalk');
+  const fits = P.eta <= Math.min(...MODEL.consumables.map(c => c.cap)) * (1 - SET.safety.reserve);
+  const items = [
+    [fits ? 'ok' : 'danger', fits ? '✓' : '!', 'Whole plan finishes before turnaround time (' + fmtT(P.turn) + ')'],
+    ['ok', '✓', 'Pair linked: Astronaut A · Astronaut B vitals received'],
+    ['ok', '✓', 'Spacesuits and 4 consumables full (O2 480 min)'],
+    ['ok', '✓', 'Weather OK: wind ' + WEATHER.wind + ' m/s · τ ' + WEATHER.tau + ' (MEDA, simulated)'],
+    ['warn', '!', 'Space weather caution: ' + DONKI.note + ' - contingency on alert'],
+    [S.emergOk ? 'ok' : 'warn', S.emergOk ? '✓' : '!', 'Emergency return route checked']
+  ];
+  body(
+    '<div class="sec"><h3>Final pre-departure check</h3>' +
+    items.map((c, i) => '<div class="chk"><span class="ic2 ' + c[0] + '">' + c[1] + '</span><span>' + c[2] + '</span>' +
+      (i === 5 && !S.emergOk ? '<button class="sm" id="emBtn">Check</button>' : '') + '</div>').join('') + '</div>' +
+    '<div class="cardbox"><div class="note">This display does not certify \'safe\' - the astronauts decide to depart after reviewing the caution items · this candidate runs in the 2D simulator on this display only · the mission sent to the 3D helmet HUD is the Cheyava mission (left menu)</div></div>'
+  );
+  foot('<button id="backRoute2">← Route plan</button><button class="cta" id="goCtrl" ' + (fits && S.emergOk ? '' : 'disabled') + '>Start 2D simulation →</button>');
+  const em = document.getElementById('emBtn');
+  if (em) em.onclick = () => { S.emergOk = true; renderCheck(); };
+  document.getElementById('backRoute2').onclick = () => { S.screen = 'route'; render(); };
+  document.getElementById('goCtrl').onclick = () => {
+    toast('2D simulator scenario started (this is not the 3D Cheyava mission)');
+    S.screen = 'ctrl'; startSim(); render();
+  };
+}
+
+/* ════════ Cheyava representative mission (3D) ════════
+   One mission shared with the 3D scene. Everything on these screens is read from the 3D mission state sent by the parent window
+   (mission id, plan version, route as Mars latitude/longitude, travel assumption, tasks, task minutes, return budget, live position,
+   phase, clock, oxygen, field records). Nothing here is simulated by this display; the 2D simulator candidates stay a separate scenario. */
+const HUD = { linked: false, m: null, live: null, records: [], reports: [], pending: false, onAck: null, step: 'why', fitted: false };
+const fieldRecG = L.layerGroup().addTo(map), repG = L.layerGroup().addTo(map);
+const FIELD_KIND = { sample: 'Sample', photo: 'Photo', memo: 'Voice memo', interest: 'Point of interest', obs: 'Observation answer', compare: 'POV match', followup: 'Carry-over check' };
+const PHASE_TX = { outbound: 'Outbound', arrived: 'Arrived at destination', onsite: 'On-site tasks', returning: 'Returning', atBase: 'At habitat ramp', ended: 'Marswalk ended' };
+const ANS_TX = { seen: 'Seen', not_seen: 'Not seen', undetermined: "Can't tell" };
+const mmss = (sec) => { const v = Math.max(0, Math.round(sec)); return String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0'); };
+const tag = (k) => '<span class="pill ' + ({ observation: 'ok', analysis: 'warn', estimate: 'dim', simulated: 'dim', measured: 'ok' }[k] || 'dim') + '" style="font-size:10.5px;padding:1px 7px">' + ({ observation: 'observation', analysis: 'published analysis', estimate: 'estimate', simulated: 'simulated', measured: 'measured' }[k]) + '</span>';
+// Why this site: only material the app really uses (docs/REFERENCES.md). No new analysis; no exact registration between the images is claimed.
+const REP_DATA = [
+  ['PIA26368', 'Perseverance WATSON image of the rock "Cheyava Falls", sol 1212 (2024-07-18) · NASA/JPL-Caltech/MSSS', 'observation', 'Reference image on the HUD observation check (resized only)'],
+  ['PIA26640', 'PIXL mineral map of the Cheyava Falls sample (vivianite, greigite), published 2025-09-10 · NASA/JPL-Caltech', 'analysis', 'Shown beside the reference image; not registered to it, not a live detection'],
+  ['NASA release 2025-09-10', '"Potential biosignature": non-biological explanations are not ruled out', 'analysis', 'Limits what the app may say: the astronaut records observations, no verdict'],
+  ['Front Hazcam sol 1215 workspace mesh', 'Measured terrain and planning image at rover stop site 56 / drive 0 · NASA/JPL-Caltech', 'measured', 'POV match: planned outlines against the real view at the destination'],
+  ['HiRISE DTM 1 m + orthoimage', 'Mars Reconnaissance Orbiter · NASA/JPL-Caltech/University of Arizona', 'measured', '3D ground and route heights'],
+  ['Perseverance traverse (M20 waypoints)', "The rover's published drive path", 'measured', 'The route of this mission (a rover path, not verified for a walking astronaut)'],
+  ['Sampling points A / B', 'Computed from raw WATSON camera metadata', 'estimate', 'Where the HUD arrow points for the sample task'],
+  ['Position, clock, oxygen, dose', 'Demo values of the 3D scene', 'simulated', 'Live monitor and record metadata']
+];
+const REP_CHECKS = [['Layering', 'thin stacked layers'], ['Grains', 'grains visible to the eye'], ['Sorting', 'grain sizes look even'], ['Veins', 'white veins as in the reference image'], ['Spots', 'spots with dark rims as in the reference image'], ['Non-biological explanation', 'could a non-biological process explain it']];
+function repDraw() {
+  repG.clearLayers(); const m = HUD.m; if (!m || S.screen !== 'rep') return;
+  const pts = m.route.ll; L.polyline(pts, { color: '#45cfee', weight: 3, opacity: .95 }).bindTooltip('Mission route · ' + m.route.lengthM + ' m · ' + m.route.source).addTo(repG);
+  L.circleMarker(pts[0], { radius: 7, color: '#fff', fillColor: '#45cfee', fillOpacity: 1, weight: 2 }).bindTooltip('Demo habitat of the 3D scene (fictional building at the start of this route)', { permanent: true, direction: 'bottom' }).addTo(repG);
+  L.circleMarker(pts[pts.length - 1], { radius: 9, color: '#fff', fillColor: '#f5a623', fillOpacity: 1, weight: 2.5 }).bindTooltip('Destination · ' + m.dest.name, { permanent: true, direction: 'top' }).addTo(repG);
+  const v = HUD.live; if (v && v.departed && v.phase !== 'ended') L.circleMarker([v.lat, v.lon], { radius: 6, color: '#071022', fillColor: '#71eaff', fillOpacity: 1, weight: 2 }).bindTooltip('Astronaut (3D mission) · ' + (PHASE_TX[v.phase] || v.phase), { direction: 'right' }).addTo(repG);
+  if (!HUD.fitted) { HUD.fitted = true; map.fitBounds(L.latLngBounds(pts).pad(.6)); }
+}
+function repBudgetHtml(m) {
+  const b = m.budget, on = m.todos.filter(t => t.on);
+  return '<div class="kv"><span>Travel (one way, ' + m.transport.label + ')</span><b>' + mmss(b.travelSec) + '</b></div>' +
+    '<div class="kv"><span>On-site tasks (' + on.length + ')</span><b>' + mmss(b.staySec) + '</b></div>' +
+    '<div class="kv"><span>Margin</span><b>' + mmss(b.marginSec) + '</b></div>' +
+    '<div class="kv"><span>Turnaround time (latest return start)</span><b id="repTurn">T+' + mmss(b.turnaroundSec) + '</b></div>' +
+    '<div class="kv"><span>Whole Marswalk</span><b>' + mmss(b.totalSec) + '</b></div>' +
+    '<div class="kv"><span>Oxygen at return</span><b id="repO2">' + b.o2AtReturn + '%</b> <span class="note">(simulated, −' + b.o2PctPerMin + '%/min)</span></div>';
+}
+function repResultsHtml() {
+  const R = HUD.records, m = HUD.m, by = (k) => R.filter(r => r.kind === k), row = (a, b) => '<div class="kv"><span>' + a + '</span><span style="text-align:right">' + b + '</span></div>';
+  if (!R.length) { const v = HUD.live || {}; return '<div class="cardbox"><b>Nothing recorded yet for this mission.</b><div class="note" style="margin-top:5px">' + (v.departed ? 'The astronaut is ' + (PHASE_TX[v.phase] || v.phase).toLowerCase() + '. Answers and the sample record appear here as soon as they are recorded on the helmet HUD.' : 'The astronaut has not left the habitat. Results appear here after the Marswalk is carried out as the Surface Astronaut (Esc, then key 2): observation answers, the sample record and the end report.') + '</div></div>'; }
+  const obs = by('obs'), cmp = by('compare'), smp = by('sample'), poi = by('interest'), ph = by('photo'), memo = by('memo'), rpt = HUD.reports[HUD.reports.length - 1];
+  const where = (r) => r.latN.toFixed(5) + '°N ' + r.lonE.toFixed(5) + '°E';
+  return (rpt ? '<div class="cardbox" style="margin-bottom:9px"><b>End report received</b> ' + tag('simulated') + row('Samples · observation answers', rpt.samples + ' · ' + rpt.observations) + row('Points of interest · photos · memos', rpt.interest + ' · ' + rpt.photos + ' · ' + rpt.memos) + row('Records received', rpt.sent + ' / ' + rpt.total) + row('Ended · oxygen left', 'T+' + mmss(rpt.endedAt) + ' · ' + rpt.o2 + '%') + '</div>' : '') +
+    (cmp.length ? '<div class="sec"><h3>POV match</h3><div class="cardbox">' + cmp.map(r => row('#' + r.id + ' · T+' + mmss(r.simT), '<b>' + (r.result === 'match' ? 'Match (astronaut confirmed)' : 'No match (astronaut reported)') + '</b>')).join('') + '<div class="note">Not automatic recognition.</div></div></div>' : '') +
+    '<div class="sec"><h3>Observation answers (' + obs.length + ' / ' + REP_CHECKS.length + ')</h3><div class="cardbox">' +
+      (obs.length ? obs.map(r => { const name = r.text.split(':')[0]; return row('#' + r.id + ' · ' + name + ' · T+' + mmss(r.simT), '<b' + (r.answer === 'undetermined' ? ' style="color:var(--warn)"' : '') + '>' + (ANS_TX[r.answer] || r.answer) + '</b>'); }).join('') : '<div class="note">None yet</div>') +
+      '<div class="note">The astronaut\'s own visual answers. "Can\'t tell" is a valid result. No score, no biosignature verdict.</div></div></div>' +
+    '<div class="sec"><h3>Samples (' + smp.length + ')</h3><div class="cardbox">' + (smp.length ? smp.map(r => row('#' + r.id + ' · T+' + mmss(r.simT), where(r) + ' · ' + r.doseUsv.toFixed(2) + ' µSv') ).join('') + '<div class="note">Mock collection in the demo. Position, time and dose are simulated values ' + tag('simulated') + '</div>' : '<div class="note">None yet</div>') + '</div></div>' +
+    (poi.length + ph.length + memo.length ? '<div class="sec"><h3>Other records</h3><div class="cardbox">' + poi.concat(ph, memo).map(r => row('#' + r.id + ' · ' + (FIELD_KIND[r.kind] || r.kind) + ' · T+' + mmss(r.simT), r.kind === 'memo' ? '"' + r.text.replace(/[<>&]/g, '') + '"' + (r.demoExample ? ' <span class="note">(demo example, not speech)</span>' : '') : where(r))).join('') + '</div></div>' : '');
+}
+function renderRep() {
+  const m = HUD.m; setTitle('Cheyava mission (3D)'); show('panel', true, 'flex'); repDraw();
+  if (!m) { head('Cheyava mission (3D)', 'Waiting for the 3D mission…'); body('<div class="note">This screen reads the mission of the 3D scene. Open the planning display from the habitat seat in the 3D app.</div>'); foot(''); return; }
+  const v = HUD.live || {}, sent = m.sent, out = m.departed || ['returning', 'atBase', 'ended'].includes(m.phase), idline = '<b>' + m.missionId + '</b> · ' + (sent ? 'plan v' + sent.planVersion + ' sent' : 'draft v' + m.planVersion + ' · not sent');
+  const tabs = '<div style="display:flex;gap:6px;margin-bottom:11px">' + [['why', '1 Why'], ['plan', '2 Plan'], ['live', '3 Monitor'], ['results', '4 Results']].map(t => '<button class="sm' + (HUD.step === t[0] ? ' cta' : '') + '" data-rstep="' + t[0] + '" style="flex:1">' + t[1] + '</button>').join('') + '</div>';
+  head('Cheyava mission (3D)', m.missionId + ' · ' + m.dest.name);
+  let h = tabs, f = '';
+  if (HUD.step === 'why') {
+    h += '<div class="sec"><h3>Why this site</h3><div class="cardbox"><p style="margin:0 0 7px;line-height:1.5"><b>What was observed:</b> at this rover stop Perseverance imaged the rock "Cheyava Falls" (PIA26368): spots with dark rims and white veins. PIXL later mapped vivianite and greigite in the sample (PIA26640).</p>' +
+      '<p style="margin:0 0 7px;line-height:1.5"><b>Why look again:</b> NASA called these features a <b>potential biosignature</b> (2025-09-10); non-biological explanations are not ruled out. A person on site can compare more surfaces and angles than the rover images show.</p>' +
+      '<p style="margin:0;line-height:1.5"><b>What the astronaut checks on site:</b> ' + REP_CHECKS.map(c => c[0].toLowerCase()).join(', ') + '. Each answer is Seen / Not seen / Can\'t tell. The app records, it does not judge.</p></div></div>' +
+      '<div class="sec"><h3>Data behind this mission</h3>' + REP_DATA.map(d => '<div class="cardbox" style="margin-bottom:6px;padding:8px 11px"><div style="display:flex;gap:7px;align-items:center;justify-content:space-between"><b style="font-size:12.5px">' + d[0] + '</b>' + tag(d[2]) + '</div><div class="note" style="margin-top:2px">' + d[1] + '</div><div style="font-size:12px;margin-top:3px">Used for: ' + d[3] + '</div></div>').join('') +
+      '<div class="note">Sources and conditions: docs/REFERENCES.md. The two NASA images are not geometrically registered to each other or to the 3D scene.</div></div>';
+    f = '<span class="note" style="flex:1">' + idline + '</span><button class="cta" data-rstep="plan">Plan the tasks →</button>';
+  } else if (HUD.step === 'plan') {
+    h += '<div class="sec"><h3>Mission</h3><div class="cardbox">' + '<div class="kv"><span>Mission ID</span><b>' + m.missionId + '</b></div><div class="kv"><span>Plan version</span><b>' + (sent ? 'v' + sent.planVersion + ' sent' + (sent.planVersion !== m.planVersion ? ' · draft v' + m.planVersion : '') : 'draft v' + m.planVersion + ' (not sent)') + '</b></div>' +
+      '<div class="kv"><span>Destination</span><span style="text-align:right">' + m.dest.name + '<br><small class="note">' + m.route.ll[m.route.ll.length - 1][0].toFixed(5) + '°N ' + m.route.ll[m.route.ll.length - 1][1].toFixed(5) + '°E</small></span></div>' +
+      '<div class="kv"><span>Route</span><span style="text-align:right">' + m.route.lengthM + ' m one way<br><small class="note">' + m.route.source + '</small></span></div>' +
+      '<div class="kv"><span>Travel assumption</span><b>' + m.transport.label + '</b></div></div></div>' +
+      '<div class="sec"><h3>On-site tasks <small style="color:var(--dim);font-weight:400">' + (out ? 'locked: the astronaut is out' : 'uncheck to leave a task out') + '</small></h3>' +
+      m.todos.map(t => '<label class="chk" style="cursor:pointer"><input type="checkbox" data-rtask="' + t.id + '"' + (t.on ? ' checked' : '') + (out ? ' disabled' : '') + '> <span style="flex:1">' + t.name + '</span><b>' + t.min + ' min</b></label>').join('') +
+      '<div class="note">A task left out is not shown on the helmet HUD, and its minutes leave the stay time and the return budget below.</div></div>' +
+      '<div class="sec"><h3>Return budget <small style="color:var(--dim);font-weight:400">same numbers the HUD receives</small></h3><div class="cardbox" id="repBudget">' + repBudgetHtml(m) + '</div>' +
+      '<div class="note">Computed from route length, assumed speed and task minutes. Not a verified consumables model.</div></div>';
+    f = '<button data-rstep="why">← Why</button><button class="cta" id="repSend"' + (out || HUD.pending ? ' disabled' : '') + '>' + (out ? 'Astronaut is out' : sent && sent.planVersion === m.planVersion ? 'Send again (v' + (m.planVersion + 1) + ')' : 'Send plan to helmet HUD →') + '</button>';
+  } else if (HUD.step === 'live') {
+    const prog = v.lengthM ? Math.round(100 * v.s / v.lengthM) : 0;
+    h += '<div class="sec"><h3>3D mission state ' + tag('simulated') + '</h3><div class="cardbox">' +
+      '<div class="kv"><span>Mission</span><b>' + m.missionId + (sent ? ' · plan v' + sent.planVersion : ' · no plan sent') + '</b></div>' +
+      '<div class="kv"><span>Phase</span><b id="repPhase">' + (v.departed ? (PHASE_TX[v.phase] || v.phase) : (v.phase === 'ended' ? PHASE_TX.ended : 'Inside the habitat (not departed)')) + '</b></div>' +
+      '<div class="kv"><span>Mission clock</span><b id="repClock">T+' + mmss(v.simT || 0) + '</b></div>' +
+      '<div class="kv"><span>Oxygen</span><b id="repLiveO2">' + (v.o2 != null ? v.o2 + '%' : '-') + '</b></div>' +
+      '<div class="kv"><span>Position on route</span><b>' + (v.s != null ? v.s + ' / ' + v.lengthM + ' m (' + prog + '%)' : '-') + '</b></div>' +
+      '<div class="kv"><span>Map position</span><span>' + (v.lat != null ? v.lat.toFixed(5) + '°N ' + v.lon.toFixed(5) + '°E' : '-') + '</span></div>' +
+      '<div class="kv"><span>Travel mode</span><b>' + (v.transport === 'rover' ? 'Rover' : 'On foot') + '</b></div>' +
+      '<div class="kv"><span>Plan acknowledged on HUD</span><b>' + (v.planAck ? 'Yes' : 'No') + '</b></div>' +
+      (v.stayLeft != null ? '<div class="kv"><span>Stay time left</span><b>' + (v.stayLeft < 0 ? '−' : '') + mmss(Math.abs(v.stayLeft)) + '</b></div>' : '') +
+      '<div class="kv"><span>To turnaround time</span><b>' + (v.turnaroundLeft != null ? (v.turnaroundLeft < 0 ? 'over ' : '') + mmss(Math.abs(v.turnaroundLeft)) : '-') + '</b></div>' +
+      '<div class="kv"><span>Comm link · records received</span><b>' + (v.commUp ? 'Up' : 'Down') + ' · ' + HUD.records.length + (v.records != null ? ' / ' + v.records : '') + '</b></div></div>' +
+      '<div class="note">Read from the 3D mission once a second. This display runs no simulation of its own for this mission; the 2D simulator crew in the left menu belongs to the other scenario.</div></div>';
+    f = '<button data-rstep="plan">← Plan</button><button class="cta" data-rstep="results">Results →</button>';
+  } else {
+    h += '<div class="sec"><h3>Results of ' + m.missionId + '</h3>' + repResultsHtml() + '</div>';
+    f = '<button data-rstep="live">← Monitor</button>' + (v.phase === 'ended' ? '<button class="cta" id="repNext">Plan next Marswalk →</button>' : '');
+  }
+  body(h); foot(f);
+  document.querySelectorAll('[data-rstep]').forEach(el => el.onclick = () => { HUD.step = el.dataset.rstep; renderRep(); });
+  document.querySelectorAll('[data-rtask]').forEach(el => el.onchange = () => parent.postMessage({ type: 'areo:todo', id: el.dataset.rtask, on: el.checked }, location.origin));
+  const sb = document.getElementById('repSend'); if (sb) sb.onclick = () => { HUD.pending = true; renderRep(); parent.postMessage({ type: 'areo:plan', decider: 'Habitat planner' }, location.origin);
+    HUD.onAck = (a) => { HUD.pending = false; if (a.ok) { toast(a.missionId + ' · plan v' + a.planVersion + ' sent to the helmet HUD · ' + a.tasks.length + ' tasks'); addLog(a.missionId + ' plan v' + a.planVersion + ' sent to the helmet HUD (' + a.tasks.join(', ') + ')'); HUD.step = 'live'; } else toast(a.why === 'already-out' ? 'The astronaut is already out: the plan is not replaced' : 'Could not send the plan to the helmet HUD', 5000); renderRep(); }; };
+  const nb = document.getElementById('repNext'); if (nb) nb.onclick = () => { parent.postMessage({ type: 'areo:next-eva' }, location.origin); HUD.step = 'plan'; };
+}
+window.addEventListener('message', (ev) => {
+  if (ev.source !== parent || ev.origin !== location.origin || !ev.data) return;
+  const m = ev.data;
+  if (m.type === 'areo:mission') { const first = !HUD.linked, changed = !HUD.m || HUD.m.missionId !== m.missionId; HUD.linked = true; HUD.m = m; if (changed) { HUD.records = HUD.records.filter(r => r.missionId === m.missionId); HUD.fitted = false; }
+    if (first) renderNav(); if (S.screen === 'rep' && !(document.activeElement && document.activeElement.dataset && document.activeElement.dataset.rtask && false)) renderRep(); }
+  else if (m.type === 'areo:live') { HUD.live = m; if (S.screen === 'rep') { repDraw(); if (HUD.step === 'live') renderRep(); } }
+  else if (m.type === 'areo:plan-ack') { if (HUD.onAck) { const f = HUD.onAck; HUD.onAck = null; f(m); } }
+  else if (m.type === 'areo:record') {
+    if (HUD.records.some(r => r.missionId === m.missionId && r.id === m.id)) return;   // already have it (sent again after a reload)
+    HUD.records.push(m);
+    // the pin sits exactly at the coordinates stored with the record
+    L.marker([m.latN, m.lonE], { icon: L.divIcon({ className: '', html: '<div class="crewpin" style="background:#71eaff;width:11px;height:11px"></div>', iconSize: [11, 11] }) })
+      .bindTooltip((FIELD_KIND[m.kind] || m.kind) + ' #' + m.id + ' · ' + (m.missionId || 'Marswalk ' + m.eva) + ' · ' + (m.kind === 'obs' ? m.text + ' · ' : '') + m.latN.toFixed(5) + '°N ' + m.lonE.toFixed(5) + '°E (simulated position)', { direction: 'top' }).addTo(fieldRecG);
+    addLog('Field record received from the helmet HUD: ' + (FIELD_KIND[m.kind] || m.kind) + ' #' + m.id + (m.kind === 'obs' ? ' (' + m.text + ')' : '') + ' at ' + m.latN.toFixed(5) + '°N ' + m.lonE.toFixed(5) + '°E');
+    if (m.kind === 'sample') toast('Sample #' + m.id + ' received from the helmet HUD');
+    if (S.screen === 'rep' && HUD.step === 'results') renderRep(); if (S.screen === 'ctrl') render();
+  }
+  else if (m.type === 'areo:report') {
+    if (HUD.reports.some(r => r.missionId === m.missionId)) return;
+    HUD.reports.push(m);
+    addLog((m.missionId || 'Marswalk ' + m.eva) + ' report received: ' + m.samples + ' samples · ' + m.observations + ' observation answers · ' + m.interest + ' points of interest · ' + m.sent + '/' + m.total + ' records');
+    toast((m.missionId || 'Marswalk ' + m.eva) + ' report received: ' + m.samples + ' samples, ' + m.observations + ' observation answers', 6000);
+    const obsTx = HUD.records.filter(r => r.kind === 'obs' && r.missionId === m.missionId).map(r => r.text).join(' · ');
+    S.archive.push({ hud: true, seq: m.eva, site: 'Cheyava Falls sampling site · ' + (m.missionId || 'helmet HUD Marswalk ' + m.eva) + (m.planVersion ? ' · plan v' + m.planVersion : ''), acts: m.samples + ' samples · ' + m.observations + ' observation answers · ' + m.interest + ' points of interest · ' + m.photos + ' photos · ' + m.memos + ' voice memos · ' + m.sent + '/' + m.total + ' records received (simulated link)' + (obsTx ? '<br>Observation answers: ' + obsTx : '') });
+    if (S.screen === 'status' || S.screen === 'home' || S.screen === 'ctrl' || S.screen === 'rep') render();
+  }
+});
+if (parent !== window) parent.postMessage({ type: 'areo:hello' }, location.origin);
+
+/* ════════ Monitoring - simulation (model spec §1-§6) ════════ */
+function segLerp(wp, cum, total, f) {
+  const d = f * total;
+  for (let i = 1; i < wp.length; i++) if (d <= cum[i]) {
+    const t = (d - cum[i - 1]) / (cum[i] - cum[i - 1] || 1);
+    return [wp[i - 1][0] + (wp[i][0] - wp[i - 1][0]) * t, wp[i - 1][1] + (wp[i][1] - wp[i - 1][1]) * t];
+  }
+  return wp[wp.length - 1];
+}
+function addLog(msg, lvl) { S.log.unshift({ t: S.sim ? S.sim.t : 0, msg, lvl: lvl || 'ok' }); }
+function startSim() {
+  const P = planCalc(); const wp = activeWp(); const r = ROUTES[S.site.id];
+  const cum = [0]; for (let i = 1; i < wp.length; i++) cum.push(cum[i - 1] + map.distance(wp[i - 1], wp[i]));
+  const rem = {}; MODEL.consumables.forEach(c => rem[c.key] = c.cap);
+  S.sim = {
+    wp, r, cum, total: cum[cum.length - 1], P, t: 0, phase: 'out', f: 0,
+    rem, stam: 100, dose: 0, hr: 70, workT: 0,
+    speFired: false, commFired: false, eventActive: false, shielded: false, done: false, actual: [], pos: wp[0]
+  };
+  addLog('EVA-01 departed - destination ' + S.site.name + ' · 2 astronauts');
+  routeG.clearLayers(); simG.clearLayers();
+  L.polyline(wp, { color: '#5f7bd6', weight: 2, dashArray: '5 6', opacity: .9 }).bindTooltip('Planned route').addTo(simG);
+  if (!S.planB && r.hiddenSeg != null) L.polyline([r.wp[r.hiddenSeg], r.wp[r.hiddenSeg + 1]], { color: '#ff5d6c', weight: 3.5, dashArray: '6 7', opacity: .6 }).addTo(simG);
+  S.sim.actualLine = L.polyline([], { color: '#45cfee', weight: 3 }).addTo(simG);
+  S.sim.mA = L.marker(wp[0], { icon: L.divIcon({ className: '', html: '<div class="crewpin" style="background:#f5a623"></div>', iconSize: [15, 15] }) }).bindTooltip('Astronaut A', { direction: 'right' }).addTo(simG);
+  S.sim.mB = L.marker(wp[0], { icon: L.divIcon({ className: '', html: '<div class="crewpin" style="background:#2b6fd4"></div>', iconSize: [15, 15] }) }).bindTooltip('Astronaut B', { direction: 'left' }).addTo(simG);
+  map.fitBounds(L.latLngBounds(wp.concat([[BASE.lat, BASE.lon]])).pad(.3));
+  applyLPreset('Science');
+  S.sim.timer = setInterval(simTick, 550);
+}
+function simTick() {
+  const m = S.sim; if (!m || m.done) return;
+  if (m.eventActive) { renderKpi(); return; }
+  m.t += 1;   // 1 tick = 1 min (simulated)
+  const cell = cellAt(m.pos[0], m.pos[1]);
+  const moving = m.phase !== 'work';
+  const MW = moving ? pandolf(cell ? cell.slope_deg : 5, m.phase === 'out') : MODEL.baseMW * 1.15;
+  const fRate = MW / MODEL.baseMW;
+  MODEL.consumables.forEach(c => { m.rem[c.key] -= (c.scale ? fRate * c.scale : 1); });
+  const pctVO2 = Math.min((MW * MODEL.o2PerWatt) / MODEL.vo2abs, 1);
+  m.hr = Math.min(Math.round(MODEL.hrA + MODEL.hrB * pctVO2), MODEL.hrMax);
+  m.stam = Math.min(Math.max(m.stam + (pctVO2 > MODEL.sustain ? -14 * (pctVO2 - MODEL.sustain) : 8 * (MODEL.sustain - pctVO2)), 0), 100);
+  const shF = m.shielded ? (1 - DONKI.spe.shieldPct / 100) : 1;
+  m.dose += (MODEL.radDay / 1440) * shF;
+  const spe = DONKI.spe;
+  if (m.t >= spe.onset && m.t < spe.onset + spe.dur) m.dose += (spe.spike / spe.dur) * shF;
+  if (!m.speFired && m.t >= spe.onset) { m.speFired = true; fireEvent('sep'); return; }
+
+  if (m.phase === 'out') {
+    m.f = Math.min(m.t / m.P.move, 1);
+    if (m.f >= 1) { m.phase = 'work'; m.workT = 0; addLog('Arrived at destination - field tasks started'); }
+  } else if (m.phase === 'work') {
+    m.f = 1; m.workT += 1;
+    if (m.workT >= 22) { m.phase = 'ret'; m.retStart = m.t; addLog('Tasks done - return started'); }
+  } else {
+    const rf = Math.min((m.t - m.retStart) / m.P.ret, 1);
+    m.f = (m.retFrom != null ? m.retFrom : 1) * (1 - rf);
+    if (!m.commFired && !S.planB && m.r.hiddenSeg != null) {
+      const h0 = m.cum[m.r.hiddenSeg] / m.total, h1 = m.cum[m.r.hiddenSeg + 1] / m.total;
+      if (m.f <= h1 && m.f >= h0) { m.commFired = true; fireEvent('comm'); return; }
+    }
+    if (rf >= 1) { endSim(); return; }
+  }
+  const pA = segLerp(m.wp, m.cum, m.total, m.f);
+  const pB = segLerp(m.wp, m.cum, m.total, Math.max(m.f - 0.03, 0));
+  m.pos = pA;
+  m.mA.setLatLng(pA); m.mB.setLatLng(pB);
+  m.actual.push(pA); m.actualLine.setLatLngs(m.actual);
+  wbRing.setRadius(Math.max(walkRadiusM(Math.min(...Object.values(m.rem))), 150));
+  renderKpi(); renderEnv(); renderGuideCard();
+  const cvs = crewVitals();
+  ['cv0', 'cv1'].forEach((id, i) => { const el = document.getElementById(id); if (el) el.textContent = 'HR ' + cvs[i].hr + ' · O₂ ' + cvs[i].o2 + '%'; });
+  if (['mon', 'crew'].includes(S.ctrlTab)) renderCtrlPanel();
+}
+function fireEvent(kind) {
+  const m = S.sim; m.eventActive = true; m.kind = kind;
+  document.body.classList.add('alerting');
+  const ab = document.getElementById('alertbar'); ab.style.display = 'block';
+  const sh = document.getElementById('sheet'); sh.style.display = 'block';
+  if (kind === 'comm') {
+    ab.textContent = '⚠ Anomaly - Comm loss · entered shadow segment (last signal 3 min ago)';
+    sh.innerHTML = '<h3>Anomaly: Comm loss</h3><div class="note">Agreed contingency - leave the shadow and reconnect; return if not reconnected within 10 min · habitat only lists options, the astronauts decide</div>' +
+      '<div class="opts"><div class="opt" id="optA"><b>Suggested · reconnect via detour</b><small>Leave shadow segment · +9 min</small></div>' +
+      '<div class="opt" id="optB"><b>Return now</b><small>Task records kept · shortest route</small></div></div>';
+    addLog('Anomaly - Comm loss (shadow segment)', 'danger');
+  } else {
+    ab.textContent = '⚠ Anomaly - Radiation storm (SEP) · ' + DONKI.note;
+    sh.innerHTML = '<h3>Anomaly: Radiation storm (solar particle event)</h3><div class="note">Expected extra dose +' + DONKI.spe.spike + ' mSv · terrain shielding cuts up to ' + DONKI.spe.shieldPct + '% (RAD measured) · dose budget ' + SET.safety.doseBudget + ' mSv</div>' +
+      '<div class="opts"><div class="opt" id="optA"><b>Suggested · wait behind terrain shielding</b><small>Dose −' + DONKI.spe.shieldPct + '% · resume after the event</small></div>' +
+      '<div class="opt" id="optB"><b>Stop tasks · return now</b><small>Shorter plan · least exposure time</small></div></div>';
+    addLog('Anomaly - Radiation storm alert (DONKI replay)', 'warn');
+  }
+  document.getElementById('optA').onclick = () => resolveEvent(kind, 'A');
+  document.getElementById('optB').onclick = () => resolveEvent(kind, 'B');
+  S.ctrlTab = 'alert'; renderCtrlPanel(); renderKpi();
+}
+function resolveEvent(kind, pick) {
+  const m = S.sim;
+  m.eventActive = false;
+  document.body.classList.remove('alerting');
+  let msg;
+  if (kind === 'sep' && pick === 'A') { m.shielded = true; msg = 'Waiting behind terrain shielding - dose reduction applied'; }
+  else if (kind === 'sep') {
+    msg = 'Stop tasks · return now';
+    if (m.phase === 'out') { m.retFrom = m.f; m.phase = 'ret'; m.retStart = m.t; m.P.ret = Math.max(m.f * m.total / SPEED, 2); }
+  }
+  else msg = pick === 'A' ? 'Reconnect via detour (+9 min)' : 'Return now';
+  document.getElementById('alertbar').style.display = 'none';
+  document.getElementById('sheet').style.display = 'none';
+  addLog('Response applied - ' + msg);
+  toast('Astronaut response received - ' + msg + ' · log updated');
+  S.ctrlTab = 'mon'; renderCtrlPanel();
+}
+function endSim() {
+  const m = S.sim; m.done = true; clearInterval(m.timer);
+  document.body.classList.remove('alerting');
+  addLog('EVA-01 return complete');
+  const acts = [S.actions.sample && 'Sample collected', S.actions.analysis && 'Field analysis (Raman/IR)'].filter(Boolean).join(' · ') || 'No records';
+  S.archive.push({ seq: S.archive.length + 1, site: S.site.name, dist: (m.total * 2 / 1000).toFixed(1), dose: m.dose.toFixed(2), acts });
+  document.getElementById('endBox').innerHTML =
+    '<h2 style="color:var(--ok)">EVA-01 return complete</h2>' +
+    '<div class="kv"><span>Destination</span><b>' + S.site.name + '</b></div>' +
+    '<div class="kv"><span>Total distance</span><b>' + (m.total * 2 / 1000).toFixed(1) + ' km</b></div>' +
+    '<div class="kv"><span>Completed tasks</span><span>' + acts + '</span></div>' +
+    '<div class="kv"><span>Total dose</span><b style="color:' + (m.dose > SET.safety.doseBudget ? 'var(--danger)' : 'inherit') + '">' + m.dose.toFixed(2) + ' / ' + SET.safety.doseBudget.toFixed(1) + ' mSv</b> <span class="note">(~' + Math.round(m.dose / 0.1) + ' chest X-rays' + (m.dose > SET.safety.doseBudget ? ' · over budget - report required' : '') + ')</span></div>' +
+    '<div class="kv"><span>Consumables left (min)</span><b>' + Math.round(Math.min(...Object.values(m.rem))) + ' min</b></div>' +
+    '<div class="note" style="margin:10px 0 16px">Marswalk records feed the next analysis - changing the indicator priority rescores the whole grid</div>' +
+    '<button class="cta" id="againBtn" style="width:100%">New search (map home)</button>';
+  document.getElementById('endModal').style.display = 'flex';
+  document.getElementById('againBtn').onclick = () => {
+    document.getElementById('endModal').style.display = 'none';
+    simG.clearLayers(); routeG.clearLayers();
+    S.sim = null; S.screen = 'home'; S.emergOk = false; S.planB = false;
+    S.actions = { sample: false, analysis: false, crew: false };
+    wbRing.setRadius(Math.min(SET.rangeKm, FULL_RADIUS_KM) * 1000); render();
+    map.flyTo([BASE.lat + 0.015, BASE.lon - 0.012], 13);
+  };
+}
+function renderKpi() {
+  const m = S.sim; if (!m) return;
+  const st = document.getElementById('kpiState');
+  if (m.eventActive) { st.textContent = 'Responding to anomaly'; st.className = 'pill danger'; }
+  else if (m.phase === 'work') { st.textContent = 'Field tasks'; st.className = 'pill warn'; }
+  else { st.textContent = m.phase === 'ret' ? 'Returning' : 'Marswalk in progress'; st.className = 'pill ok'; }
+  const sec = m.t * 60;
+  document.getElementById('kpiElapsed').textContent =
+    String(Math.floor(sec / 3600)).padStart(2, '0') + ':' + String(Math.floor(sec / 60) % 60).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+  let homeMin;
+  if (m.phase === 'out') homeMin = (1 - m.f) * m.P.move + 22 + m.P.ret;
+  else if (m.phase === 'work') homeMin = (22 - m.workT) + m.P.ret;
+  else homeMin = m.f * m.total / SPEED;
+  document.getElementById('kpiHome').textContent = Math.max(Math.round(homeMin), 0) + ' min';
+  const traveled = m.phase === 'out' ? m.f * m.total : m.phase === 'work' ? m.total : m.total + (1 - m.f) * m.total;
+  const tot = m.total * 2, pct = Math.round(traveled / tot * 100);
+  document.getElementById('kpiDist').textContent = (traveled / 1000).toFixed(1) + ' / ' + (tot / 1000).toFixed(1) + ' km (' + pct + '%)';
+  document.getElementById('kpiFill').style.width = pct + '%';
+  const cell = cellAt(m.pos[0], m.pos[1]);
+  const sc = cellScore(cell);
+  document.getElementById('kpiIdx').textContent = sc == null ? '-' : sc;
+}
+function renderEnv() {
+  const m = S.sim; if (!m || !m.pos) return;
+  const cell = cellAt(m.pos[0], m.pos[1]);
+  const sc = cellScore(cell);
+  const ec = document.getElementById('envcard'); ec.style.display = 'block';
+  ec.innerHTML = '<h3>Current location (EVA-01) · real grid data</h3>' +
+    '<div class="kv"><span>Exploration priority</span><span><b>' + (sc == null ? '-' : sc) + '</b>' + (sc != null ? ' <span class="pill ' + (sc >= 62 ? 'ok' : sc >= 40 ? 'warn' : 'dim') + '">' + (sc >= 62 ? 'High' : sc >= 40 ? 'Medium' : 'Low') + '</span>' : '') + '</span></div>' +
+    '<div class="kv"><span>Slope</span><b>' + (cell ? cell.slope_deg + '°' : '-') + '</b></div>' +
+    '<div class="kv"><span>Comm link</span><span>' + (cell ? (cell.comm === 'shadow' ? '🔴 Shadow' : '🟢 Good') : '-') + '</span></div>' +
+    '<div class="kv"><span>Rock cover</span><b>' + (cell ? Math.round((cell.rock || 0) * 100) + '%' : '-') + '</b></div>';
+}
+function renderGuideCard() {
+  const m = S.sim; if (!m) return;
+  const g = document.getElementById('guidecard'); g.style.display = 'flex';
+  const remain = m.phase === 'out' ? (1 - m.f) * m.total : 0;
+  g.innerHTML = '<h3>Marswalk guide · next action</h3>' +
+    '<div class="act next"><b>◎ ' + (m.phase === 'out' ? 'Moving to destination' : m.phase === 'work' ? 'Doing field tasks' : 'Returning to habitat') + '</b>' +
+    '<small>' + (m.phase === 'out' ? (remain / 1000).toFixed(1) + ' km left · ~' + Math.round(remain / SPEED) + ' min' :
+      m.phase === 'work' ? S.site.name + ' · tasks left ' + Math.max(22 - m.workT, 0) + ' min (compressed)' :
+      'Return ~' + Math.round(m.f * m.total / SPEED) + ' min') + '</small></div>' +
+    actCk('sample', 'Sample collection point (suggested)', 'Clay mineral outcrop · S1=' + (cellAt(S.site.lat, S.site.lon) || {}).S1 + '/4') +
+    actCk('analysis', 'Run field analysis', 'Handheld analyzer (Raman/IR) suggested') +
+    actCk('crew', 'Check astronaut status', 'Lowest consumable left ' + Math.round(Math.min(...Object.values(m.rem))) + ' min');
+  ['sample', 'analysis', 'crew'].forEach(k => {
+    const el = document.getElementById('ak_' + k);
+    if (el) el.onchange = e => {
+      S.actions[k] = e.target.checked;
+      if (e.target.checked) addLog('Log - ' + { sample: 'Sample collected', analysis: 'Field analysis (Raman/IR) done', crew: 'Astronaut status checked' }[k]);
+    };
+  });
+}
+function actCk(k, t, s) {
+  return '<div class="act"><label class="ck"><input type="checkbox" id="ak_' + k + '" ' + (S.actions[k] ? 'checked' : '') + '><span><b>' + t + '</b><small>' + s + '</small></span></label></div>';
+}
+function renderCtrlPanel() {
+  const m = S.sim; if (!m) return;
+  const cp = document.getElementById('ctrlpanel'); cp.style.display = 'block';
+  const TABS = [['mon', 'Monitor'], ['crew', 'Crew'], ['alert', 'Alerts'], ['scen', 'Plans'], ['log', 'Log']];
+  let html = '';
+  if (S.ctrlTab === 'mon') {
+    html = '<div class="kv"><span>Phase</span><span>' + (m.phase === 'out' ? 'Outbound' : m.phase === 'work' ? 'Field tasks' : 'Return') + '</span></div>' +
+      MODEL.consumables.map(c => {
+        const pct = Math.max(m.rem[c.key] / c.cap * 100, 0);
+        return '<div class="kv" style="margin-bottom:0"><span>' + c.name + '</span><b>' + Math.round(m.rem[c.key]) + ' min</b></div>' +
+          '<div class="bar"><div class="fill" style="width:' + pct + '%;background:' + (pct < 25 ? 'var(--danger)' : pct < 50 ? 'var(--warn)' : '#4aa3ff') + '"></div></div>';
+      }).join('') +
+      '<div class="kv" style="margin-top:7px"><span>Return limit (lowest consumable)</span><b>' + Math.round(Math.min(...Object.values(m.rem))) + ' min</b></div>' +
+      '<div class="kv"><span>Dose / budget</span><b style="color:' + (m.dose > SET.safety.doseBudget ? 'var(--danger)' : m.dose > SET.safety.doseBudget * .7 ? 'var(--warn)' : 'inherit') + '">' + m.dose.toFixed(2) + ' / ' + SET.safety.doseBudget.toFixed(1) + ' mSv</b></div>' +
+      '<div class="kv"><span>Weather</span><span>' + WEATHER.tempC + '℃ · ' + WEATHER.wind + ' m/s · τ' + WEATHER.tau + '</span></div>' +
+      '<div class="kv"><span>Space weather</span><span class="pill ' + (m.t >= DONKI.spe.onset && m.t < DONKI.spe.onset + DONKI.spe.dur ? 'danger">SEP active' : 'warn">Caution') + '</span></div>' +
+      '<div class="note" style="margin-top:6px">Dashed = plan · solid = tracked path · values = simulated</div>';
+  } else if (S.ctrlTab === 'crew') {
+    html = crewRow(SET.crewA.name, m, 1.03) + crewRow(SET.crewB.name, m, 0.97) +
+      '<div class="note">HR = 70.5 + 113.2×%VO₂ (PhysioNet, 992 people) · stamina = W\'BAL</div>';
+  } else if (S.ctrlTab === 'alert') {
+    const al = S.log.filter(l => l.lvl !== 'ok');
+    html = al.length ? al.map(l => '<div class="kv"><span class="pill ' + l.lvl + '">' + fmtT(540 + l.t) + '</span><span>' + l.msg + '</span></div>').join('') :
+      '<div class="note">No anomaly detected - comm link, consumables and space weather monitored</div>';
+  } else if (S.ctrlTab === 'scen') {
+    html = '<div class="note" style="margin-bottom:7px">Contingency plans agreed before departure (shared to HUD)</div>' +
+      ['30 min behind plan → skip some tasks', 'Turnaround time reached → return now', 'Comm loss → leave shadow and reconnect; return if not within 10 min', 'Radiation storm → wait behind shielding or return'].map(x => '<div class="chk"><span class="ic2 ok">✓</span><span>' + x + '</span></div>').join('');
+  } else {
+    html = S.log.map(l => '<div class="kv"><span style="font-family:var(--mono)">' + fmtT(540 + l.t) + '</span><span>' + l.msg + '</span></div>').join('') || '<div class="note">No records</div>';
+  }
+  cp.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px">' +
+    TABS.map(([k, t]) => '<button class="sm" style="' + (S.ctrlTab === k ? 'background:var(--ink);color:#fff;border-color:var(--ink)' : '') + '" data-tab="' + k + '">' + t + '</button>').join('') + '</div>' + html;
+  cp.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.ctrlTab = b.dataset.tab; renderCtrlPanel(); });
+}
+function crewRow(n, m, k) {
+  const o2 = Math.min(Math.max(m.rem.o2 / 480 * 100 * k, 0), 100);
+  const c = o2 < 30 ? 'danger' : o2 < 55 ? 'warn' : 'ok';
+  return '<div class="cardbox" style="margin-bottom:7px"><div class="kv"><b>' + n + '</b><span class="pill ' + c + '">O2 ' + Math.round(o2) + '%</span></div>' +
+    '<div class="kv"><span>HR</span><b>' + Math.round(m.hr * (k === 1.03 ? 1 : 0.96)) + ' bpm</b></div>' +
+    '<div class="kv"><span>Stamina</span><b>' + Math.round(m.stam) + '%</b></div>' +
+    '<div class="kv"><span>Last signal</span><span>' + (m.eventActive && m.kind === 'comm' ? '3 min ago ⚠' : (2 + m.t % 11) + ' s ago') + '</span></div></div>';
+}
+
+/* ════════ Settings (manual changes - persisted) ════════ */
+function openSettings() {
+  const sb = document.getElementById('setBox');
+  const un = SET.safety.unlocked;
+  sb.innerHTML = '<h2>Settings</h2><div class="note">Saved settings persist across runs - no need to set them each time</div>' +
+    '<h4>Search · astronauts</h4>' +
+    '<div class="set-kv"><span>Search range (km) <span class="note">max ' + FULL_RADIUS_KM.toFixed(1) + ' = return range</span></span><input type="number" id="st_range" step="0.5" min="0.5" max="' + FULL_RADIUS_KM.toFixed(1) + '" value="' + SET.rangeKm + '"></div>' +
+    '<div class="note" style="margin:4px 0 2px">Edit each astronaut\'s name, mass and load from the crew cards at the bottom of the left menu</div>' +
+    '<h4>Indicator priority - drag to reorder (weights = ' + SET.formula + ' formula, automatic)</h4>' + renderIndRows() +
+    '<div class="set-kv"><span>Weight formula</span><span><button class="sm ' + (SET.formula === 'ROC' ? 'pri' : '') + '" id="st_roc">ROC (top-heavy)</button> <button class="sm ' + (SET.formula === 'RS' ? 'pri' : '') + '" id="st_rs">RS (gentle)</button></span></div>' +
+    '<h4>Safety limits 🔒</h4>' +
+    '<div class="set-kv"><span>Slope limit (°)</span><input type="number" id="st_slope" ' + (un ? '' : 'disabled') + ' step="1" min="10" max="30" value="' + SET.safety.slopeMax + '"></div>' +
+    '<div class="set-kv"><span>Consumables reserve (%)</span><input type="number" id="st_res" ' + (un ? '' : 'disabled') + ' step="5" min="10" max="30" value="' + Math.round(SET.safety.reserve * 100) + '"></div>' +
+    '<div class="set-kv"><span>Dose budget (mSv/EVA)</span><input type="number" id="st_dose" ' + (un ? '' : 'disabled') + ' step="0.1" min="0.5" max="2" value="' + SET.safety.doseBudget + '"></div>' +
+    '<label class="set-kv" style="cursor:pointer"><span class="note">Enable manual safety-limit changes - not recommended · changes are logged</span><input type="checkbox" id="st_unlock" ' + (un ? 'checked' : '') + '></label>' +
+    '<div style="display:flex;gap:8px;margin-top:14px"><button id="st_reset">Restore defaults</button><button class="pri" id="st_save" style="flex:1">Save</button></div>';
+  document.getElementById('setModal').style.display = 'flex';
+  bindIndRows(openSettings);
+  document.getElementById('st_roc').onclick = () => { SET.formula = 'ROC'; SET.preset = null; applyWeights(); saveSet(); openSettings(); };
+  document.getElementById('st_rs').onclick = () => { SET.formula = 'RS'; SET.preset = null; applyWeights(); saveSet(); openSettings(); };
+  document.getElementById('st_unlock').onchange = e => {
+    SET.safety.unlocked = e.target.checked;
+    if (e.target.checked) { addLog('Manual safety-limit changes enabled - reason must be logged', 'warn'); toast('Safety limits unlocked - not recommended'); }
+    saveSet(); openSettings();
+  };
+  document.getElementById('st_reset').onclick = () => {
+    SET = JSON.parse(JSON.stringify(SET_DEFAULT)); applyWeights(); saveSet(); openSettings();
+    toast('Defaults (safety-recommended) restored');
+  };
+  document.getElementById('st_save').onclick = () => {
+    SET.rangeKm = Math.min(+document.getElementById('st_range').value || 3, FULL_RADIUS_KM);
+    if (SET.safety.unlocked) {
+      SET.safety.slopeMax = +document.getElementById('st_slope').value || 25;
+      SET.safety.reserve = (+document.getElementById('st_res').value || 15) / 100;
+      SET.safety.doseBudget = +document.getElementById('st_dose').value || 1.0;
+    }
+    saveSet(); applyWeights();
+    wbRing.setRadius(Math.min(SET.rangeKm, FULL_RADIUS_KM) * 1000);
+    document.getElementById('setModal').style.display = 'none';
+    toast('Settings saved - kept for next run');
+    render();
+  };
+}
+
+/* ════════ Guide ════════ */
+function openGuide() {
+  const gb = document.getElementById('guideBox');
+  gb.innerHTML = '<h2>Indicator · data layer guide</h2>' +
+    [['Exploration priority', 'Per grid cell (160 m): indicators S1-S5 (0-4 evidence strength) summed with rank-based weights (ROC) → 0-100. Real data: CRISM minerals + USGS geology. A ranking aid for where to explore, not a detection or a probability of life'],
+     ['Weights', 'Not hand-picked - set the indicator rank and the Barron ROC/RS formula computes them (default 45.7/25.7/15.7/9/4%)'],
+     ['Safety gates', 'Return range (round trip ÷2 + reserve), slope limit, dose budget - never added to the score; they lock suggestions. Locked by default; unlocking needs explicit confirmation in Settings'],
+     ['Return limit', 'Set by whichever of the 4 consumables (O2, cooling water, CO₂, battery) runs out first (Apollo PLSS measured)'],
+     ['Comm shadow', 'DEM line-of-sight calculation - cells hidden from the habitat by terrain. Not a measured radio signal (reference only)'],
+     ['Rock cover', 'THEMIS thermal inertia → boulder-field fraction (obstacles). Adds route cost (detour); slope handles blocking'],
+     ['Radiation dose', 'Baseline 0.64 mSv/sol (Curiosity RAD) + spikes during radiation storms · terrain shielding up to 20%'],
+     ['Status colors', 'Normal green · caution orange · danger red (all screens)']]
+    .map(([t, d]) => '<div class="kv" style="align-items:flex-start;gap:12px"><b style="min-width:92px">' + t + '</b><span class="note">' + d + '</span></div>').join('') +
+    '<button class="pri" style="width:100%;margin-top:12px" onclick="document.getElementById(\'guideModal\').style.display=\'none\'">Close</button>';
+  document.getElementById('guideModal').style.display = 'flex';
+}
+
+/* ════════ Render root ════════ */
+function setTitle(t) { document.getElementById('screenTitle').textContent = t; }
+function head(t, s) { document.getElementById('phTitle').textContent = t; document.getElementById('phSub').textContent = s; }
+function body(h) { document.getElementById('panelBody').innerHTML = h; }
+function foot(h) { document.getElementById('panelFoot').innerHTML = h; }
+function show(id, on, flex) { document.getElementById(id).style.display = on ? (flex || 'block') : 'none'; }
+function render() {
+  renderNav();
+  show('kpibar', S.screen === 'ctrl', 'flex');
+  document.getElementById('datasrc').style.top = S.screen === 'ctrl' ? '88px' : '57px';
+  show('layerbox', !!S.layerOpen);
+  const lbtn = document.getElementById('layerBtn');
+  if (lbtn) lbtn.classList.toggle('on', !!S.layerOpen);
+  document.getElementById('tip').style.display = 'none';
+  show('ctrlpanel', S.screen === 'ctrl');
+  show('envcard', S.screen === 'ctrl' && !!S.sim);
+  show('guidecard', S.screen === 'ctrl' && !!S.sim, 'flex');
+  if (S.screen !== 'ctrl') { show('alertbar', false); show('sheet', false); }
+  show('page', S.screen === 'status' || S.screen === 'auto');
+  show('panel', false);
+  if (S.screen !== 'rep') repG.clearLayers(); else routeG.clearLayers();
+  { const cb = document.getElementById('crewbox'); if (cb) { cb.style.display = S.screen === 'rep' ? 'none' : ''; cb.title = '2D simulator crew (not the 3D mission)'; } }   // the 2D simulator crew is not the 3D astronaut
+  if (S.screen === 'home') { renderHome(); routeG.clearLayers(); }
+  else if (S.screen === 'status') renderStatus();
+  else if (S.screen === 'auto') renderAuto();
+  else if (S.screen === 'route') renderRoute();
+  else if (S.screen === 'check') renderCheck();
+  else if (S.screen === 'rep') renderRep();
+  else if (S.screen === 'ctrl') { setTitle('Live monitor · 2D simulator scenario'); show('panel', false); renderCtrlPanel(); renderKpi(); renderEnv(); renderGuideCard(); }
+  drawSites();
+  renderLayerbox();
+}
+wbRing.setRadius(Math.min(SET.rangeKm, FULL_RADIUS_KM) * 1000);
+applyWeights();
+render();
+</script>
+</body>
+</html>

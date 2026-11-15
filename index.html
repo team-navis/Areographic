@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Areographic — demo</title>
+<meta name="application-name" content="Areographic" />
+<meta name="description" content="Areographic demo (simulated): plan a Marswalk on the habitat planning display, then carry it out through the astronaut's helmet HUD." />
+<link rel="icon" type="image/png" sizes="64x64" href="/assets/brand/mark-64.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/mark-32.png" />
+<link rel="apple-touch-icon" href="/assets/brand/mark-180.png" />
+<link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+<div id="app">
+  <div id="gl"></div>
+  <div id="terminal-overlay" aria-label="Selected habitat display"></div>
+  <div id="overlay">
+    <div id="landing" class="hidden">
+      <div class="brand"><span class="eyebrow">Marswalk navigation · Demo</span><h1><img class="brand-logo" src="/assets/brand/logo-light.webp" alt="Areographic" width="1200" height="286" draggable="false" /></h1><small class="ai-tag">AI-generated logo</small><p>Jezero field station</p></div>
+      <div class="pick"><p>Click a person to choose a role <small>· Keys: 1 Habitat Planner · 2 Surface Astronaut</small></p>
+        <div class="pick-row hidden" aria-hidden="true"><button id="btn-pad" class="role"><b>Habitat Planner</b><span>Habitat display · Planning Display</span></button><button id="btn-hud" class="role"><b>Surface Astronaut</b><span>Walk inside the habitat · WASD</span></button></div></div>
+      <div class="legal">Fictional 3D habitat · archived measured terrain · simulated mission <a href="%BASE_URL%CREDITS.txt" target="_blank" rel="noopener" style="color:inherit">Data sources and notices</a></div>
+    </div>
+    <div id="topbar" class="hidden"><button id="btn-switch">Switch role</button><button id="btn-focus" class="hidden">Zoom display (F)</button><span id="phase"></span></div>
+    <section id="room-ui" class="hidden" aria-label="Habitat planning room">
+      <div class="room-context"><span class="eyebrow"><img class="brand-mini" src="/assets/brand/logo-light.webp" alt="Areographic" /> / Habitat <small class="ai-tag">AI-generated logo</small></span><h2 id="room-title">Areographic</h2><p id="room-breadcrumb" aria-live="polite">Habitat planning room / Seat view</p></div>
+      <div class="room-tools"><button id="btn-room" class="hidden">← Back to seat</button><button id="btn-motion" aria-pressed="true">View motion on</button></div>
+      <div class="monitor-switch" id="monitor-switch" role="group" aria-label="Switch habitat display"><button id="mon-prev" type="button" aria-label="Previous display">‹</button><div class="ms-label"><span id="ms-num"></span><b id="ms-title"></b></div><button id="mon-next" type="button" aria-label="Next display">›</button></div>
+      <nav class="monitor-dock" aria-label="Choose habitat display">
+        <button data-monitor="planner"><span>MISSION CONTROL</span><b>Planning Display</b><small>Map / site analysis / Marswalk status</small></button>
+      </nav>
+      <div class="room-footer"><span id="room-help">Mouse to look around · click a display · wheel to move closer</span><span id="room-telemetry"></span><button id="btn-eva">Airlock · astronaut view →</button></div>
+    </section>
+    <section id="walk-ui" class="hidden" aria-label="Walking inside the habitat">
+      <div class="walk-context"><span class="eyebrow" id="walk-location">Habitat interior (fictional)</span><p>Habitat interior · before EVA departure</p></div>
+      <div class="walk-reticle" aria-hidden="true"></div>
+      <div class="walk-controls"><button id="walk-monitor" class="hidden">F · Open display</button><p><b>WASD</b> move · drag mouse / arrow keys to look · <b>Esc</b> start screen</p><small>Go through the airlock on the left to start the surface exploration.</small></div>
+    </section>
+    <div id="sheen"></div>
+    <div id="loading"><div class="brand"><h1><img class="brand-logo" src="/assets/brand/logo-light.webp" alt="Areographic" width="1200" height="286" draggable="false" /></h1><p id="service-line">A layered, integrated view of Mars surface data that helps astronauts plan and carry out a Marswalk in search of potential biosignatures, from route planning in the habitat to the helmet HUD in the field.</p><div id="load-bar" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div><p id="load-label">Loading terrain and habitat… <b id="load-pct">0%</b></p><button id="start-btn" type="button" disabled>Press <kbd>Enter</kbd> to start</button><p id="gpu-note" hidden><b>Graphics acceleration is off in this browser</b>, so the 3D view will be very slow. In Chrome or Edge open <code>Settings → System</code>, turn on <b>Use graphics acceleration when available</b>, then relaunch the browser. (Check: <code>chrome://gpu</code>)</p><p id="loading-msg" role="status">Loading terrain and habitat…</p></div></div>
+  </div>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

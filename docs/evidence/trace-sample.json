@@ -1,0 +1,557 @@
+{
+ "schema": "marswalk-trace/1",
+ "exportedAt": "2026-11-14T22:03:03.556Z",
+ "eva": 1,
+ "notice": "모의 임무 기록입니다. 시각·위치·산소·선량·교신은 모의 값이고, 응답은 대원의 육안 기록이며 분석·판정이 아닙니다. actor=scripted 항목은 정해진 시연 응답이며 사람의 판단이 아닙니다.",
+ "clock": {
+  "unit": "모의 임무 시계 초",
+  "now": 30.016200000002875
+ },
+ "phase": "ended",
+ "inputs": [
+  {
+   "id": "HiRISE DTM 1 m (JEZ_hirise_soc_006)",
+   "kind": "실측 · 궤도",
+   "usedFor": "근거리 지형 높이 · 경로 경사 계산",
+   "source": "https://planetarymaps.usgs.gov/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif",
+   "localFile": "hirise_dtm_1m_640.u16",
+   "localSha256": "546d05984e2290b5c07c5b1cd9a045367ad9777379bea6a100d3402fd4e4c97a",
+   "processing": "640 m 창 잘라냄 · 16비트 양자화(최대 오차 0.7 mm)"
+  },
+  {
+   "id": "HiRISE 정사영상 25 cm",
+   "kind": "실측 · 궤도",
+   "usedFor": "지도 바탕 · 지형 착색(연출)",
+   "source": "https://planetarymaps.usgs.gov/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first.tif",
+   "localFile": "hirise_ortho_25cm_2560.jpg",
+   "localSha256": "94f2454022b4f4813a7ae905b744418ee9be1539b835db0c2aadab1a6f2963cd"
+  },
+  {
+   "id": "CTX DTM 20 m (JEZ_ctx_B_soc_008)",
+   "kind": "실측 · 궤도",
+   "usedFor": "광역 지형",
+   "source": "https://planetarymaps.usgs.gov/mosaic/mars2020_trn/CTX/JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0.tif",
+   "localFile": "ctx_dtm_20m_400.u16",
+   "localSha256": "93a6bb9be3bd896ab3245e3b4624fa2087afeddc822093d1a2f68d413fe066fa"
+  },
+  {
+   "id": "M20 traverse (MMGIS M20_traverse.json)",
+   "kind": "실측 · 로버 위치",
+   "usedFor": "고정 경로(주행선)",
+   "source": "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json",
+   "sourceSha256": "6ddd0ece913d75b45d105946082f95ed84e68f4718b68d32a4421dc30877e7e6",
+   "localFile": "route.json"
+  },
+  {
+   "id": "M20 waypoints (MMGIS M20_waypoints.json)",
+   "kind": "실측 · 로버 위치",
+   "usedFor": "정지점 · 목적지 56_0",
+   "source": "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json"
+  },
+  {
+   "id": "FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01",
+   "kind": "실측 · 전방 Hazcam 메시 (sol 1215)",
+   "usedFor": "계획 영상 · 대조 패키지의 선 · 현장 대조 대상",
+   "source": [
+    "https://d1ejlg980osaur.cloudfront.net/m20/r11/mars2020_hazcam_ops_mesh/data/sol/01215/ids/rdr/mesh/FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01.obj",
+    "https://d1ejlg980osaur.cloudfront.net/m20/r11/mars2020_hazcam_ops_mesh/data/sol/01215/ids/rdr/mesh/FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01.png"
+   ],
+   "localFile": "cropped to 1.5 m around N -0.555 m, E -2.295 m; vertex clustering (8 mm inside 0.75 m, 20 mm outside) -> 35065 vertices / 70118 triangles; texture cropped to the kept faces and resized to 2048x1118 JPEG q86. Script: tools/terrain/build_workspace_mesh.py",
+   "localSha256": {
+    "bin": "5b8e06545e9a2ed4fda5552129bf37367bad2e726a83c5a6e6e321d02e8fce4c",
+    "jpg": "01b4445c1c4c6681032fee008bae51209c2ea4c8b8dbfa854d055a212f563afa"
+   },
+   "limits": "single-view stereo mesh: surfaces hidden from the left front Hazcam are missing; decimated. In the scene a constant vertical shift and an edge blend put it on the HiRISE 1 m DTM.",
+   "presentation": "메시 높이 이동 · 가장자리 변형 · 착색은 연출"
+  },
+  {
+   "id": "NLG_1176_0771346345M727RAS_N0530130SCAM06176_0A01LLJ01",
+   "kind": "실측 · Navcam 메시 (sol 1176)",
+   "usedFor": "경로 옆 지형 조각(표시만)",
+   "source": [
+    "https://d1ejlg980osaur.cloudfront.net/m20/r11/mars2020_navcam_ops_mesh/data/sol/01176/ids/rdr/mesh/NLG_1176_0771346345M727RAS_N0530130SCAM06176_0A01LLJ01.obj",
+    "https://d1ejlg980osaur.cloudfront.net/m20/r11/mars2020_navcam_ops_mesh/data/sol/01176/ids/rdr/mesh/NLG_1176_0771346345M727RAS_N0530130SCAM06176_0A01LLJ01.png"
+   ],
+   "localSha256": {
+    "bin": "ef3eb4c5f6ed359aed2fda9e85e3fa647403c35125f4ee8ab54f3c308628bde8",
+    "jpg": "abcc1436357fbc828bf7f9c9e5bf75b2a1bdd1119cea01780f6de03d1614fcc1"
+   },
+   "presentation": "높이 이동 · 가장자리 변형 · 착색은 연출"
+  },
+  {
+   "id": "PIA26368",
+   "kind": "실측 영상 · WATSON (sol 1212)",
+   "usedFor": "관찰 대조 ① 원본 영상",
+   "source": "https://www.jpl.nasa.gov/images/pia26368-perseverance-finds-a-rock-with-leopard-spots/",
+   "originalSha256": "02a6c0d201d58d0623f5f546f7e0748d9cafdddf90aa6994cd29e5e64b21ce9f",
+   "credit": "NASA/JPL-Caltech/MSSS"
+  },
+  {
+   "id": "PIA26640",
+   "kind": "장비 분석 · PIXL 광물 지도",
+   "usedFor": "관찰 대조 ② 공개 분석 자료 (①과의 위치 정합 미확인)",
+   "source": "https://science.nasa.gov/photojournal/perseverances-pixl-finds-vivianite-greigite-in-cheyava-falls-sample/",
+   "originalSha256": "7125992eabb74e5b226456e87d7c8e19037974a24a46390f12134ef03abda303",
+   "credit": "NASA/JPL-Caltech"
+  }
+ ],
+ "plan": {
+  "planVersion": 2,
+  "destKey": "56_0",
+  "route": {
+   "oneWayM": 343.8457378011231,
+   "traverseM": 326.27800779316374,
+   "maxSlopeDeg": 12.711269375417038,
+   "basis": "M20 주행선 + HiRISE 1 m DTM 높이 (계산)"
+  },
+  "sent": {
+   "rev": 1,
+   "planVersion": 2,
+   "decider": "김선비",
+   "transport": "foot",
+   "todos": [
+    {
+     "id": "compare",
+     "name": "현장 대조 · 선 투영",
+     "min": 4
+    },
+    {
+     "id": "observe",
+     "name": "관찰 대조 · 관찰 리스트",
+     "min": 6
+    },
+    {
+     "id": "sample",
+     "name": "시료 기록",
+     "min": 5
+    },
+    {
+     "id": "photo",
+     "name": "촬영 마킹",
+     "min": 2
+    },
+    {
+     "id": "memo",
+     "name": "음성 메모",
+     "min": 3
+    }
+   ],
+   "budget": {
+    "outM": 334.2347382008034,
+    "transport": "foot",
+    "transportLabel": "도보 1.4 m/s (모의)",
+    "speed": 1.4,
+    "travelSec": 238.73909871485958,
+    "staySec": 1200,
+    "marginSec": 180,
+    "turnaroundSec": 1620,
+    "totalSec": 1858.7390987148597,
+    "o2Use": 10.842644742503348,
+    "o2AtReturn": 89.15735525749665,
+    "note": "모의 · 검증된 소모품 모델 아님"
+   }
+  }
+ },
+ "package": {
+  "rev": 1,
+  "planVersion": 2,
+  "matchesPlanVersion": true,
+  "stale": false,
+  "imageId": "FLF_1215_0774815107M492RAS",
+  "source": "전방 Hazcam 작업 구역 메시 텍스처 · sol 1215 (2024-07-21)",
+  "credit": "NASA/JPL-Caltech",
+  "lineFingerprint": "219f3fc2",
+  "lineCount": 32,
+  "detail": 2,
+  "targets": [
+   {
+    "id": 1,
+    "u": 0.52441,
+    "v": 0.24234999999999995
+   }
+  ]
+ },
+ "transmissions": {
+  "plan": {
+   "confirmedAt": 0,
+   "sentAt": 0,
+   "receivedAt": 0.03470000000298023,
+   "ackAt": 1.7340000000000004,
+   "ack": {
+    "actor": "human",
+    "label": "사람 대원 · HUD 수동 조작"
+   }
+  },
+  "package": {
+   "sentAt": 0,
+   "receivedAt": 0.03470000000298023,
+   "ackAt": 1.7340000000000004,
+   "ack": {
+    "actor": "human",
+    "label": "사람 대원 · HUD 수동 조작"
+   }
+  },
+  "remoteReturn": {
+   "text": "복귀 개시 지시",
+   "sentAt": 11.684000000000026,
+   "receivedAt": 11.700299999997046,
+   "ackAt": 12.883400000005993,
+   "ack": {
+    "actor": "human",
+    "label": "사람 대원 · HUD 수동 조작"
+   },
+   "declined": true,
+   "declinedAt": 13.483500000000037,
+   "executedAt": null,
+   "executed": null
+  },
+  "alerts": [
+   {
+    "id": 1,
+    "kind": "weather",
+    "title": "우주기상 경보",
+    "level": "warning",
+    "source": "기지 전송 · 모의 사건 (실제 관측 아님)",
+    "raisedAt": 14.499900000006003,
+    "sentAt": 14.499900000006003,
+    "receivedAt": 14.516500000000041,
+    "ackAt": 15.700200000003022,
+    "ack": {
+     "actor": "human",
+     "label": "사람 대원 · HUD 수동 조작"
+    },
+    "choice": "return",
+    "choiceAt": 16.20010000000898,
+    "chosen": {
+     "actor": "human",
+     "label": "사람 대원 · HUD 수동 조작"
+    },
+    "held": false,
+    "heldAt": null,
+    "executedAt": 16.849299999997044,
+    "executed": {
+     "actor": "human",
+     "label": "사람 대원 · HUD 수동 조작"
+    },
+    "resolvedAt": 14.499900000006003
+   }
+  ]
+ },
+ "responses": {
+  "compare": {
+   "result": "match",
+   "at": 6.7502999999970275,
+   "gazeErrDeg": 0.4616207851419492,
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작",
+   "input": "button",
+   "againstPackage": {
+    "rev": 1,
+    "planVersion": 2
+   },
+   "note": "대원이 직접 고른 결과 · 자동 인식 아님"
+  },
+  "observations": [
+   {
+    "id": "bedding",
+    "name": "층리",
+    "question": "얇은 층이 겹친 구조가 보이는가",
+    "answer": "not_seen",
+    "answerLabel": "못 봄",
+    "at": 9.067200000002993,
+    "actor": "human",
+    "label": "사람 대원 · HUD 수동 조작",
+    "input": "typed"
+   },
+   {
+    "id": "grain",
+    "name": "입자",
+    "question": "입자가 눈으로 구분되는가",
+    "answer": null,
+    "answerLabel": "응답 없음",
+    "at": null,
+    "input": null
+   },
+   {
+    "id": "sorting",
+    "name": "분급",
+    "question": "입자 크기가 고르게 보이는가",
+    "answer": null,
+    "answerLabel": "응답 없음",
+    "at": null,
+    "input": null
+   },
+   {
+    "id": "vein",
+    "name": "맥",
+    "question": "흰 맥이 보이는가 · ①과 비교",
+    "answer": "seen",
+    "answerLabel": "봄",
+    "at": 8.317200000002991,
+    "actor": "human",
+    "label": "사람 대원 · HUD 수동 조작",
+    "input": "typed"
+   },
+   {
+    "id": "spots",
+    "name": "반점",
+    "question": "반점과 어두운 테두리가 보이는가 · ①과 비교",
+    "answer": "undetermined",
+    "answerLabel": "판단 불가",
+    "at": 8.700000000000012,
+    "actor": "human",
+    "label": "사람 대원 · HUD 수동 조작",
+    "input": "typed"
+   },
+   {
+    "id": "alt",
+    "name": "대안 설명",
+    "question": "비생물 과정으로도 설명될 만한 모습인가",
+    "answer": "undetermined",
+    "answerLabel": "판단 불가",
+    "at": 9.434000000000012,
+    "actor": "human",
+    "label": "사람 대원 · HUD 수동 조작",
+    "input": "typed"
+   }
+  ],
+  "memos": [
+   {
+    "id": 6,
+    "type": "memo",
+    "text": "반점 테두리가 흐려서 PIXL 지도와 같은 위치인지 판단 못함. 가까이서 다시 확인 필요",
+    "actor": "human",
+    "label": "사람 대원 · HUD 수동 조작",
+    "input": "음성 대체 입력(데모 텍스트)",
+    "createdAt": 10.300400000005977,
+    "receivedAtPad": 10.317000000000016,
+    "phase": "onsite",
+    "transport": "foot",
+    "position": {
+     "lonE": 77.30519088999999,
+     "latN": 18.497484439999997,
+     "routeS_m": 343.8457378011231,
+     "kind": "모의 위치를 지도 좌표로 바꾼 값"
+    },
+    "doseUsv_simulated": 0.07987578703708338,
+    "hasCapture": false
+   }
+  ],
+  "returnStart": {
+   "at": 16.849299999997044,
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작"
+  },
+  "missionEnd": {
+   "at": 28.333299999996946,
+   "how": "안쪽 에어록 문 통과",
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작"
+  }
+ },
+ "records": [
+  {
+   "id": 1,
+   "type": "compare",
+   "text": "현장 대조: 대원이 일치 확인 (계획 v2 패키지 r1, 시선 오차 0.5°). 자동 인식 아님.",
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작",
+   "input": "버튼",
+   "createdAt": 6.7502999999970275,
+   "receivedAtPad": 6.776600000008949,
+   "phase": "onsite",
+   "transport": "foot",
+   "position": {
+    "lonE": 77.30519088999999,
+    "latN": 18.497484439999997,
+    "routeS_m": 343.8457378011231,
+    "kind": "모의 위치를 지도 좌표로 바꾼 값"
+   },
+   "doseUsv_simulated": 0.052346076388865834,
+   "result": "match",
+   "hasCapture": true,
+   "captureNote": "모의 화면 · 실제 관측 아님 (이 파일에는 넣지 않음)"
+  },
+  {
+   "id": 2,
+   "type": "obs",
+   "text": "맥: 봄",
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작",
+   "input": "음성 대체 입력(데모 텍스트)",
+   "createdAt": 8.317200000002991,
+   "receivedAtPad": 8.355200000002991,
+   "phase": "onsite",
+   "transport": "foot",
+   "position": {
+    "lonE": 77.30519088999999,
+    "latN": 18.497484439999997,
+    "routeS_m": 343.8457378011231,
+    "kind": "모의 위치를 지도 좌표로 바꾼 값"
+   },
+   "doseUsv_simulated": 0.06449680555557875,
+   "item": "vein",
+   "answer": "seen",
+   "hasCapture": true,
+   "captureNote": "모의 화면 · 실제 관측 아님 (이 파일에는 넣지 않음)"
+  },
+  {
+   "id": 3,
+   "type": "obs",
+   "text": "반점: 판단 불가",
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작",
+   "input": "음성 대체 입력(데모 텍스트)",
+   "createdAt": 8.700000000000012,
+   "receivedAtPad": 8.725000000000012,
+   "phase": "onsite",
+   "transport": "foot",
+   "position": {
+    "lonE": 77.30519088999999,
+    "latN": 18.497484439999997,
+    "routeS_m": 343.8457378011231,
+    "kind": "모의 위치를 지도 좌표로 바꾼 값"
+   },
+   "doseUsv_simulated": 0.06746527777777787,
+   "item": "spots",
+   "answer": "undetermined",
+   "hasCapture": true,
+   "captureNote": "모의 화면 · 실제 관측 아님 (이 파일에는 넣지 않음)"
+  },
+  {
+   "id": 4,
+   "type": "obs",
+   "text": "층리: 못 봄",
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작",
+   "input": "음성 대체 입력(데모 텍스트)",
+   "createdAt": 9.067200000002993,
+   "receivedAtPad": 9.092100000008953,
+   "phase": "onsite",
+   "transport": "foot",
+   "position": {
+    "lonE": 77.30519088999999,
+    "latN": 18.497484439999997,
+    "routeS_m": 343.8457378011231,
+    "kind": "모의 위치를 지도 좌표로 바꾼 값"
+   },
+   "doseUsv_simulated": 0.07031277777780098,
+   "item": "bedding",
+   "answer": "not_seen",
+   "hasCapture": true,
+   "captureNote": "모의 화면 · 실제 관측 아님 (이 파일에는 넣지 않음)"
+  },
+  {
+   "id": 5,
+   "type": "obs",
+   "text": "대안 설명: 판단 불가",
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작",
+   "input": "음성 대체 입력(데모 텍스트)",
+   "createdAt": 9.434000000000012,
+   "receivedAtPad": 9.465400000005973,
+   "phase": "onsite",
+   "transport": "foot",
+   "position": {
+    "lonE": 77.30519088999999,
+    "latN": 18.497484439999997,
+    "routeS_m": 343.8457378011231,
+    "kind": "모의 위치를 지도 좌표로 바꾼 값"
+   },
+   "doseUsv_simulated": 0.07315717592592602,
+   "item": "alt",
+   "answer": "undetermined",
+   "hasCapture": true,
+   "captureNote": "모의 화면 · 실제 관측 아님 (이 파일에는 넣지 않음)"
+  },
+  {
+   "id": 6,
+   "type": "memo",
+   "text": "반점 테두리가 흐려서 PIXL 지도와 같은 위치인지 판단 못함. 가까이서 다시 확인 필요",
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작",
+   "input": "음성 대체 입력(데모 텍스트)",
+   "createdAt": 10.300400000005977,
+   "receivedAtPad": 10.317000000000016,
+   "phase": "onsite",
+   "transport": "foot",
+   "position": {
+    "lonE": 77.30519088999999,
+    "latN": 18.497484439999997,
+    "routeS_m": 343.8457378011231,
+    "kind": "모의 위치를 지도 좌표로 바꾼 값"
+   },
+   "doseUsv_simulated": 0.07987578703708338,
+   "hasCapture": false
+  },
+  {
+   "id": 7,
+   "type": "sample",
+   "text": "",
+   "actor": "human",
+   "label": "사람 대원 · HUD 수동 조작",
+   "input": "음성 대체 입력(데모 텍스트)",
+   "createdAt": 10.649700000003,
+   "receivedAtPad": 10.678400000005979,
+   "phase": "onsite",
+   "transport": "foot",
+   "position": {
+    "lonE": 77.30519088999999,
+    "latN": 18.497484439999997,
+    "routeS_m": 343.8457378011231,
+    "kind": "모의 위치를 지도 좌표로 바꾼 값"
+   },
+   "doseUsv_simulated": 0.08258447916668993,
+   "target": {
+    "id": 1,
+    "u": 0.52441,
+    "v": 0.24234999999999995,
+    "planVersion": 2,
+    "rev": 1
+   },
+   "hasCapture": true,
+   "captureNote": "모의 화면 · 실제 관측 아님 (이 파일에는 넣지 않음)"
+  }
+ ],
+ "recordsReceivedAtPad": 7,
+ "followUps": [
+  {
+   "key": "e1-obs-4",
+   "kind": "관찰 응답",
+   "title": "층리: 못 봄",
+   "note": "현장에서 못 봄 · 다시 볼지 정함",
+   "fromRecordId": 4,
+   "recordedAt": 9.067200000002993,
+   "markedForNextEva": true
+  },
+  {
+   "key": "e1-obs-3",
+   "kind": "관찰 응답",
+   "title": "반점: 판단 불가",
+   "note": "현장에서 판단 불가 · 추가 확인 필요",
+   "fromRecordId": 3,
+   "recordedAt": 8.700000000000012,
+   "markedForNextEva": false
+  },
+  {
+   "key": "e1-obs-5",
+   "kind": "관찰 응답",
+   "title": "대안 설명: 판단 불가",
+   "note": "현장에서 판단 불가 · 추가 확인 필요",
+   "fromRecordId": 5,
+   "recordedAt": 9.434000000000012,
+   "markedForNextEva": false
+  },
+  {
+   "key": "e1-sample-7",
+   "kind": "시료 기록",
+   "title": "시료 기록 #7",
+   "note": "분석 대기 · 생명 여부 미판정",
+   "fromRecordId": 7,
+   "recordedAt": 10.649700000003,
+   "markedForNextEva": false
+  }
+ ],
+ "carriedFromPreviousEva": [],
+ "scriptedCrewLog": []
+}

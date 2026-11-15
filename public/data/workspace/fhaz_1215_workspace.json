@@ -1,0 +1,128 @@
+{
+ "source_id": "FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01",
+ "frame": "SITE_FRAME index 56: +X north, +Y east, +Z down, metres; origin = rover position at site 56 / drive 0",
+ "crop": {
+  "centre_ne_m": [
+   -0.555,
+   -2.295
+  ],
+  "radius_m": 1.5
+ },
+ "decimation": {
+  "method": "vertex clustering",
+  "cell_m_inside": 0.008,
+  "inside_radius_m": 0.75,
+  "cell_m_outside": 0.02
+ },
+ "original": {
+  "vertices": 165569,
+  "triangles": 324617,
+  "texture_px": [
+   5120,
+   2880
+  ]
+ },
+ "vertices": 35065,
+ "triangles": 70118,
+ "texture": {
+  "file": "fhaz_1215_workspace.jpg",
+  "px": [
+   2048,
+   1118
+  ],
+  "source_box_px": [
+   873,
+   556,
+   5120,
+   2875
+  ]
+ },
+ "rock_region_image": {
+  "u0": 0.31813703790911224,
+  "u1": 0.776730868848599,
+  "v0": 0.1043760241483398,
+  "v1": 0.5739439413540319
+ },
+ "layout": {
+  "positions_f32": [
+   0,
+   420780
+  ],
+  "uv_f32": [
+   420780,
+   280520
+  ],
+  "indices_u32": [
+   701300,
+   841416
+  ]
+ },
+ "points": {
+  "A": {
+   "name": "Apollo Temple abrasion patch",
+   "estimate_ned_m": [
+    -0.5,
+    -2.24,
+    0.13
+   ],
+   "basis": "computed from raw WATSON camera metadata; not an official target coordinate",
+   "snapped_vertex_ned_m": [
+    -0.4994,
+    -2.2403,
+    0.1612
+   ],
+   "horizontal_snap_m": 0.0007,
+   "mesh_minus_estimate_down_m": 0.0312,
+   "uv": [
+    0.55455,
+    0.71542
+   ],
+   "texture_snap": {
+    "method": "centroid of the brightest 2 % of texture pixels within 6 cm of the estimate",
+    "contrast_dn": 50.4,
+    "vertex_ned_m": [
+     -0.482,
+     -2.2493,
+     0.1511
+    ],
+    "uv": [
+     0.56202,
+     0.7189
+    ],
+    "moved_m": 0.022
+   }
+  },
+  "B": {
+   "name": "Cheyava Falls natural target / Sapphire Canyon core area",
+   "estimate_ned_m": [
+    -0.61,
+    -2.35,
+    0.18
+   ],
+   "basis": "computed from raw WATSON camera metadata; not an official target coordinate",
+   "snapped_vertex_ned_m": [
+    -0.6078,
+    -2.3437,
+    0.1966
+   ],
+   "horizontal_snap_m": 0.0067,
+   "mesh_minus_estimate_down_m": 0.0166,
+   "uv": [
+    0.52441,
+    0.75765
+   ]
+  }
+ },
+ "sha256": {
+  "source_obj": "d20fa35f32d949b907cd638c558035afcd037c52dfde774ebdb0b0622f92edb0",
+  "source_png": "68a4c25e7d3fcdad6b1250b1564f79e1443b0d9753755c58a7f3350c177734c1",
+  "bin": "5b8e06545e9a2ed4fda5552129bf37367bad2e726a83c5a6e6e321d02e8fce4c",
+  "jpg": "01b4445c1c4c6681032fee008bae51209c2ea4c8b8dbfa854d055a212f563afa"
+ },
+ "bytes": {
+  "source_obj": 38135858,
+  "source_png": 31123798,
+  "bin": 1542716,
+  "jpg": 504631
+ }
+}
