@@ -1,0 +1,77 @@
+/* v0.2 HUD extension (src/hud/field-hud.js). Scoped to `.hud.fx`; the existing HUD rules in src/style.css are not edited.
+   Colours follow docs/hud-design-basis.md: green normal information on dark plates, yellow = caution, red = warning,
+   blue = advisory, cyan = missing/stale data. */
+  .hud.fx .fx-cau, .hud.fx .fx-warn { padding-left: .3em; }
+.hud.fx .fx-cau { box-shadow: -.5em 0 0 var(--cau); color: var(--cau); border-bottom-color: var(--cau); }
+.hud.fx .fx-warn { box-shadow: -.5em 0 0 #b3261e; color: #fff; border-bottom-color: #fff; }
+/* overlap fixes (design review): the list card no longer carries the cropped photo, and never reaches the navigation panel */
+.hud.fx .hud-card { top: 11.4%; max-height: calc(81vh - 11.4vh - 11.2em); max-width: calc(41.5vw - 184px); overflow: hidden; } /* stays right of the compass on narrow screens */
+.hud.fx .hud-card[data-phase="onsite"] > #hud-ref, .hud.fx .hud-card[data-phase="onsite"] > #hud-ref + .hud-credit, .hud.fx .hud-card[data-phase="onsite"] > .hud-feat { display: none; }
+.hud.fx .hud-card #hud-lastrec { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.hud.fx .hud-card .hud-item { padding-top: 0; padding-bottom: 0; }
+.hud.fx.has-card .hud-tr { right: auto; left: 8.5%; top: 14.5%; } /* minimap moves to the left while a card is open */
+.hud.fx.has-card .hud-tr:not(.hidden) ~ .hud-card { right: 8.5%; }
+.hud.fx.has-card .hud-brand { display: none; }
+.fx-cmp { display: flex; gap: .7em; align-items: flex-start; margin: .2em 0; } .fx-cmp img { display: block; width: 7.6em; aspect-ratio: 2048 / 1118; height: auto; margin: 0; border: 1px solid var(--g); flex: none; }
+.hud.fx .fx-note, .hud.fx .fx-voice { left: 8.5%; bottom: 32%; width: 25.5em; border: 1px solid var(--g); z-index: 3; } /* left of centre: the rock and the horizon stay visible */
+.hud.fx .fx-note { color: var(--gv); }
+.hud.fx.has-board .fx-note { display: none; } .hud.fx.has-board .fx-voice { left: 50%; transform: translateX(-50%); bottom: 1.5%; } .hud.fx.has-board .fx-voice label, .hud.fx.has-board #hud-voice-state { display: none; } /* compact bar under the board; the placeholder keeps the fallback label */
+.hud.fx .fx-voice:not(.hidden) ~ .fx-note { display: none; } /* the voice bar already shows the result */
+.fx-voice label { display: block; font-size: .93em; margin-top: .2em; } .fx-voice input { width: 100%; font: inherit; color: var(--gv); background: #000; border: 1px solid var(--g); margin: .2em 0; padding: .1em .4em; }
+#hud-voice-note { color: var(--gv); min-height: 1.35em; }
+/* ---- observation check board (design proposal d) ---- */
+.hud.fx.has-board .hud-brand, .hud.fx.has-board .hud-tc, .hud.fx.has-board .hud-bl, .hud.fx.has-board .hud-br, .hud.fx.has-board .hud-tr, .hud.fx.has-board .hud-bc, .hud.fx.has-board .hud-cue { display: none; }
+.hud.fx .fx-board { left: 10.75%; right: 10.75%; top: 14%; padding: .7em 1em .6em; font-size: clamp(13.5px, 1.72vh, 19px); }
+.fx-board .b-head { display: flex; align-items: baseline; gap: 1em; margin-bottom: .45em; white-space: nowrap; } .fx-board h1 { margin: 0; font-size: 1.2em; font-weight: 700; color: #fff; } .fx-board .vit { margin-left: auto; }
+.fx-board .b-panes { display: grid; grid-template-columns: 1fr 1.18fr 1fr; gap: .9em; }
+.fx-board h2 { margin: 0 0 .3em; font-size: 1em; font-weight: 700; color: var(--gv); white-space: nowrap; overflow: hidden; } .fx-board h2 i { font-style: normal; font-weight: 400; color: var(--g); font-size: .93em; margin-left: .4em; }
+.fx-board h2 em { font-style: normal; display: inline-block; width: 1.4em; line-height: 1.4em; text-align: center; background: var(--gv); color: #04130a; font-weight: 700; border-radius: 2px; margin-right: .4em; }
+.fx-board .b-frame { height: 25.5vh; background: #020503; display: flex; position: relative; border: 1px solid rgba(140, 255, 158, .45); }
+.fx-board .b-frame img { display: block; height: 100%; width: 100%; object-fit: contain; min-width: 0; } /* whole image, never cropped */
+#hud-pane2 .b-frame img { width: auto; flex: none; }
+.fx-board .b-legend { flex: 1; min-width: 0; padding: .3em .5em; font-size: .93em; line-height: 1.3; display: flex; flex-direction: column; gap: .35em; color: var(--gv); } .b-legend small { display: block; } .b-legend .sw { display: inline-block; width: 1.7em; height: .75em; margin-right: .4em; }
+.fx-board .b-frame.new { align-items: center; justify-content: center; text-align: center; background: repeating-linear-gradient(135deg, #07120a 0 10px, #020503 10px 20px); }
+.fx-board .simlabel { position: absolute; left: 0; bottom: 0; background: rgba(3, 9, 5, .92); color: #fff; padding: .05em .5em; font-size: .93em; border-top: 1px solid var(--g); border-right: 1px solid var(--g); }
+.fx-board .empty { background: rgba(3, 9, 5, .92); padding: .3em .6em; font-size: .93em; }
+.fx-board .b-meta { font-size: .93em; margin-top: .3em; line-height: 1.4; } .fx-board .b-meta b { color: #fff; }
+.fx-board .tag { border: 1px solid var(--g); padding: 0 .35em; margin-right: .3em; } .fx-board .tag.none { border-color: var(--stale); color: var(--stale); }
+.fx-board .b-plan { margin-top: .4em; font-size: .93em; color: var(--gv); }
+.fx-board .b-notice { margin-top: .3em; font-size: .93em; padding: .15em .6em; border-left: .35em solid var(--stale); color: #fff; }
+.fx-board .b-items { margin-top: .45em; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .35em .9em; }
+.fx-board .b-item { display: flex; align-items: center; gap: .5em; padding: .12em .5em; border: 1px solid rgba(140, 255, 158, .4); } .b-item.sel { border-color: #fff; background: rgba(140, 255, 158, .16); }
+.b-item .t { flex: 1; min-width: 0; color: var(--gv); font-weight: 600; } .b-item .t small { display: block; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-item .seg { display: flex; font-size: .93em; white-space: nowrap; } .b-item .seg span { padding: 0 .4em; border: 1px solid rgba(140, 255, 158, .55); margin-left: -1px; } .b-item .seg span.on { background: var(--gv); color: #04130a; font-weight: 700; border-color: var(--gv); }
+.fx-board .b-opts { margin-top: .45em; display: flex; align-items: center; gap: .5em; white-space: nowrap; } .b-opts .hud-item { display: inline-block; border: 1px solid rgba(140, 255, 158, .55); padding: .05em .7em; } .b-opts .hud-item.sel { border-color: #fff; color: #fff; background: rgba(140, 255, 158, .16); } .b-opts .keys { margin-left: auto; font-size: .93em; }
+.fx-board .b-foot { margin-top: .4em; font-size: .93em; }
+@media (max-width: 1400px) { .fx-board .b-items { grid-template-columns: 1fr 1fr; } }
+.fx-voice input::placeholder { color: var(--g); opacity: .8; }
+.hud.fx .fx-chip { border: 1px solid var(--cau); border-radius: 3px; padding: 0 .4em; font-size: .93em; }
+/* en-route brief (joint demo feedback 2026-11-15): a short line under the compass while moving; hidden whenever an alert / plan / package card needs the crew */
+.hud.fx .fx-brief { position: absolute; left: 50%; top: 25.5%; transform: translateX(-50%); max-width: min(30em, 38vw); font-size: .86em; line-height: 1.4; text-align: center; color: #fff; background: rgba(4, 10, 14, .55); border-radius: 6px; padding: .45em .9em; z-index: 2; pointer-events: none; }
+.hud.fx .fx-brief #hud-brief-auto { color: #ffd84d; font-weight: 600; margin-bottom: .15em; } .hud.fx .fx-brief #hud-brief-auto.hidden { display: none; }
+.hud.fx.has-board .fx-brief, .hud.fx.has-card .fx-brief, .hud.fx.detail-open .fx-brief { display: none; } /* never over a card that needs the crew */
+/* photo (suit button 3): viewfinder corners close in, a short flash, then the captured demo frame shrinks toward the bottom-left record corner */
+.hud.fx .fx-shutter { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+.fx-shutter .c { position: absolute; width: 9vmin; height: 9vmin; border: 0 solid #fff; opacity: 0; filter: drop-shadow(0 0 4px #000a); }
+.fx-shutter .tl { left: 24%; top: 22%; border-left-width: 3px; border-top-width: 3px; } .fx-shutter .tr { right: 24%; top: 22%; border-right-width: 3px; border-top-width: 3px; }
+.fx-shutter .bl { left: 24%; bottom: 22%; border-left-width: 3px; border-bottom-width: 3px; } .fx-shutter .br { right: 24%; bottom: 22%; border-right-width: 3px; border-bottom-width: 3px; }
+.fx-shutter .flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+.fx-shutter .thumb { position: absolute; left: 50%; top: 50%; width: 34vw; transform: translate(-50%, -50%); border: 2px solid #fff; border-radius: 4px; opacity: 0; box-shadow: 0 8px 30px #000a; }
+.fx-shutter .lbl { position: absolute; left: 50%; top: calc(50% + 11vw); transform: translateX(-50%); color: #fff; font-size: 15px; font-weight: 600; text-shadow: 0 1px 3px #000; opacity: 0; white-space: nowrap; }
+.fx-shutter.go .c { animation: sh-corner .9s ease-out forwards; }
+.fx-shutter.go .tl { --dx: -18px; --dy: -18px; } .fx-shutter.go .tr { --dx: 18px; --dy: -18px; } .fx-shutter.go .bl { --dx: -18px; --dy: 18px; } .fx-shutter.go .br { --dx: 18px; --dy: 18px; }
+.fx-shutter.go .flash { animation: sh-flash .28s ease-out .12s; }
+.fx-shutter.go .thumb { animation: sh-thumb 1.35s cubic-bezier(.5, 0, .3, 1) .2s forwards; }
+.fx-shutter.go .lbl { animation: sh-lbl 1.2s ease-out .25s forwards; }
+@keyframes sh-corner { 0% { opacity: 0; transform: translate(var(--dx), var(--dy)); } 25% { opacity: 1; transform: none; } 70% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes sh-flash { 0% { opacity: 0; } 25% { opacity: .7; } 100% { opacity: 0; } }
+@keyframes sh-thumb { 0% { opacity: 0; transform: translate(-50%, -50%) scale(1.04); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 45% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% - 32vw), calc(-50% + 28vh)) scale(.22); } }
+@keyframes sh-lbl { 0% { opacity: 0; } 20% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+/* reduced motion (OS setting): no flash and no flying, but the frame and the captured picture still show for a moment (fade only) */
+@keyframes sh-still { 0% { opacity: 0; } 12% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .fx-shutter.go .flash { animation: none; } .fx-shutter.go .c { animation: sh-still 1.3s linear forwards; transform: none; } .fx-shutter.go .thumb { animation: sh-still 1.3s linear forwards; transform: translate(-50%, -50%); } }
+/* task card overflow (fitCard in field-hud.js): first drop pictures and source lines, then compact rows, then window the item list */
+.hud.fx .hud-card.fit1 img, .hud.fx .hud-card.fit1 .fx-cmp, .hud.fx .hud-card.fit1 .hud-credit, .hud.fx .hud-card.fit1 .hud-feat, .hud.fx .hud-card.fit1 #hud-lastrec { display: none !important; }
+.hud.fx .hud-card.fit2 { line-height: 1.18; } .hud.fx .hud-card.fit2 .hud-v, .hud.fx .hud-card.fit2 .hud-row2 { font-size: .9em; } .hud.fx .hud-card.fit2 .hud-keys { font-size: .76em; }
+.hud.fx .hud-card .hud-item.off { display: none; }
+.hud.fx .hud-card .fx-more { font-size: .8em; opacity: .85; padding: .1em .45em; }

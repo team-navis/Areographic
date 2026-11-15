@@ -1,0 +1,70 @@
+/* Field mission cards (mission-cards.js): one mission at a time, kit panel, three numbered buttons; arrow above the mission target. */
+.hud .mc-card { position: absolute; right: 7.5%; top: 17%; width: clamp(18em, 27vw, 26em); max-height: 68vh; overflow: hidden; pointer-events: auto;
+  padding: .9em 1.05em 1em; background: rgba(6, 12, 16, .7); border: 0 solid transparent; border-image: url(/assets/hud/panel_info_01.webp) 66 fill / 22px / .5em .6em stretch;
+  display: flex; flex-direction: column; gap: .55em; color: #fff; }
+.hud .mc-card.hidden, .hud .mc-target.hidden { display: none; }
+.hud.has-mission .hud-card, .hud.mc-onsite .hud-br, .hud.mc-onsite .fx-brief, .hud.mc-onsite .hud-rlegend { display: none !important; } /* navigation stays while a receipt / alert card shows on the move */
+.hud .mc-head { display: flex; align-items: center; gap: .55em; }
+.hud .mc-n { flex: none; min-width: 1.55em; height: 1.55em; display: grid; place-items: center; background: #f2f6f8; color: #0b1418; font-weight: 800; border-radius: 3px; font-size: 1.05em; }
+.hud .mc-head h3 { margin: 0; font-size: 1.35em; line-height: 1.15; font-weight: 700; letter-spacing: -.01em; flex: 1; min-width: 0; overflow-wrap: anywhere; } /* long titles (e.g. Observation · Non-biological explanation) wrap to a second line instead of being cut */
+.hud .mc-head { align-items: flex-start; } .hud .mc-head .mc-n, .hud .mc-head .mc-chip { margin-top: .1em; }
+.hud .mc-chip { flex: none; border: 1.5px solid rgba(255, 255, 255, .55); border-radius: 999px; padding: .08em .75em; font-weight: 600; font-variant-numeric: tabular-nums; }
+.hud .mc-text { margin: 0; padding-left: .6em; border-left: 3px solid #b58cf0; line-height: 1.4; font-weight: 600; }
+.hud .mc-state { font-size: .82em; color: #cfe8ef; }
+.hud .mc-state.ok { color: #71eaff; } .hud .mc-state.wait { color: #ffd166; }
+.hud .mc-media { position: relative; margin: 0; border: 2px solid #71eaff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 12px rgba(113, 234, 255, .55), inset 0 0 8px rgba(113, 234, 255, .35); background: #000; }
+.hud .mc-media img { display: block; width: 100%; height: 9.5em; object-fit: cover; }
+.hud .mc-media.big img { height: 17em; object-fit: contain; }
+.hud .mc-mlabel { position: absolute; left: 0; top: 0; background: rgba(6, 12, 16, .85); padding: .15em .7em; font-weight: 700; border-bottom-right-radius: 6px; border-right: 1.5px solid #71eaff; border-bottom: 1.5px solid #71eaff; }
+.hud .mc-credit { font-size: .66em; color: rgba(255, 255, 255, .62); line-height: 1.3; }
+.hud .mc-sep { height: 1px; background: rgba(255, 255, 255, .25); margin: .15em 0; }
+.hud .mc-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5em; }
+.hud .mc-btn { font: inherit; color: #fff; background: rgba(6, 12, 16, .55); border: 1.5px solid rgba(255, 255, 255, .7); border-radius: 9px; padding: .45em .35em .4em; cursor: pointer;
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; align-items: center; column-gap: .35em; row-gap: .2em; text-align: left; min-width: 0; }
+.hud .mc-btn kbd { grid-row: 1; margin: 0; }
+.hud .mc-btn .mc-ic { grid-row: 1; justify-self: center; display: grid; place-items: center; }
+.hud .mc-btn .mc-ic svg { width: 1.45em; height: 1.45em; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.hud .mc-btn .mc-ic .hk-ic { width: 1.5em; height: 1.5em; }
+.hud .mc-btn .mc-bl { grid-column: 1 / -1; font-size: .74em; font-weight: 600; text-align: center; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud .mc-btn:hover, .hud .mc-btn.on { border-color: #71eaff; box-shadow: 0 0 10px rgba(113, 234, 255, .6), inset 0 0 8px rgba(113, 234, 255, .3); }
+.hud .mc-btn.on .mc-ic svg { stroke: #71eaff; }
+.hud .mc-btn.dim { opacity: .55; }
+
+/* arrow above the mission target, pointing down at it (or to the screen edge when the target is out of view) */
+.hud .mc-target { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; z-index: 3; }
+.hud .mc-target img { position: absolute; left: -32px; top: -78px; width: 64px; height: 50px; transform: rotate(var(--rot, 180deg)); filter: drop-shadow(0 0 8px rgba(113, 234, 255, .9)); animation: mc-bob 1.1s ease-in-out infinite; }
+.hud .mc-target .mc-tlabel { position: absolute; left: 0; top: -112px; transform: translateX(-50%); white-space: nowrap; font-weight: 700; padding: .12em .6em; background: rgba(6, 12, 16, .72); border: 1.5px solid #71eaff; border-radius: 6px; text-shadow: 0 1px 2px #000; }
+.hud .mc-target .mc-tdist { position: absolute; left: 0; top: -24px; transform: translateX(-50%); font-style: normal; font-size: .8em; color: #cfeff7; text-shadow: 0 1px 3px #000; }
+.hud .mc-target.edge img { top: -25px; animation: none; }
+.hud .mc-target.edge .mc-tlabel { top: 32px; }
+.hud .mc-target.edge .mc-tdist { top: 64px; }
+@keyframes mc-bob { 0%, 100% { translate: 0 -8px; } 50% { translate: 0 4px; } }
+
+/* the same card for receipts, alerts and instructions */
+.hud .mc-n.warn { background: #ffd166; }
+.hud .mc-card[data-kind="alert"] { border-image-source: url(/assets/hud/panel_info_02.webp); }
+.hud .mc-card[data-kind="alert"] .mc-text { border-left-color: #ffd166; }
+.hud .mc-card[data-kind] .mc-text small { color: rgba(255, 255, 255, .7); }
+.hud .mc-card[data-kind] .mc-btns { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+/* edge arrow: keep the label and distance inside the screen */
+.hud .mc-target[data-side="left"] .mc-tlabel, .hud .mc-target[data-side="left"] .mc-tdist { transform: none; left: -28px; }
+.hud .mc-target[data-side="right"] .mc-tlabel, .hud .mc-target[data-side="right"] .mc-tdist { transform: translateX(-100%); left: 28px; }
+.hud .mc-target .mc-tdist { white-space: nowrap; }
+.hud.vt .hud-bl .hud-row2 b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* Marswalk report (habitat ramp / ended): rows check in one by one when the report first opens */
+.hud .mc-card[data-kind="report"] { border-image-source: url(/assets/hud/panel_info_01.webp); }
+.hud .mc-report { display: grid; gap: .28em; }
+.hud .mc-rrow { display: grid; grid-template-columns: 1.5em 1fr auto; align-items: center; gap: .45em; padding: .22em .1em; border-bottom: 1px solid rgba(255, 255, 255, .14); }
+.hud .mc-rrow .mc-ric { display: grid; place-items: center; }
+.hud .mc-rrow .mc-ric svg { width: 1.2em; height: 1.2em; fill: none; stroke: #71eaff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.hud .mc-rrow .mc-ric .hk-ic { width: 1.25em; height: 1.25em; }
+.hud .mc-rrow .mc-rl { font-size: .86em; line-height: 1.2; } .hud .mc-rrow .mc-rl small { display: block; font-size: .8em; color: rgba(255, 255, 255, .62); }
+.hud .mc-rrow b { font-size: 1.05em; font-variant-numeric: tabular-nums; color: #fff; }
+.hud .mc-report.fresh .mc-rrow { animation: mc-checkin .45s ease-out both; }
+.hud .mc-report.fresh .mc-rrow:nth-child(2) { animation-delay: .18s; } .hud .mc-report.fresh .mc-rrow:nth-child(3) { animation-delay: .36s; }
+.hud .mc-report.fresh .mc-rrow:nth-child(4) { animation-delay: .54s; } .hud .mc-report.fresh .mc-rrow:nth-child(5) { animation-delay: .72s; } .hud .mc-report.fresh .mc-rrow:nth-child(6) { animation-delay: .9s; }
+.hud .mc-card[data-kind="report"] .mc-n { background: #71eaff; animation: mc-glow 1.6s ease-out 1; }
+@keyframes mc-checkin { from { opacity: 0; transform: translateX(14px); background: rgba(113, 234, 255, .28); } to { opacity: 1; transform: none; background: transparent; } }
+@keyframes mc-glow { 0% { box-shadow: 0 0 0 0 rgba(113, 234, 255, .9); } 100% { box-shadow: 0 0 0 14px rgba(113, 234, 255, 0); } }
+@media (prefers-reduced-motion: reduce) { .hud .mc-report.fresh .mc-rrow, .hud .mc-card[data-kind="report"] .mc-n { animation: none; } }

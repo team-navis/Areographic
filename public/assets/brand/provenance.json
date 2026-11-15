@@ -1,0 +1,60 @@
+{
+  "source": "Latest user-supplied Areographic light and dark logo artwork; team OpenAI image generation as previously confirmed.",
+  "source_files": {
+    "light_sha256": "eeb9d1132aadc0c44aed331c13add9a43846841d42ca88791c2ca1a5dacee4e9",
+    "dark_sha256": "6d451ebdbe883544e90ce7d0bd15a51b41715c8bbe0d4f4da9ba140446213a64"
+  },
+  "processing": "Supplied colors and lettering preserved. Transparent margins trimmed, resized, A symbol extracted for favicons. Visible \"AI-generated\" label (favicons: \"AI\") added for the Space Apps disclosure; it replaces the earlier \"SI\" badge (2026-11-15).",
+  "files": [
+    {
+      "file": "public/assets/brand/logo-light.webp",
+      "width": 1200,
+      "height": 286,
+      "sha256": "cb09083057415a99046e1d064c5eaa43ce25caf002b87007fd882b237e9c6bfb",
+      "bytes": 78006,
+      "visibleWatermark": "AI-generated"
+    },
+    {
+      "file": "public/assets/brand/logo.webp",
+      "width": 1200,
+      "height": 284,
+      "sha256": "349fb22f72524b13eeabb5fc1ac7536a86b367456d12b4111d6d7aef5be0bc69",
+      "bytes": 71658,
+      "visibleWatermark": "AI-generated"
+    },
+    {
+      "file": "pad/assets/logo.png",
+      "width": 1800,
+      "height": 426,
+      "sha256": "a2b77db6b83b0ee1db09f13c6f3ce21f92a4fb48cf3e57a7f75123a1464fb16d",
+      "bytes": 342901,
+      "visibleWatermark": "AI-generated"
+    },
+    {
+      "file": "public/assets/brand/mark-32.png",
+      "width": 32,
+      "height": 32,
+      "sha256": "4413dc62d9d379d6486bf03a5136f8f12b757a74f89485aafb919014d927f3b3",
+      "bytes": 2083,
+      "visibleWatermark": "AI"
+    },
+    {
+      "file": "public/assets/brand/mark-64.png",
+      "width": 64,
+      "height": 64,
+      "sha256": "9e7ae25920241956ea3232669922ee6502189d48b18b35426222974e8b6f97e8",
+      "bytes": 5587,
+      "visibleWatermark": "AI"
+    },
+    {
+      "file": "public/assets/brand/mark-180.png",
+      "width": 180,
+      "height": 180,
+      "sha256": "52aecca7cac15c63ebff0c43901b3c0703ff28752741454732c10bc96b42513b",
+      "bytes": 27598,
+      "visibleWatermark": "AI"
+    }
+  ],
+  "aiGenerated": true,
+  "tool": "OpenAI image generation (ChatGPT)"
+}

@@ -1,0 +1,14 @@
+/* v0.2 PAD panel (src/pad/field-pad.js). Self-contained overlay inside the PAD root; existing PAD rules are not edited. */
+.pad { position: relative; }
+.fp-open { margin-left: 8px; padding: 5px 12px; font: inherit; font-size: 13.5px; background: #1d252c; color: #ffd089; border: 1px solid var(--amber); border-radius: 4px; cursor: pointer; } .fp-open small { color: #9aa3ab; } .fp-open:hover { background: #26303a; }
+.fp { position: absolute; left: 0; right: 0; top: 46px; bottom: 26px; background: #0c1014; display: flex; flex-direction: column; z-index: 5; }
+.fp-tabs { display: flex; gap: 6px; padding: 8px 14px 0; border-bottom: 1px solid #222b33; } .fp-tabs button { padding: 7px 14px; font: inherit; font-size: 14px; background: none; color: #dfe4e8; border: 1px solid #222b33; border-bottom: 0; border-radius: 4px 4px 0 0; cursor: pointer; } .fp-tabs button.on { border-color: var(--amber); color: #ffd089; background: #1a1f24; } .fp-sp { flex: 1; }
+.fp-body { flex: 1; min-height: 0; padding: 12px 14px; overflow: auto; }
+.fp-cols { display: flex; gap: 14px; height: 100%; } .fp-side { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+#fp-cv { display: block; width: 660px; height: 360px; border: 1px solid #222b33; cursor: crosshair; } #fp-map { display: block; width: 470px; height: 470px; border: 1px solid #222b33; }
+.fp-credit { font-size: 11.5px; color: #8b949c; margin-top: 6px; max-width: 660px; line-height: 1.45; }
+.fp-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; } .fp-col { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.fp-tlist { margin: 0; padding-left: 18px; font-size: 13.5px; } .fp .dim { color: #8b949c; }
+.fp-state { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; } .fp-state .st { padding: 3px 9px; border: 1px solid #3a444d; border-radius: 12px; color: #8b949c; } .fp-state .st.on { border-color: #2f6b4a; color: #8fe0b0; } .fp-state .st.warn { border-color: #7a5a22; color: #ffcf85; }
+.fp-scroll { max-height: 128px; overflow: auto; } .fp .pad-table { font-size: 12.5px; } .fp .pad-table td { padding: 5px 4px; vertical-align: top; }
+.fp-tech { font-size: 11.5px; color: #8b949c; margin-top: 4px; } .fp-tech summary { cursor: pointer; }

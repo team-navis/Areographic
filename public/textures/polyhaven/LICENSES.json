@@ -1,0 +1,213 @@
+{
+ "rubber_tiles": {
+  "name": "Rubber Tiles",
+  "authors": [
+   "Amal Kumar"
+  ],
+  "license": "CC0 1.0",
+  "page": "https://polyhaven.com/a/rubber_tiles",
+  "files": {
+   "rubber_tiles_diff_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rubber_tiles/rubber_tiles_diff_1k.jpg",
+    "bytes": 32375,
+    "sha256": "ddd8dd69c9f9ee611c40ac020509ec06d7661c3eb88c173b2803d1061bdf5be9",
+    "source_bytes": 351085,
+    "source_sha256": "07c66caf17f14b1eae8a60bfd11a3b00a88af0101d51aab370609a2f13bb8c04",
+    "width": 1024,
+    "processed": "re-encoded JPEG q82, 1024 px kept"
+   },
+   "rubber_tiles_nor_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rubber_tiles/rubber_tiles_nor_gl_1k.jpg",
+    "bytes": 18967,
+    "sha256": "915d7177662aefa3b9a2ebacd854151fe0b8a0b4af7392f21b0964147cff2eb4",
+    "source_bytes": 477716,
+    "source_sha256": "9d030b6b52c039af437e5bd58590bf0b8abfbead85c02567211a341d292e5aa5",
+    "width": 512,
+    "processed": "resized to 512 px, JPEG q80 4:4:4"
+   },
+   "rubber_tiles_rough_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rubber_tiles/rubber_tiles_rough_1k.jpg",
+    "bytes": 24146,
+    "sha256": "316ecbdb26be898e9afdc8d216474d4746bea7b800a3fdd15a4543dbc4f3cb27",
+    "source_bytes": 590975,
+    "source_sha256": "a5b1f7f48bcb1d7d4d6ac87e19a0566a58b097e29292704649c46da60dc207a4",
+    "width": 512,
+    "processed": "resized to 512 px, greyscale JPEG q80"
+   }
+  }
+ },
+ "fabric_pattern_07": {
+  "name": "Fabric Pattern 07",
+  "authors": [
+   "Rob Tuytel"
+  ],
+  "license": "CC0 1.0",
+  "page": "https://polyhaven.com/a/fabric_pattern_07",
+  "files": {
+   "fabric_pattern_07_nor_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fabric_pattern_07/fabric_pattern_07_nor_gl_1k.jpg",
+    "bytes": 91046,
+    "sha256": "0f252ee4f470b69864482b77fa3fc041a5a4fb18ad4f37b29ccb950254f0beae",
+    "source_bytes": 828071,
+    "source_sha256": "f6955bbdead9f023f2357f6f8808ed49627d10882cd2a3cb6b5a5ace155abc45",
+    "width": 512,
+    "processed": "resized to 512 px, JPEG q80 4:4:4"
+   },
+   "fabric_pattern_07_rough_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fabric_pattern_07/fabric_pattern_07_rough_1k.jpg",
+    "bytes": 64111,
+    "sha256": "f9e1318b74f6c9e246590da53fffd70985cb4748834c165a10f34dd3698e1f9e",
+    "modified": false,
+    "source_bytes": 488744,
+    "source_sha256": "3d90ac40b5c32a15649cc8525b7eeed133ea46b63a0e3eae5e34911d5c967e3a",
+    "width": 512,
+    "processed": "resized to 512 px, greyscale JPEG q80"
+   }
+  }
+ },
+ "red_laterite_soil_stones": {
+  "name": "Red Laterite Soil Stones",
+  "authors": [
+   "Amal Kumar"
+  ],
+  "license": "CC0 1.0",
+  "page": "https://polyhaven.com/a/red_laterite_soil_stones",
+  "files": {
+   "red_laterite_soil_stones_diff_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/red_laterite_soil_stones/red_laterite_soil_stones_diff_1k.jpg",
+    "bytes": 197842,
+    "sha256": "929d07f42852f29f14a6554239c1b87c628bf6be0a605b32d42f959279968e47",
+    "source_bytes": 906764,
+    "source_sha256": "949cd648409b30e2267d89066965605d22dba4ce73d601673e155046c41e1219",
+    "width": 1024,
+    "processed": "re-encoded JPEG q82, 1024 px kept"
+   },
+   "red_laterite_soil_stones_nor_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/red_laterite_soil_stones/red_laterite_soil_stones_nor_gl_1k.jpg",
+    "bytes": 126583,
+    "sha256": "78d3ee9191d00e9f905f703ca1fd797f419b162e31f53849ecc783604dae70f4",
+    "source_bytes": 1494933,
+    "source_sha256": "05500e4daf8ce2d67ffaf1e5394453979cad016462c5aca917f2323b2b7cd11f",
+    "width": 512,
+    "processed": "resized to 512 px, JPEG q80 4:4:4"
+   }
+  }
+ },
+ "rock_face": {
+  "name": "Rock Face",
+  "authors": [
+   "Greg Zaal",
+   "Dario Barresi"
+  ],
+  "license": "CC0 1.0",
+  "page": "https://polyhaven.com/a/rock_face",
+  "files": {
+   "rock_face_diff_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rock_face/rock_face_diff_1k.jpg",
+    "bytes": 145290,
+    "sha256": "06614f829ff035148a72c500ff4cef01da718fcdd086e36ab41c34e26692f6ed",
+    "source_bytes": 732721,
+    "source_sha256": "cce4b50517161264bdef196f5e247e328ca3739083cd6044ad3cc54d88cb82e2",
+    "width": 1024,
+    "processed": "re-encoded JPEG q82, 1024 px kept"
+   },
+   "rock_face_nor_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rock_face/rock_face_nor_gl_1k.jpg",
+    "bytes": 95896,
+    "sha256": "2dd6ae5b9f01b049e8905ac923522041c36a2e07acf3cf9b797cda2e503e7e99",
+    "source_bytes": 1139857,
+    "source_sha256": "e2682e1286c8b6aca7e01ba7b8fe1726cb6606042b9ee70d097aa67470d410ef",
+    "width": 512,
+    "processed": "resized to 512 px, JPEG q80 4:4:4"
+   }
+  }
+ },
+ "fabric_leather_02": {
+  "name": "Fabric Leather 02",
+  "authors": [
+   "Rob Tuytel"
+  ],
+  "license": "CC0 1.0",
+  "page": "https://polyhaven.com/a/fabric_leather_02",
+  "files": {
+   "fabric_leather_02_diff_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fabric_leather_02/fabric_leather_02_diff_1k.jpg",
+    "bytes": 246118,
+    "sha256": "8535970b30176f3e4a0e960f41fc5e6a543e41d096df39d2bfd294478c517e61",
+    "source_bytes": 663390,
+    "source_sha256": "97ba9480c7619efc9b8c08202c3e3773d1dd532dacce4dfe97f86e95339cf132",
+    "width": 1024,
+    "processed": "re-encoded JPEG q82, 1024 px kept"
+   },
+   "fabric_leather_02_nor_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fabric_leather_02/fabric_leather_02_nor_gl_1k.jpg",
+    "bytes": 30977,
+    "sha256": "349afffcc217ff9aee182e59436744c70790b3dbbe822ebb6f2e33219471d2d5",
+    "source_bytes": 170918,
+    "source_sha256": "2652ece55bd2780be1e16fb5ebc4171b139da45bcf9839a161b9ae236534e471",
+    "width": 512,
+    "processed": "resized to 512 px, JPEG q80 4:4:4"
+   }
+  }
+ },
+ "denim_fabric": {
+  "name": "Denim Fabric",
+  "authors": [
+   "Rob Tuytel"
+  ],
+  "license": "CC0 1.0",
+  "page": "https://polyhaven.com/a/denim_fabric",
+  "files": {
+   "denim_fabric_diff_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/denim_fabric/denim_fabric_diff_1k.jpg",
+    "bytes": 391423,
+    "sha256": "e372de7e481aa02144ca9499a597adbdce70dfb95e855dbee15707f3f816a21d",
+    "source_bytes": 886486,
+    "source_sha256": "d6d0254e2c90768482b0be8cfdc16e18117acc92bad00d406fd4b9be24facdec",
+    "width": 1024,
+    "processed": "re-encoded JPEG q82, 1024 px kept"
+   },
+   "denim_fabric_nor_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/denim_fabric/denim_fabric_nor_gl_1k.jpg",
+    "bytes": 36766,
+    "sha256": "8d45f4f1e4c6015de84981f50bba003877cc5084f8d57b35426e250e470858cc",
+    "source_bytes": 474669,
+    "source_sha256": "de0e9c5ed5cce7dacd50a67be16c6d8b8dc036907638e3702729c2f60296094e",
+    "width": 512,
+    "processed": "resized to 512 px, JPEG q80 4:4:4"
+   }
+  }
+ },
+ "blue_metal_plate": {
+  "name": "Blue Metal Plate",
+  "authors": [
+   "Rob Tuytel"
+  ],
+  "license": "CC0 1.0",
+  "licensePage": "https://polyhaven.com/license",
+  "page": "https://polyhaven.com/a/blue_metal_plate",
+  "files": {
+   "blue_metal_plate_nor_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/blue_metal_plate/blue_metal_plate_nor_gl_1k.jpg",
+    "bytes": 8830,
+    "sha256": "ef72f72a3bead0f4411648e929ad91cc64defda8dc8e5f759a3562dcfbba4d88",
+    "modified": false,
+    "source_bytes": 238025,
+    "source_sha256": "970f0273c9e2e3b4fc8338bfd58a28c413b70ac4d1734d9dc8a136724bde56e6",
+    "width": 512,
+    "processed": "resized to 512 px, JPEG q80 4:4:4"
+   },
+   "blue_metal_plate_rough_1k.jpg": {
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/blue_metal_plate/blue_metal_plate_rough_1k.jpg",
+    "bytes": 19600,
+    "sha256": "616a45ec716857fa4a36e259d85270e0faab86aaafc933f381e801dbaf47e9f1",
+    "modified": false,
+    "source_bytes": 402450,
+    "source_sha256": "37168cf57144db28dd0743dab47fbebc09147fac919d5e2b5610b069c0b13a46",
+    "width": 512,
+    "processed": "resized to 512 px, greyscale JPEG q80"
+   }
+  },
+  "usage": "Original OpenGL normal and roughness maps only, with procedural warm enamel color. Blue diffuse map is not included or used."
+ }
+}

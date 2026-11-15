@@ -1,0 +1,10 @@
+import { chromium } from 'playwright-core';
+const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--ignore-gpu-blocklist'] });
+const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
+page.on('pageerror', (e) => console.log('[pageerror]', String(e).slice(0, 600)));
+await page.goto('http://127.0.0.1:5173/'); await page.waitForFunction(() => window.__mw && window.__mw.ready, null, { timeout: 90000 });
+console.log(await page.evaluate(() => { const mw = window.__mw, g = mw.astro.group; g.updateMatrixWorld(true); const inv = g.matrixWorld.clone().invert(); const out = {};
+  mw.astro.model.traverse((o) => { if (!o.isMesh) return; const p = o.geometry.attributes.position, v = o.position.clone(); const name = o.material.name.split('_').slice(-1)[0] + ':' + o.material.color.getHexString(); const b = out[name] || (out[name] = { min: [9, 9, 9], max: [-9, -9, -9], n: 0 });
+    for (let i = 0; i < p.count; i += 7) { v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld).applyMatrix4(inv); ['x', 'y', 'z'].forEach((k, j) => { b.min[j] = Math.min(b.min[j], v[k]); b.max[j] = Math.max(b.max[j], v[k]); }); b.n++; } });
+  return Object.entries(out).map(([k, b]) => k + ' ' + b.min.map((x) => x.toFixed(2)) + ' .. ' + b.max.map((x) => x.toFixed(2))).join('\n'); }));
+await browser.close();

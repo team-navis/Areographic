@@ -1,0 +1,36 @@
+/* Minimal planning flow pages (src/pad/plan-pad.js). */
+.pp-min { width: 56px; font: inherit; background: #0c1014; color: #e6e9ec; border: 1px solid #3a444d; border-radius: 4px; padding: 2px 6px; }
+.pp-text { flex: 1; font: inherit; background: #0c1014; color: #e6e9ec; border: 1px solid #3a444d; border-radius: 4px; padding: 5px 8px; user-select: text; }
+.pp-chk { display: block; margin: 6px 0; white-space: normal; font-size: 14px; } .pp-branch { margin: 4px 0 0 26px; padding: 0; font-size: 13.5px; color: #cfd6dc; line-height: 1.6; }
+.pad #pp-tx, .pad #pp-pkg { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.pad #pp-tx .st, .pad #pp-pkg .st { padding: 3px 9px; border: 1px solid #3a444d; border-radius: 12px; color: #8b949c; } .pad #pp-tx .st.on, .pad #pp-pkg .st.on { border-color: #2f6b4a; color: #8fe0b0; }
+.pp-log { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.55; max-height: 150px; overflow: auto; } .pp-log small { color: #ffcf85; }
+
+/* status strip + science workbench (design guide) */
+.pad-strip { height: 26px; display: flex; align-items: center; gap: 14px; padding: 0 14px; font-size: 11.5px; color: #9aa3ab; border-bottom: 1px solid #222b33; background: #0d1216; white-space: nowrap; overflow: hidden; }
+.pad-strip em { font-style: normal; border: 1px solid #3a444d; border-radius: 8px; padding: 0 6px; margin-right: 4px; color: #cfd6dc; } .pad-strip b { color: #e6e9ec; font-weight: 600; } .pad-strip .sp { flex: 1; }
+.ps { border-radius: 8px; padding: 0 7px; border: 1px solid; font-weight: 600; } .ps-ok { color: #8fe0b0; border-color: #2f6b4a; } .ps-cau { color: #ffd84d; border-color: #8a7420; } .ps-alarm { color: #fff; background: #b3261e; border-color: #b3261e; } .ps-late { color: #63e6ff; border-color: #2b7d8c; } .ps-unk { color: #aab3ba; border-color: #555f68; border-style: dashed; }
+.pad-tag.unseen { border-color: #2b7d8c; color: #63e6ff; border-style: dashed; }
+.site-bench { gap: 7px; overflow: auto; } .site-title { display: flex; flex-direction: column; gap: 5px; } .site-title b { font-size: 19px; font-weight: 600; color: #fff; }
+.site-ev th { width: 74px; color: #8b949c; font-weight: 400; vertical-align: top; border-bottom: 1px solid #1a2128; padding: 4px; } .site-ev td { padding: 4px; } .site-ev td small { display: block; color: #7d8790; } .site-ev td b { font-weight: 500; }
+.site-keys { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 2px 4px; } .site-keys b { font-size: 26px; font-weight: 300; color: #fff; } .site-keys b i { font-style: normal; font-size: 13px; margin-left: 2px; color: #9aa3ab; } .site-keys span { display: block; font-size: 12px; color: #9aa3ab; }
+#site-cands tr.sel td { color: #fff; } .site-more summary { cursor: pointer; font-size: 13px; color: #cfd6dc; padding: 3px 0; } .site-more summary small { color: #7d8790; } .site-more[open] { display: flex; flex-direction: column; gap: 6px; }
+/* selection stays white, not amber (earlier decision) */
+.pad .pad-navbtn.on { border-color: #f1ece0; color: #fff; background: #1a1f24; } .pad .pad-cand.sel { border-color: #f1ece0; } .pad .pad-pick:disabled { color: #fff; border-color: #f1ece0; } .pad .fp-tabs button.on { border-color: #f1ece0; color: #fff; }
+.site-bench .pad-layers { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+
+/* on-demand source/limit text */
+.ps-info { font: inherit; font-size: 11px; background: none; color: #cfd6dc; border: 1px solid #3a444d; border-radius: 8px; padding: 0 8px; cursor: pointer; } .ps-info:hover { border-color: #f1ece0; }
+.pad .pad-foot.pad-foot-ondemand { display: none; } .pad .pad-foot.pad-foot-ondemand.open { display: block; height: auto; white-space: normal; line-height: 1.6; padding: 6px 14px; }
+.pad .pad-note:not(.open):not(#fp-evnote):not(#pad-rank-note) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; } .pad .pad-note:not(#fp-evnote):not(#pad-rank-note)::before { content: "ⓘ "; color: #9aa3ab; } .pad .pad-note.open { cursor: pointer; }
+
+/* UI friction review: hide nav entries that do not work yet; final review screen */
+.pad .pad-navbtn:disabled { display: none; }
+.pp-review .pad-card dl { grid-template-columns: 86px 1fr; } .pp-edit { margin-top: 8px; border-top: 1px solid #222b33; padding-top: 6px; } .pp-edit summary { cursor: pointer; color: #cfd6dc; font-size: 13.5px; } .pp-inline { font-size: 12.5px; color: #9aa3ab; margin: 6px 0; }
+.pp-chk small { display: block; color: #8b949c; margin-left: 22px; } .pp-chk.need { outline: 1px solid #ffd84d; outline-offset: 2px; } .pp-text.need { border-color: #ffd84d; }
+.pp-actions { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; } .pp-why { font-size: 13px; color: #8fe0b0; } .pp-why.bad { color: #ffd84d; } .pp-why.flash { animation: ppflash .9s; } @keyframes ppflash { 0%, 60% { background: #5a4a10; } 100% { background: none; } }
+.pad .pad-primary.blocked { filter: saturate(.45) brightness(.85); }
+.pad .pad-grid2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .pad .pad-grid2 > *, .pad .pad-side > * { min-width: 0; }
+/* long lists scroll inside their own box; the PAD frame, key values and buttons stay in place (joint demo feedback 2026-11-15) */
+#home-records { display: block; max-height: 230px; overflow-y: auto; }
+#pc-log, #pc-tx { max-height: 210px; overflow-y: auto; }
