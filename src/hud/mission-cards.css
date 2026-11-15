@@ -1,9 +1,9 @@
-/* 현장 미션 카드 (mission-cards.js): one mission at a time, kit panel, three numbered buttons; arrow above the mission target. */
+/* Field mission cards (mission-cards.js): one mission at a time, kit panel, three numbered buttons; arrow above the mission target. */
 .hud .mc-card { position: absolute; right: 7.5%; top: 17%; width: clamp(18em, 27vw, 26em); max-height: 68vh; overflow: hidden; pointer-events: auto;
   padding: .9em 1.05em 1em; background: rgba(6, 12, 16, .7); border: 0 solid transparent; border-image: url(/assets/hud/panel_info_01.webp) 66 fill / 22px / .5em .6em stretch;
   display: flex; flex-direction: column; gap: .55em; color: #fff; }
 .hud .mc-card.hidden, .hud .mc-target.hidden { display: none; }
-.hud.has-mission .hud-card, .hud.mc-onsite .hud-br, .hud.mc-onsite .fx-brief { display: none !important; } /* navigation stays while a receipt / alert card shows on the move */
+.hud.has-mission .hud-card, .hud.mc-onsite .hud-br, .hud.mc-onsite .fx-brief, .hud.mc-onsite .hud-rlegend { display: none !important; } /* navigation stays while a receipt / alert card shows on the move */
 .hud .mc-head { display: flex; align-items: center; gap: .55em; }
 .hud .mc-n { flex: none; min-width: 1.55em; height: 1.55em; display: grid; place-items: center; background: #f2f6f8; color: #0b1418; font-weight: 800; border-radius: 3px; font-size: 1.05em; }
 .hud .mc-head h3 { margin: 0; font-size: 1.35em; font-weight: 700; letter-spacing: -.01em; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -45,3 +45,7 @@
 .hud .mc-card[data-kind="alert"] .mc-text { border-left-color: #ffd166; }
 .hud .mc-card[data-kind] .mc-text small { color: rgba(255, 255, 255, .7); }
 .hud .mc-card[data-kind] .mc-btns { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+/* edge arrow: keep the label and distance inside the screen */
+.hud .mc-target[data-side="left"] .mc-tlabel, .hud .mc-target[data-side="left"] .mc-tdist { transform: none; left: -28px; }
+.hud .mc-target[data-side="right"] .mc-tlabel, .hud .mc-target[data-side="right"] .mc-tdist { transform: translateX(-100%); left: 28px; }
+.hud .mc-target .mc-tdist { white-space: nowrap; }

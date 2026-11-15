@@ -1,67 +1,104 @@
 <p align="center"><img src="public/assets/brand/logo.webp" alt="Areographic" width="420" /></p>
 
-# Areographic — 화성 탐사 3D 데모 (team navis)
+# Areographic (team navis)
 
-team navis의 NASA Space Apps Challenge 2026 Seoul 제품 저장소입니다. 행사 기간은 2026년 11월 14~15일 KST입니다.
+A layered, integrated view of Mars surface data that helps astronauts plan and carry out a Marswalk in search of potential biosignatures, from route planning in the habitat to the helmet HUD in the field.
 
-현재 제품 파일로 시작한 공개 스냅샷입니다. 원본의 Git 이력과 과거 테스트 캡처는 포함하지 않습니다. 아래 개발 설명의 과거 브랜치명과 검증 기록은 당시 내용이며, 공개본의 범위와 배포 절차는 [docs/deployment.md](docs/deployment.md)에 있습니다.
+- **Live demo:** <https://team-navis.github.io/Areographic/> (desktop browser with WebGL2; press Enter on the start screen)
+- **Challenge:** NASA Space Apps Challenge 2026, "Interplanetary Survival Guide: Martian Map". Seoul event, 14 to 15 November 2026 KST.
+- **Sources and licenses:** [docs/REFERENCES.md](docs/REFERENCES.md)
 
-## 현재 상태
+## What it does
 
-- `demo/3d-stage1`의 3D 탐사자·로버를 기반으로 한 브라우저 데모입니다. NAVIS / HABITAT ALPHA는 데모 화면 표기이며 최종 제품명은 미확정입니다.
-- 시작·관제·실내 보행·외부 탐사는 하나의 실제 3D 월드를 사용합니다. 따뜻한 금속 패널, 작업대, 세 모니터, 화성 창문과 에어록을 절차적 모델로 구성했으며, 현장 대원 시점에서 기지 내부를 `WASD`로 걸을 수 있습니다.
-- 벽·천장은 단차가 있는 금속 패널과 체결부, 가구는 접힌 작업대·들어간 문짝·경첩·서랍·운반함 잠금장치로 구성합니다. 도장과 브러시 금속의 표면, 실제 관통창이 있는 에어록 문, 위치와 가림을 반영한 정적 확산 간접광을 적용했습니다.
-- 관제실의 세 모니터에서 지형·관측 자료, 경로·임무 계획, 대원·로버 상태를 확인합니다. 모니터를 클릭하면 카메라가 접근하고 화면 안의 세부 탭을 조작할 수 있습니다.
-- 실내에서는 벽·책상·의자 등 가구 충돌을 적용하고 마우스 드래그 또는 방향키로 둘러봅니다. 걸어간 곳에서 모니터를 열었다 닫으면 같은 위치로 돌아옵니다. 에어록을 통과하면 기존 헬멧 HUD와 고정 경로 탐사·로버 승하차로 이어집니다.
-- 관제와 현장은 같은 브라우저의 임무 상태를 공유합니다. 실내 보행 중에는 EVA 거리·시간·산소가 진행되지 않으며, 선택한 계획과 실내 위치를 유지합니다.
-- 탐사 HUD는 `demo/hud-route`의 근거 기반 HUD입니다(녹색 평상 표시, 노랑·빨강 경보, 위쪽 고정 상태 띠, 미니맵, 도착 → 작업 → 기록 → 복귀 → 임무 종료). HUD에는 마우스로 누를 수 있는 항목이 없고 손 조작기 대역 키(`1`·`2`·휠·`M`)와 음성 `V`로 조작합니다. `feat/immersive-mission-control`의 **우주복·임무 상태** 내용(계산 조건, 미연결 센서 항목, 정지 속도 0, 남은 이동 시간 계산값)은 버튼 2 또는 음성 "상세"로 여닫는 표시 전용 층에 들어 있습니다.
-- 지형은 보관된 HiRISE/CTX 관측 자료를 사용합니다. 기지·인물·로버와 이동·산소는 가상 또는 모의이며 실시간 센서가 아닙니다.
-- 구현: Three.js의 단일 3D 장면, 물리적 모니터 메시의 CanvasTexture 요약, 접근 완료 후 DOM 상세 오버레이, Vite. 이전 2.5D 이미지 장면과 CSS3D 렌더 경로를 대체했습니다. 기존 기지 콘셉트 이미지는 참고 자산으로 보관하며 현재 실행 화면에서는 사용하지 않습니다.
-- 이 브랜치(`integrate/immersive`)는 `demo/hud-route`(`80e0e10`)에 `feat/immersive-mission-control`(`04ed300`)을 로컬에서 합친 통합 준비본입니다. 기지 안은 후자를, 기지 밖은 전자를 따릅니다. 선택 근거와 검증은 [integration-immersive.md](docs/integration-immersive.md). 팀 검토 전이며 원격에 올리지 않았습니다.
-- 외부 탐사는 Perseverance 실제 주행선(M20 traverse)을 따르는 고정 경로 전진입니다. 도착 확인 → 작업(H2) → 기록(H3) → 복귀(H5) → 기지 도착 → 임무 종료까지 이어집니다. NASA Mark III 우주복은 리깅·보행 주기·착석 자세가 없는 정적 모델입니다.
+The demo runs in one 3D world at Jezero crater, on the Perseverance drive path. You pick one of two roles.
 
-## 실행
+- **Habitat Planner.** Sits at the habitat display inside the crew's habitat. The display opens the team's habitat planning display (`pad/pad.html`): a route map on NASA Mars Trek tiles with a 160 m grid of data layers (minerals, geology, slope, comm link line of sight, rock cover). The planner compares candidate sites by science value and astronaut safety factors and plans the route.
+- **Surface Astronaut.** Walks through the habitat (`WASD`, mouse drag or arrow keys), passes the airlock and starts a Marswalk. A heads-up-display (HUD) projected on the spacesuit's helmet visor shows the route, destination, oxygen, turnaround time (latest return start), alerts and a minimap. The astronaut rides the rover along the route, gets off at the destination and works through arrive, task, record and return. At the destination, point-of-view images and planned outlines on the visor (POV match) show what to expect. The astronaut takes photos, records voice memos and checks the rock against an observation checklist (layering, grains, sorting, veins, spots, non-biological explanation). The HUD has no mouse targets. It uses suit-style keys (`1`, `2`, `3`, `M`, `W`/`S` auto-advance) and `V` (hold) for a voice memo.
+
+The planning display and the 3D Marswalk are separate pages. The planning display does not yet send its plan into the 3D mission state.
+
+## NASA data used
+
+Data from multiple NASA science missions, pre-downloaded and bundled as static files. The 3D demo makes no live NASA API calls. Full identifiers, processing and use conditions are in [docs/REFERENCES.md](docs/REFERENCES.md).
+
+- **Topographic and optical:** Mars 2020 Terrain Relative Navigation HiRISE DTM (1 m) and orthoimage (25 cm), CTX DTM (20 m) and orthoimage (6 m) mosaics (USGS Astrogeology; HiRISE and CTX on Mars Reconnaissance Orbiter).
+- **Perseverance (Mars 2020):** MMGIS waypoints (sols 1171 to 1220) and the real traverse (sols 1175 to 1185), used as the route; sol 1215 front Hazcam and sol 1176 Navcam terrain meshes from the PDS Imaging Node; WATSON image PIA26368; Raw Images metadata for two WATSON frames, used to estimate sampling-point positions.
+- **Published analysis (shown as reference, not our analysis):** PIXL mineral map PIA26640, the NASA rock sample list, and the NASA release of 2025-09-10 on a "potential biosignature".
+- **Planning display:** NASA Mars Trek map tiles, loaded at runtime. Grid layers derived by the team's data work from CRISM (clays, carbonates), USGS geologic map SIM3464, DEM (slope, line of sight) and THEMIS thermal inertia (rock cover). Product IDs and processing records for the grid sources are not yet confirmed.
+
+## Limits and simulated parts
+
+- **Measured (archived observations):** terrain, orthoimages, rover waypoints and traverse, Hazcam/Navcam meshes, PIA26368.
+- **Estimated (our calculation):** sampling points A and B (from raw camera metadata, not official target coordinates), route length and slope.
+- **Simulated:** mission clock, astronaut position and speed, oxygen, dose, comm loss, alerts, the simulated partner's responses, and the weather and alert scenarios in the planning display. Nothing is live.
+- **Not connected:** live Mars weather, space weather (DONKI), spacesuit sensors and comm link line of sight. The screen shows them as not connected.
+- **Visual only:** the habitat, the NASA Mark III spacesuit (static model, no rigging, not certified for the Mars surface), the procedural planner and rover (fictional, not Perseverance), rocks, sky and colour tinting of greyscale images.
+- The project does not detect or judge life and performs no new instrument analysis. The "potential biosignature score" in the planning display is a ranking aid for exploration priority, not a probability of life. The Perseverance traverse was driven by a rover. It is not verified as safe for a walking astronaut or a crewed rover.
+- Tested on desktop. Mobile controls and low-end GPU performance are not verified. Voice memo needs HTTPS or localhost and a microphone. Real microphone recognition has not been tested on a device.
+
+## Run locally
 
 ```bash
 npm ci
 npm run dev
 ```
 
-브라우저에서 [http://127.0.0.1:5173/](http://127.0.0.1:5173/)를 엽니다. WebGL2를 지원하는 브라우저가 필요합니다. 데이터·모델은 저장소에 포함되어 있으며 NASA API 키는 필요 없습니다.
+Open <http://127.0.0.1:5173/>. You need a browser with WebGL2. Data and models are in the repository. No NASA API key is needed.
 
 ```bash
-npm test       # 실내 보행·충돌·임무·로버·HUD·간접광 계산 검사
-npm run build # dist/ 생성
+npm test       # habitat walk, collision, mission, rover, HUD and indirect light calculations
+npm run build  # creates dist/
 ```
 
-빌드가 배포나 공개를 수행하지는 않습니다. 관제실 사용법과 변경 범위는 [immersive-control.md](docs/immersive-control.md), 외부 HUD·경로는 [stage2-hud-route.md](docs/stage2-hud-route.md)와 [hud-design-basis.md](docs/hud-design-basis.md), 기존 탐사자·로버 조작은 [stage1-demo.md](docs/stage1-demo.md), 자료 출처와 한계는 [stage1-data-assets.md](docs/stage1-data-assets.md)를 확인하세요.
+The build does not deploy or publish anything. Pages deployment is described in [docs/deployment.md](docs/deployment.md).
 
-## 빠른 시연
+## AI use
 
-1. **관제자**를 선택하고 세 모니터를 클릭하거나 `1`·`2`·`3`을 눌러 상세 화면으로 들어갑니다. `Esc`로 관제석에 돌아옵니다.
-2. 중앙 **경로·임무 계획 → 계획 시작**에서 지형 레이어·후보지를 비교합니다. 왼쪽 **과학·관측 자료**에서 고도 단면·정지점·출처를 확인합니다.
-3. **대원 시점 · 기지 걷기** 또는 시작 화면의 **현장 대원**을 선택합니다. `WASD`로 실내를 걷고 마우스 드래그·방향키로 둘러봅니다. 모니터를 바라보고 `F` 또는 직접 클릭으로 상세 화면을 열고, `Esc`로 서 있던 위치에 복귀합니다.
-4. 왼쪽 에어록을 걸어서 통과하면 외부 탐사 HUD로 전환됩니다. 밖에서는 `W`를 누르는 동안 고정 경로로 전진합니다(실내 `WASD` 자유 보행은 여기서 끝납니다). 로버의 경로상 3m 안에서 멈춘 뒤 `E`로 탑승하고 `Shift`+`W`로 배속 주행, 정지 후 `E`로 내립니다. HUD의 `2`는 우주복·임무 상태 층, `1`은 강조 항목 실행입니다.
-5. **역할 전환 → 관제자 → 대원·기지 운영**에서 같은 임무 위치·산소·로버 상태를 확인합니다. 이미 출발한 대원의 시점으로 다시 전환하면 외부 탐사를 이어갑니다.
+- Code was written with the help of an AI coding assistant (Claude). Commits show it as co-author.
+- The HUD design kit (`public/assets/hud/`) and the Areographic logo were generated by the team with OpenAI image generation (ChatGPT). We only resized and converted them. Four icons (destination, habitat, partner, return) were drawn by hand as SVG in the kit style.
+- 3D models made earlier with the AI 3D service EVOVA were removed from the repository on 2026-11-15. They are not in this repository or the deployment.
 
-현재 작업은 `npm test` **31개**와 프로덕션 빌드를 통과했습니다. 이번 실내 모델·간접광 수정은 1512×1243 데스크톱 화면에서 보행·책상 충돌·모니터 클릭/F 진입·로버 상세 탭·Esc 복귀·에어록 통과와 외부 HUD 연결을 확인했습니다. 앞선 HUD·로버 승하차 검증과 이번 검증은 [관제실 문서](docs/immersive-control.md)에 구분해 기록했습니다. 모바일 조작과 저사양 GPU 성능은 검증하지 않았습니다. 기존 `capture:stage1`·`capture:rover` 결과를 현재 수정의 검증 결과로 사용하지 않습니다.
+## License
 
-## 팀 기록
+Code and documents written by the team are under the [MIT License](LICENSE) (Copyright © 2026 team-navis). Other material in the repository is not MIT. It keeps its own terms.
 
-행사 규정, 현재 결정, 자료 출처와 실행 기록은 별도 [hackathon-kit의 행사 workspace](https://github.com/team-navis/hackathon-kit/tree/main/workspace/2026-nasa-space-apps-seoul)에 보관합니다. 이 저장소에는 실제 제품 소스와 해당 제품의 테스트를 관리합니다.
+- **AI output made by the team:** HUD design assets and the Areographic logo (OpenAI image generation; under the OpenAI Terms of Use the output belongs to the user). The terms of the generation tool also apply.
+- **NASA, JPL and USGS material** (terrain mosaics, rover traverse and waypoints, Hazcam and Navcam meshes, images PIA26368 and PIA26640, Mars Trek map tiles in the planning display): follows each agency's public media guidelines (give credit, do not imply endorsement) and the USGS citation request. It is not under a Creative Commons license. The Mark III spacesuit model from NASA 3D Resources also follows the NASA media guidelines.
+- **Open source and third-party assets:** three.js (MIT), Draco decoder (Apache-2.0, `public/draco/LICENSE`), Poly Haven textures (CC0 1.0, `public/textures/polyhaven/LICENSES.json`), Inter font (SIL OFL 1.1, Google Fonts), Leaflet (BSD-2-Clause, planning display).
 
-각자 AI와 개발 환경을 사용하며 개인 계정, 인증 파일과 비밀정보를 저장소에 넣지 않습니다. 구현·검증·배포의 상태는 실제 근거가 생긴 뒤 갱신합니다.
+This is a hackathon demo, not a NASA product. No endorsement by NASA, JPL, Caltech or USGS is implied. Per-asset sources, terms and open items are in [docs/REFERENCES.md](docs/REFERENCES.md).
 
-## 공개 범위
+## Repository notes
 
-이 저장소는 공개용이며 기존 비공개 저장소는 그대로 보존합니다. EVOVA 모델 3개는 포함하지 않고 현재 NASA 우주복과 절차적 관제자·로버를 사용합니다. [GitHub Pages 데모](https://team-navis.github.io/Areographic/)는 Actions에서 수동 배포하며 일반 push로 갱신하지 않습니다. 배포와 공식 제출은 별개입니다.
+This public repository is a snapshot started from the current product files. It does not include the Git history or old test captures of the original private repository, which is kept as is. Branch names, commit IDs and verification records in older development documents describe that time, not this repository's history. Event rules, team decisions and data-source research are kept in the separate [hackathon-kit event workspace](https://github.com/team-navis/hackathon-kit/tree/main/workspace/2026-nasa-space-apps-seoul). Each team member uses their own AI and development setup. Personal accounts, credentials and secrets are not stored in the repository. The [GitHub Pages demo](https://team-navis.github.io/Areographic/) is deployed manually from Actions, not on every push. Deployment and official submission are separate steps.
 
-## 라이선스
+More documents: habitat control room [docs/immersive-control.md](docs/immersive-control.md), field HUD and route [docs/stage2-hud-route.md](docs/stage2-hud-route.md) and [docs/hud-design-basis.md](docs/hud-design-basis.md), astronaut and rover controls [docs/stage1-demo.md](docs/stage1-demo.md), data sources and limits [docs/stage1-data-assets.md](docs/stage1-data-assets.md).
 
-팀이 작성한 코드·문서는 [MIT License](LICENSE)(Copyright © 2026 team-navis)를 따릅니다. 저장소에 함께 들어 있는 다른 자료는 MIT가 아니라 각자의 조건을 따릅니다.
+<details>
+<summary>Development record (earlier integration state, kept for history)</summary>
 
-- **팀이 AI로 만든 생성물**: HUD 디자인 에셋과 Areographic 로고(OpenAI 이미지 생성, OpenAI 이용약관상 출력물은 사용자 소유). 생성 도구의 약관도 함께 적용됩니다. (EVOVA로 만든 3D 모델은 2026-11-15 저장소에서 제거됐고, 대원은 NASA Mark III 모델, 관제자·로버는 코드로 만든 모델을 씁니다.)
-- **NASA·JPL·USGS 자료**(지형 모자이크, 로버 주행선·정지점, Hazcam·Navcam 메시, 사진 PIA26368·PIA26640, 관제 패드의 Mars Trek 지도 타일): 각 기관의 공개 자료 이용 지침(크레딧 표기, 보증 암시 금지)과 USGS의 인용 요청을 따릅니다. CC 라이선스가 붙은 자료가 아닙니다. NASA 3D Resources의 Mark III 우주복 모델도 NASA 미디어 이용 지침을 따릅니다.
-- **오픈소스·서드파티 자산**: three.js(MIT), Draco 디코더(Apache-2.0, `public/draco/LICENSE`), Poly Haven 텍스처(CC0 1.0, `public/textures/polyhaven/LICENSES.json`), Inter 폰트(SIL OFL 1.1, Google Fonts), Leaflet(BSD-2-Clause, 관제 패드).
+These notes describe the integration branch before the afternoon of 2026-11-15. Some details changed later: the habitat now has one large screen that opens the planning display instead of three monitors, and the EVOVA models were removed.
 
-자산별 출처·이용 조건과 아직 확인하지 못한 항목은 [docs/REFERENCES.md](docs/REFERENCES.md)에 있습니다.
+- A browser demo built on the 3D astronaut and rover of `demo/3d-stage1`. NAVIS / HABITAT ALPHA was a label on the demo screen. The final product name was not decided at that time.
+- Start, habitat control, indoor walking and the surface excursion use one real 3D world. Warm metal panels, a workbench, three monitors, a Mars window and an airlock are procedural models. From the astronaut's view you can walk inside the habitat with `WASD`.
+- Walls and ceiling are stepped metal panels with fasteners. Furniture has a folding workbench, recessed doors, hinges, drawers and latches on carrying cases. Surfaces use painted and brushed metal. The airlock door has a real see-through window. Static diffuse indirect light accounts for position and occlusion.
+- The three monitors showed terrain and observation data, route and mission plan, and astronaut and rover status. Clicking a monitor moved the camera in and let you use the detail tabs on screen.
+- Indoors, walls, desks, chairs and other furniture have collision. You look around with mouse drag or arrow keys. Opening and closing a monitor returns you to the spot where you stood. Passing the airlock leads to the helmet HUD, the fixed-route Marswalk and rover board and get off.
+- Habitat and field share the mission state in the same browser. While walking indoors, EVA distance, time and oxygen do not advance. The selected plan and the indoor position are kept.
+- The field HUD is the evidence-based HUD of `demo/hud-route` (green normal display, yellow and red alerts, fixed status band at the top, minimap, arrive → task → record → return → End Marswalk). The HUD has no mouse targets. It uses hand-controller keys (`1`, `2`, wheel, `M`) and voice `V`. The **spacesuit and mission status** content of `feat/immersive-mission-control` (calculation conditions, unconnected sensor items, stopped speed 0, calculated remaining travel time) is in a display-only layer opened and closed with button 2 or the voice word "detail".
+- Terrain uses archived HiRISE/CTX observations. Habitat, people, rover, movement and oxygen are virtual or simulated, not live sensors.
+- Implementation: one Three.js 3D scene, CanvasTexture summaries on physical monitor meshes, DOM detail overlays after the camera arrives, Vite. This replaced the earlier 2.5D image scene and the CSS3D render path. The earlier habitat concept image was kept as a reference asset and was not used in the running screen.
+- The branch `integrate/immersive` was a local integration candidate that merged `feat/immersive-mission-control` (`04ed300`) into `demo/hud-route` (`80e0e10`). Inside the habitat it followed the former, outside the latter. Choices and checks: [integration-immersive.md](docs/integration-immersive.md). It was not yet reviewed by the team and not pushed.
+- The surface excursion is fixed-route movement along the real Perseverance traverse (M20 traverse). It runs Confirm arrival → task (H2) → record (H3) → return (H5) → arrive at habitat → End Marswalk. The NASA Mark III spacesuit is a static model with no rigging, walk cycle or seated pose.
+
+Quick demo at that time:
+
+1. Choose **Habitat Planner**, click one of the three monitors or press `1`, `2`, `3` to open the detail screen. `Esc` returns to the planner seat.
+2. In the centre **Route and mission plan → Start plan**, compare terrain layers and candidate sites. On the left, **Science and observation data** shows the elevation profile, waypoints and sources.
+3. Choose **Astronaut view · walk the habitat** or **Surface Astronaut** on the start screen. Walk indoors with `WASD` and look around with mouse drag or arrow keys. Face a monitor and press `F` or click it to open the detail screen. `Esc` returns you to where you stood.
+4. Walk through the airlock on the left to switch to the field HUD. Outside, hold `W` to move forward on the fixed route (free `WASD` walking ends here). Stop within 3 m of the rover on the route, press `E` to board, `Shift`+`W` to drive faster, stop and press `E` to get off. In the HUD, `2` opens the spacesuit and mission status layer and `1` runs the highlighted item.
+5. In **Switch role → Habitat Planner → Astronaut and habitat operations**, check the same mission position, oxygen and rover state. Switching back to an astronaut who already left continues the Marswalk.
+
+At that time the work passed **31** `npm test` tests and a production build. The indoor model and indirect light changes were checked on a 1512×1243 desktop screen: walking, desk collision, monitor click and `F` entry, rover detail tab, `Esc` return, airlock passage and the link to the field HUD. Earlier HUD and rover board checks and these checks are recorded separately in the [control room document](docs/immersive-control.md). Mobile controls and low-end GPU performance were not verified. Earlier `capture:stage1` and `capture:rover` results are not used as verification of these changes.
+
+</details>

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 /**
- * 시료 채취 모션 (2026-11-15 user request): a gloved hand brings a scoop into view, the view tips down to the dig spot, the scoop
+ * Sample collection motion (2026-11-15 user request): a gloved hand brings a scoop into view, the view tips down to the dig spot, the scoop
  * digs (dust), lifts the soil, tips it into a sample tube and the tube is stowed. A small pit and spoil heap stay on the ground.
  * Procedural stand-ins for the demo only: not a model of real Mars 2020 / EVA sampling tools or procedure.
  */

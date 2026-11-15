@@ -37,12 +37,12 @@
 .hud.vt.kit .hud-item.sel { border-color: var(--acc); background: rgba(113, 234, 255, .14); box-shadow: 0 0 10px rgba(113, 234, 255, .25) inset; }
 .hud.vt.kit #hud-act { border-color: var(--acc); box-shadow: 0 0 10px rgba(113, 234, 255, .3); }
 
-/* 이동 중 안내 auto line: cyan with the kit path chevron (yellow is reserved for cautions) */
+/* en-route brief auto line: cyan with the kit path chevron (yellow is reserved for cautions) */
 .hud.vt.kit .fx-brief #hud-brief-auto { color: var(--acc); display: flex; align-items: center; justify-content: center; gap: .45em; }
 .hud.vt.kit .fx-brief #hud-brief-auto::before { content: ""; width: 1.1em; height: 1.15em; flex: none; background: url(/assets/hud/path_chevron.webp) center / contain no-repeat; animation: hk-chev 1s ease-in-out infinite; }
 @keyframes hk-chev { 50% { transform: translateY(-.15em); opacity: .7; } }
 
-/* 촬영 shutter corners in the kit cyan */
+/* photo shutter corners in the kit cyan */
 .hud.vt.kit .fx-shutter .c { border-color: var(--acc); filter: drop-shadow(0 0 6px var(--kit-glow)); }
 .hud.vt.kit .fx-shutter .thumb { border-color: var(--acc); }
 @media (prefers-reduced-motion: reduce) { .hud.vt.kit .fx-brief #hud-brief-auto::before { animation: none; } }
@@ -55,9 +55,9 @@
 /* BASE row: kit triangle pointing toward the base relative to the head */
 .hud.vt.kit .hk-basearrow { width: 1.15em; height: 1.15em; margin-right: .35em; transition: transform .15s linear; }
 .hud.vt.kit .hud-br .hud-row2 b#hud-base { display: inline-flex; align-items: center; }
-/* the key bar at the bottom already lists every input: no per-card key lines (작업, 도착 알림, 계획·경보 cards) */
-.hud.vt.kit .hud-card .hud-keys, .hud.vt.kit .hud-detail .hud-keys { display: none; } /* incl. the detail layer ("음성 V 상세" no longer applies: V is the memo) */
-/* 우주복·임무 상태 layer: rows used to be cut by the fixed height. Smaller type and the free height down to LIFE SUPPORT, never a half row */
+/* the key bar at the bottom already lists every input: no per-card key lines (tasks, arrival, plan/alert cards) */
+.hud.vt.kit .hud-card .hud-keys, .hud.vt.kit .hud-detail .hud-keys { display: none; } /* incl. the detail layer ("voice V detail" no longer applies: V is the memo) */
+/* Suit & mission status layer: rows used to be cut by the fixed height. Smaller type and the free height down to LIFE SUPPORT, never a half row */
 .hud.vt.kit .hud-detail { font-size: .82em; line-height: 1.28; top: 19.5%; max-height: calc(100vh - 19.5vh - 26.5vh - 13em); }
 .hud.vt.kit .hud-detail dl { gap: .08em .5em; }
 .hud.vt.kit .hud-detail.fit1 .hud-credit { display: none; }

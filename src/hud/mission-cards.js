@@ -3,9 +3,9 @@ import { OBS_ITEMS, REFERENCE, PLAN_IMAGE } from '../state/field-ops.js';
 import { kitImg, KIT } from './hud-kit.js';
 
 /**
- * 현장 미션 카드 (2026-11-15, user request): on site the crew does one mission at a time on one card with at most three buttons
+ * Field mission cards (2026-11-15, user request): on site the crew does one mission at a time on one card with at most three buttons
  * (keys 1 · 2 · 3, also clickable), and a floating arrow above the mission's target in the scene points down at it.
- * Missions reuse the existing records (현장 대조, 관찰 응답, 메모, 시료 기록, 이월 확인); nothing here judges or detects anything.
+ * Missions reuse the existing records (POV match, observation answer, memo, sample record, carry-over check); nothing here judges or detects anything.
  * Alerts, plan/package receipts and base instructions still come first (the card steps aside while they are open).
  */
 const ICON = {
@@ -28,11 +28,11 @@ export function installMissionCards({ el, mission, st, hooks, act }) {
   /** The mission list for this stop. done/skip decide which one is current; `steps` are the sub-steps shown as k / K. */
   function list() {
     const L = [], todos = (st.planTx ? st.planTx.todos : st.planDraft.todos.filter((t) => t.on)).map((t) => t.id), planned = (id) => todos.includes(id); // the controller's plan decides which missions there are
-    if (planned('compare') && st.pkg && st.pkg.ackAt !== null) L.push({ id: 'compare', title: '현장 대조', target: 'rock', tlabel: '대조할 암석', done: !!st.compare.result });
-    if (planned('observe')) { const k = OBS_ITEMS.findIndex((it) => !st.observations[it.id]); L.push({ id: 'observe', title: '관찰 대조', target: 'rock', tlabel: '관찰 대상', steps: OBS_ITEMS.length, step: k < 0 ? OBS_ITEMS.length - 1 : k, item: OBS_ITEMS[Math.max(0, k)], done: k < 0 }); }
-    if (planned('sample')) L.push({ id: 'sample', title: '시료 채취', target: 'sample', tlabel: '채취 예정 지점', done: nSample() > 0 });
-    if (planned('photo')) L.push({ id: 'photo', title: '기록 촬영', target: 'rock', tlabel: '촬영 대상', done: st.records.some((r) => r.type === 'photo' && r.simT >= st.onsiteSince) });
-    for (const c of st.carried || []) L.push({ id: 'chk-' + c.key, carried: c, title: '이월 과제', target: 'rock', tlabel: '이월 과제 대상', done: c.doneAt !== null });
+    if (planned('compare') && st.pkg && st.pkg.ackAt !== null) L.push({ id: 'compare', title: 'POV match', target: 'rock', tlabel: 'Rock to match', done: !!st.compare.result });
+    if (planned('observe')) { const k = OBS_ITEMS.findIndex((it) => !st.observations[it.id]); L.push({ id: 'observe', title: 'Observation check', target: 'rock', tlabel: 'Observation target', steps: OBS_ITEMS.length, step: k < 0 ? OBS_ITEMS.length - 1 : k, item: OBS_ITEMS[Math.max(0, k)], done: k < 0 }); }
+    if (planned('sample')) L.push({ id: 'sample', title: 'Collect sample', target: 'sample', tlabel: 'Planned sampling point', done: nSample() > 0 });
+    if (planned('photo')) L.push({ id: 'photo', title: 'Photo record', target: 'rock', tlabel: 'Photo target', done: st.records.some((r) => r.type === 'photo' && r.simT >= st.onsiteSince) });
+    for (const c of st.carried || []) L.push({ id: 'chk-' + c.key, carried: c, title: 'Carry-over task', target: 'rock', tlabel: 'Carry-over target', done: c.doneAt !== null });
     return L;
   }
   const current = () => list().find((x) => !x.done && !m.skipped.has(x.id)) || null;
@@ -41,54 +41,54 @@ export function installMissionCards({ el, mission, st, hooks, act }) {
 
   /** Buttons of the current mission (max 3). hold = runs on press and release (voice memo). */
   function buttons(cur) {
-    const skip = (id, label = '건너뛰기') => ({ icon: ICON.skip, label, run: () => { m.skipped.add(id); } });
+    const skip = (id, label = 'Skip') => ({ icon: ICON.skip, label, run: () => { m.skipped.add(id); } });
     if (!cur) return [
-      { icon: ICON.home, label: '복귀 개시', run: () => mission.startReturn() },
-      { icon: ICON.pin, label: '관심 지점 추가', run: () => act.interest() },
-      { icon: ICON.list, label: '작업 목록', run: () => { m.closed = true; } },
+      { icon: ICON.home, label: 'Start return', run: () => mission.startReturn() },
+      { icon: ICON.pin, label: 'Add point of interest', run: () => act.interest() },
+      { icon: ICON.list, label: 'Task list', run: () => { m.closed = true; } },
     ];
     if (cur.id === 'compare') return [
-      { icon: ICON.check, label: '일치 확인', dim: !hooks.aligned(), run: () => act.compare('match') },
-      { icon: ICON.cross, label: '불일치 보고', run: () => act.compare('mismatch') },
+      { icon: ICON.check, label: 'Confirm match', dim: !hooks.aligned(), run: () => act.compare('match') },
+      { icon: ICON.cross, label: 'Report no match', run: () => act.compare('mismatch') },
       skip('compare'),
     ];
     if (cur.id === 'observe') { const alt = cur.item.id === 'alt', ans = (a) => () => act.answer(cur.item.id, a); return [
-      { icon: ICON.check, label: alt ? '그렇다' : '일치', run: ans('seen') },
-      { icon: ICON.cross, label: alt ? '아니다' : '불일치', run: ans('not_seen') },
-      { icon: ICON.q, label: '판단 불가', run: ans('undetermined') },
+      { icon: ICON.check, label: alt ? 'Yes' : 'Match', run: ans('seen') },
+      { icon: ICON.cross, label: alt ? 'No' : 'No match', run: ans('not_seen') },
+      { icon: ICON.q, label: "Can't tell", run: ans('undetermined') },
     ]; }
     if (cur.id === 'photo') return [
-      { icon: ICON.cam, label: '촬영', run: () => act.photo() },
-      { icon: ICON.mic, label: m.holding ? '듣는 중 · 떼면 저장' : '음성 메모 (누르는 동안)', on: !!m.holding, hold: true, run: (down) => act.memo(down) },
-      skip('photo', '다음'),
+      { icon: ICON.cam, label: 'Photo', run: () => act.photo() },
+      { icon: ICON.mic, label: m.holding ? 'Listening · release to save' : 'Voice memo (hold)', on: !!m.holding, hold: true, run: (down) => act.memo(down) },
+      skip('photo', 'Next'),
     ];
     if (cur.id === 'sample') return [
-      { icon: ICON.check, label: act.sampling() ? '채취 중…' : '시료 채취', on: act.sampling(), run: () => act.sample() },
-      { icon: ICON.cam, label: '촬영', run: () => act.photo() },
+      { icon: ICON.check, label: act.sampling() ? 'Collecting…' : 'Collect sample', on: act.sampling(), run: () => act.sample() },
+      { icon: ICON.cam, label: 'Photo', run: () => act.photo() },
       skip('sample'),
     ];
-    return [ // 이월 과제
-      { icon: ICON.check, label: '확인함', run: () => act.carried(cur.carried.key) },
-      { icon: ICON.cam, label: '촬영', run: () => act.photo() },
+    return [ // carry-over task
+      { icon: ICON.check, label: 'Checked', run: () => act.carried(cur.carried.key) },
+      { icon: ICON.cam, label: 'Photo', run: () => act.photo() },
       skip(cur.id),
     ];
   }
 
   function body(cur) {
-    const L = list(), n = cur ? L.indexOf(cur) + 1 : L.length, N = L.length;
+    const L = list(), n = cur ? L.findIndex((x) => x.id === cur.id) + 1 : L.length, N = L.length;
     if (!cur) { const done = L.filter((x) => x.done).length;
-      return { n: '✓', title: '현장 미션 완료', chip: `${done} / ${N}`, text: `완료 ${done}건${N - done ? ` · 건너뜀 ${N - done}건` : ''}. 기록은 교신이 되면 기지로 전송됩니다. 복귀는 "복귀 개시"를 눌러야 시작합니다.`, media: '' }; }
+      return { n: '✓', title: 'Field missions done', chip: `${done} / ${N}`, text: `${done} done${N - done ? ` · ${N - done} skipped` : ''}. Records go to the habitat when the comm link is up. The return starts only with "Start return".`, media: '' }; }
     const chip = cur.steps ? `${cur.step + 1} / ${cur.steps}` : `${n} / ${N}`;
     const img = (src, label, alt) => `<figure class="mc-media${m.zoom ? ' big' : ''}"><span class="mc-mlabel">${label}</span><img src="${src}" alt="${alt}" /></figure>`;
     if (cur.id === 'compare') { const f = hooks.field();
-      return { n, title: cur.title, chip, text: '계획 영상에서 딴 선이 화면에 떠 있습니다. 고개를 돌려 선을 실제 암석 윤곽에 겹친 뒤 결과를 고르세요.',
-        sub: `<div class="mc-state ${f && f.aligned ? 'ok' : 'wait'}">${f && f.aligned ? '정렬됨 · 일치 확인 가능' : `정렬 안 됨 · 화살표 아래 암석을 바라보세요${f ? ` (시선 오차 ${f.gazeErrDeg.toFixed(1)}°)` : ''}`}</div>`,
-        media: img(PLAN_IMAGE.file, '계획 영상', '계획 영상 · 전방 Hazcam sol 1215'), credit: `계획 영상 Hazcam sol 1215 · ${PLAN_IMAGE.credit} · 자동 인식 아님` }; }
+      return { n, title: cur.title, chip, text: 'Lines from the planning image are on the visor. Turn your head to lay them on the rock outline, then choose a result.',
+        sub: `<div class="mc-state ${f && f.aligned ? 'ok' : 'wait'}">${f && f.aligned ? 'Aligned · match can be confirmed' : `Not aligned · look at the rock under the arrow${f ? ` (gaze error ${f.gazeErrDeg.toFixed(1)}°)` : ''}`}</div>`,
+        media: img(PLAN_IMAGE.file, 'Planning image', 'Planning image · front Hazcam sol 1215'), credit: `Planning image Hazcam sol 1215 · ${PLAN_IMAGE.credit} · not automatic recognition` }; }
     if (cur.id === 'observe') { const it = cur.item, alt = it.id === 'alt';
-      return { n, title: `${cur.title} · ${it.name}`, chip, text: alt ? `${it.q}?` : `원본 사진과 비교해 보세요. ${it.q.replace(' · ①과 비교', '')}?`, sub: `<div class="mc-state">${alt ? '' : '원본처럼 보이면 일치 · '}대원의 육안 기록 · 판정·점수 아님 · 본 것은 ${'<kbd>V</kbd>'} 음성 메모</div>`, media: img(REFERENCE.file, '원본 사진', 'Cheyava Falls 기준 사진 PIA26368'), credit: `${REFERENCE.source} · ${REFERENCE.credit}` }; }
-    if (cur.id === 'photo') return { n, title: cur.title, chip, text: '채취한 자리와 암석을 촬영해 남기세요. 위치·시각이 자동으로 붙습니다 (모의 화면 · 실제 카메라 아님).', media: '' };
-    if (cur.id === 'sample') return { n, title: cur.title, chip, text: '화살표가 가리키는 채취 예정 지점으로 가서 "시료 채취"를 누르면 스쿠프로 파서 시료 통에 담습니다. 어디를 채취할지는 대원이 정합니다.', sub: `<div class="mc-state">좌표·시각·선량 자동 첨부 (모의)${st.compare.result === 'match' ? ' · 일치 확인한 계획 지점' : ''}</div>`, media: '', credit: '채취 예정 지점은 공개 원자료 메타데이터 기반 추정' };
-    return { n, title: cur.title, chip, text: `지난 선외활동에서 넘어온 과제: ${cur.carried.title}`, media: '' };
+      return { n, title: `Observation · ${it.name}`, chip, text: alt ? `${it.q}?` : `Compare with the original image. ${it.q.replace(' · compare with ①', '')}?`, sub: `<div class="mc-state">${alt ? '' : 'Looks like the original = Match · '}astronaut's visual record · not a judgement or score · say what you see with ${'<kbd>V</kbd>'} voice memo</div>`, media: img(REFERENCE.file, 'Original image', 'Cheyava Falls reference image PIA26368'), credit: `${REFERENCE.source} · ${REFERENCE.credit}` }; }
+    if (cur.id === 'photo') return { n, title: cur.title, chip, text: 'Photograph the sampled spot and the rock. Position and time are added (simulated view · not a real camera).', media: '' };
+    if (cur.id === 'sample') return { n, title: cur.title, chip, text: 'Go to the planned sampling point under the arrow and press "Collect sample" to scoop it into the sample tube. The astronaut decides where to sample.', sub: `<div class="mc-state">Position, time, dose attached (simulated)${st.compare.result === 'match' ? ' · matched planned site' : ''}</div>`, media: '', credit: 'Planned sampling points are estimated from public raw-data metadata' };
+    return { n, title: cur.title, chip, text: `Carried over from the last Marswalk: ${cur.carried.title}`, media: '' };
   }
 
   /** Every other short card (plan / package receipt, alerts, base instructions, arrival, end) in the same look: title and text are taken
@@ -128,11 +128,12 @@ export function installMissionCards({ el, mission, st, hooks, act }) {
   }
 
   /** Arrow above the mission target. `proj(kind)` returns {x, y, on, behind, dist} in CSS pixels or null. */
+  const rot0 = (p) => (p.behind ? (p.x < innerWidth / 2 ? 1 : -1) : p.x < innerWidth / 2 ? -1 : 1);
   function placeArrow(proj) {
     const cur = active() ? current() : null, p = cur && proj ? proj(cur.target) : null;
     arrow.classList.toggle('hidden', !p); if (!p) return;
     const W = innerWidth, H = innerHeight, mg = 70, inView = p.on && !p.behind && p.x > mg && p.x < W - mg && p.y > mg && p.y < H - mg;
-    arrow.classList.toggle('edge', !inView);
+    arrow.classList.toggle('edge', !inView); arrow.dataset.side = inView ? '' : (rot0(p) < 0 ? 'left' : 'right');
     let x = p.x, y = p.y, rot = 180;
     if (!inView) { const side = p.behind ? (p.x < W / 2 ? 1 : -1) : p.x < W / 2 ? -1 : 1; x = side < 0 ? mg : W - mg; y = Math.min(Math.max(p.behind ? H / 2 : p.y, H * .3), H * .7); rot = side < 0 ? -90 : 90; }
     arrow.style.transform = `translate(${x.toFixed(0)}px, ${y.toFixed(0)}px)`; arrow.style.setProperty('--rot', rot + 'deg');
@@ -142,7 +143,7 @@ export function installMissionCards({ el, mission, st, hooks, act }) {
 
   return {
     get active() { return active(); },
-    /** The planned lines stay on the visor while the 현장 대조 mission is the current one. */
+    /** The planned lines stay on the visor while the POV match mission is the current one. */
     wantsLines: () => active() && (current() || {}).id === 'compare',
     press,
     reopen() { m.closed = false; m.key = ''; },

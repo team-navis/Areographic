@@ -1,14 +1,14 @@
 /**
- * Deterministic line extraction for the "대조 패키지" (planning photo -> line drawing sent to the HUD).
+ * Deterministic line extraction for the "POV match package" (planning photo -> line drawing sent to the HUD).
  * Canny-like pipeline, no randomness, no ML: luminance -> Gaussian blur -> Sobel -> non-maximum suppression ->
  * percentile hysteresis -> raster-order chain tracing -> Douglas-Peucker simplification -> longest N polylines.
  * It traces brightness edges of a public image. It does not recognise rocks, minerals or anything biological.
  * Input: { data (RGBA Uint8ClampedArray), width, height }. Output coordinates are normalised (u right, v down, 0..1).
  */
 export const DETAIL = { // the three presets offered on the PAD (all values are presentation choices)
-  1: { sigma: 2.6, hiPct: 0.9, minLen: 44, maxLines: 110, label: '굵게 (선 적음)' },
-  2: { sigma: 1.9, hiPct: 0.85, minLen: 28, maxLines: 220, label: '보통' },
-  3: { sigma: 1.3, hiPct: 0.78, minLen: 16, maxLines: 420, label: '세밀 (선 많음)' },
+  1: { sigma: 2.6, hiPct: 0.9, minLen: 44, maxLines: 110, label: 'Coarse (fewer lines)' },
+  2: { sigma: 1.9, hiPct: 0.85, minLen: 28, maxLines: 220, label: 'Medium' },
+  3: { sigma: 1.3, hiPct: 0.78, minLen: 16, maxLines: 420, label: 'Fine (more lines)' },
 };
 
 export function extractLines(img, { detail = 2, epsilon = 1.3 } = {}) {

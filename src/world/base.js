@@ -8,7 +8,7 @@ import { buildArchitectureDetails } from './habitat-architecture.js';
 import { buildHabitatFurniture } from './habitat-furniture.js';
 
 /**
- * Fictional demo habitat ("가상 기지"). Everything here is procedural modelling for the demo;
+ * Fictional demo habitat ("fictional habitat"). Everything here is procedural modelling for the demo;
  * it is not a real facility and its site is only a demo placement on the real terrain.
  * Local frame == world frame axes (x east, z south), floor at y = 0 of the returned group.
  */

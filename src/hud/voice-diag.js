@@ -17,23 +17,23 @@ export function voiceEnv() {
 
 /** Why voice cannot work here at all, or null when it may work. */
 export function envReason(env = voiceEnv()) {
-  if (!env.supported) return '이 브라우저에는 음성 인식 기능이 없습니다 (Chrome·Edge·Safari 필요)';
-  if (!env.secure) return `보안 연결이 아닙니다 (${env.origin}) · 브라우저가 마이크를 막습니다 · localhost 또는 HTTPS 주소에서 여세요`;
-  if (diag.permission === 'denied') return '마이크 권한이 거부되어 있습니다 · 주소창의 사이트 설정에서 마이크를 허용하세요';
+  if (!env.supported) return 'This browser has no speech recognition (use Chrome, Edge or Safari)';
+  if (!env.secure) return `Not a secure connection (${env.origin}) · the browser blocks the microphone · open on localhost or HTTPS`;
+  if (diag.permission === 'denied') return 'Microphone permission denied · allow the microphone in the site settings';
   return null;
 }
 
 const ERR = {
-  'not-allowed': '마이크 권한 거부 (또는 보안 연결 아님)',
-  'service-not-allowed': '브라우저가 음성 인식 서비스를 막음',
-  'audio-capture': '마이크를 찾지 못함',
-  'no-speech': '말소리를 감지하지 못함',
-  network: '음성 인식 서버에 연결하지 못함 (네트워크)',
-  aborted: '인식이 중단됨',
-  'language-not-supported': '한국어 인식을 지원하지 않음',
-  'bad-grammar': '인식 설정 오류',
+  'not-allowed': 'Microphone permission denied (or not a secure connection)',
+  'service-not-allowed': 'Browser blocked the speech recognition service',
+  'audio-capture': 'No microphone found',
+  'no-speech': 'No speech detected',
+  network: 'Could not reach the speech recognition server (network)',
+  aborted: 'Recognition aborted',
+  'language-not-supported': 'English recognition not supported',
+  'bad-grammar': 'Recognition setup error',
 };
-export const errorReason = (code) => ERR[code] || `알 수 없는 오류 (${code})`;
+export const errorReason = (code) => ERR[code] || `Unknown error (${code})`;
 
 /** Ask once for the permission state (not every browser supports the 'microphone' name). */
 export async function refreshPermission() {
@@ -48,18 +48,18 @@ export async function refreshPermission() {
 export function startRecognition(on) {
   const env = voiceEnv(), why = envReason(env); diag.result = null; diag.error = null;
   const log = (e) => { diag.last = e; diag.events.push({ e, t: Date.now() }); if (diag.events.length > 40) diag.events.shift(); };
-  if (why) { log('blocked'); on.state(`음성 불가 · ${why}`); return null; }
+  if (why) { log('blocked'); on.state(`Voice unavailable · ${why}`); return null; }
   let rec;
   try {
-    rec = new env.ctor(); rec.lang = 'ko-KR'; rec.interimResults = false; rec.maxAlternatives = 1;
-    rec.onstart = () => { log('start'); on.state('듣는 중 · 브라우저 음성 인식 (외부 서비스로 전송될 수 있음) · 우주복 환경 성능 미검증'); };
+    rec = new env.ctor(); rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 1;
+    rec.onstart = () => { log('start'); on.state('Listening · browser speech recognition (may send audio to an external service) · in-suit performance not verified'); };
     rec.onaudiostart = () => log('audiostart');
-    rec.onspeechstart = () => { log('speechstart'); on.state('말소리 감지 · 인식 중'); };
+    rec.onspeechstart = () => { log('speechstart'); on.state('Speech detected · recognizing'); };
     rec.onresult = (e) => { log('result'); const text = [...e.results].map((r) => r[0].transcript).join(' ').trim(); diag.result = text; on.result(text); };
-    rec.onnomatch = () => { log('nomatch'); on.state('말소리는 들렸지만 인식 결과가 없습니다 · 다시 말하거나 버튼을 쓰세요'); };
-    rec.onerror = (e) => { log('error:' + e.error); diag.error = e.error; on.state(`음성 인식 실패 · ${errorReason(e.error)} · 버튼으로 계속할 수 있습니다`); };
-    rec.onend = () => { log('end'); if (diag.result === null && diag.error === null) on.state('인식 결과 없음 · 키를 누른 채 말한 뒤 떼세요 · 버튼으로도 계속할 수 있습니다'); if (on.end) on.end(); };
+    rec.onnomatch = () => { log('nomatch'); on.state('Speech heard but not recognized · say it again or use the buttons'); };
+    rec.onerror = (e) => { log('error:' + e.error); diag.error = e.error; on.state(`Speech recognition failed · ${errorReason(e.error)} · you can continue with the buttons`); };
+    rec.onend = () => { log('end'); if (diag.result === null && diag.error === null) on.state('No result · hold the key while speaking, then release · the buttons also work'); if (on.end) on.end(); };
     rec.start(); log('requested');
-  } catch (err) { log('throw'); on.state(`음성 인식을 시작하지 못했습니다 (${String(err && err.message || err).slice(0, 60)}) · 버튼으로 계속할 수 있습니다`); return null; }
+  } catch (err) { log('throw'); on.state(`Could not start speech recognition (${String(err && err.message || err).slice(0, 60)}) · you can continue with the buttons`); return null; }
   return rec;
 }

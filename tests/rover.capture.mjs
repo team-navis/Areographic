@@ -74,9 +74,9 @@ check('no-dismount-while-driving', midE.transport === 'rover', 'E is ignored whi
 await page.waitForTimeout(300); const pre = await st(); await unlock(); await page.waitForTimeout(200);
 await page.click('#btn-switch'); await mode('landing'); await enterPad(page); await page.waitForTimeout(300);
 const padTxt = { transport: await page.textContent('#home-transport'), ctl: await page.textContent('#home-ctl'), s: await page.textContent('#home-s') }; const inPad = await st();
-check('pad-shows-rover-mode', padTxt.transport.includes('로버 탑승') && padTxt.ctl.includes('[로버]') && padTxt.s.startsWith(pre.s.toFixed(1)) && inPad.s === pre.s, padTxt);
+check('pad-shows-rover-mode', padTxt.transport.includes('On rover') && padTxt.ctl.includes('[Rover]') && padTxt.s.startsWith(pre.s.toFixed(1)) && inPad.s === pre.s, padTxt);
 await page.click('.pad-navbtn[data-page="site"]'); await page.waitForTimeout(700); await shot('05-pad-shows-rover', 'PAD map: crew dot + rover marker at the same shared position');
-await page.click('.pad-navbtn[data-page="home"]'); await page.waitForTimeout(600); await shot('06-pad-home-transport', 'PAD home: 이동 수단 = 로버 탑승 중');
+await page.click('.pad-navbtn[data-page="home"]'); await page.waitForTimeout(600); await shot('06-pad-home-transport', 'PAD home: Transport = On rover');
 await page.click('#btn-switch'); await mode('landing'); await page.evaluate(() => window.__mw.enterRole('hud')); await mode('hud'); const back = await st();
 check('role-switch-keeps-transport-and-position', back.transport === 'rover' && back.s === pre.s && back.roverS === pre.roverS, { transport: back.transport, s: +back.s.toFixed(2) });
 

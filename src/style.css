@@ -191,10 +191,10 @@ body[data-mode="pad"] #topbar { z-index: 4; }
 .exit-label[data-dir="right"] { transform: translate(-100%, -50%) rotate(-90deg); animation-name: exit-bob-x; }
 @keyframes exit-bob { 50% { margin-top: 8px; } } @keyframes exit-bob-x { 50% { margin-left: 0; opacity: .75; } }
 .hud.fx .fx-lines { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1; }
-/* 관제 패드 (pad/pad.html) inside the 3D control screen: a 1280x720 page scaled like the earlier PAD */
+/* Planning Display (pad/pad.html) inside the 3D control screen: a 1280x720 page scaled like the earlier PAD */
 .pad-frame { width: 1280px; height: 720px; background: #0b1026; overflow: hidden; }
 .pad-frame iframe { width: 100%; height: 100%; border: 0; display: block; background: #0b1026; }
-/* 관제 패드 full window: once the camera has reached the screen, the pad page covers the viewport at its real size (no scaling) */
+/* Planning Display full window: once the camera has reached the screen, the pad page covers the viewport at its real size (no scaling) */
 #terminal-overlay > .pad-frame.terminal-active.full { left: 0 !important; top: 0 !important; width: 100vw; height: 100vh; transform: none !important; z-index: 6; animation: pad-full-in .35s ease-out; }
 @keyframes pad-full-in { from { opacity: 0; } to { opacity: 1; } }
 body.pad-full #room-ui, body.pad-full #topbar { display: none !important; }

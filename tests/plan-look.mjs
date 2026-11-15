@@ -11,7 +11,7 @@ await page.click('.pad-navbtn[data-page="plan"]'); await wait(300); await page.f
 console.log('budget', JSON.stringify(await mw(() => { const b = window.__mw.mission.planBudget(); return { stay: b.staySec, turn: b.turnaroundSec, o2: +b.o2AtReturn.toFixed(1), shown: document.querySelector('#pp-turn').textContent.slice(0, 10) }; })));
 await page.screenshot({ path: `${OUT}/27-pad-plan-todo-budget.png` });
 await page.click('#pp-next'); await wait(500); await page.screenshot({ path: `${OUT}/28-pad-route-preview.png` }); await page.click('#pp-next2'); await wait(300);
-const dis0 = /남음|미입력/.test(await page.textContent('#pp-why')); for (const k of ['route', 'budget', 'branch']) await page.check(`[data-chk="${k}"]`); await page.click('#pp-decider'); await page.keyboard.type('관제자 123'); await wait(200);
+const dis0 = /left|no decision maker/.test(await page.textContent('#pp-why')); for (const k of ['route', 'budget', 'branch']) await page.check(`[data-chk="${k}"]`); await page.click('#pp-decider'); await page.keyboard.type('Planner 123'); await wait(200);
 const before = await mw(() => ({ tx: window.__mw.mission.st.planTx, monitor: window.__mw.activeMonitor, decider: window.__mw.mission.st.planDraft.decider })); await page.click('#pp-send'); await wait(700);
 console.log('send', JSON.stringify({ dis0, before, after: await mw(() => { const s = window.__mw.mission.st, P = window.__mw.mission.PLAN; return { tx: { ...s.planTx, todos: s.planTx.todos.length, budget: undefined }, pkg: s.pkg && { rev: s.pkg.rev, sentAt: s.pkg.sentAt, receivedAt: s.pkg.receivedAt }, stay: P.staySec, turn: P.turnaroundSec, states: document.querySelector('#pp-tx').textContent }; }) }));
 await page.screenshot({ path: `${OUT}/29-pad-departure-confirm-sent.png` });

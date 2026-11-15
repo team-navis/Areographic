@@ -118,7 +118,7 @@ export function createHabitatSurfaces() {
   const fastenerGrime = new THREE.CanvasTexture(grimeCanvas); fastenerGrime.colorSpace = THREE.SRGBColorSpace; owned.push(fastenerGrime);
   const paper = surface(512, 113, [229, 224, 207], 4, (c) => {
     c.fillStyle = '#46504b'; c.font = '600 18px monospace'; c.fillText('FIELD OPERATIONS / LOG', 34, 45);
-    c.font = '10px monospace'; c.fillText('Areographic   /   가상 기지', 34, 66);
+    c.font = '10px monospace'; c.fillText('Areographic   /   fictional habitat', 34, 66);
     c.strokeStyle = '#8d95894f'; c.lineWidth = 1;
     for (let y = 96; y < 480; y += 24) { c.beginPath(); c.moveTo(32, y); c.lineTo(480, y); c.stroke(); }
     c.strokeStyle = '#8b655e4f'; c.beginPath(); c.moveTo(60, 86); c.lineTo(60, 480); c.stroke();

@@ -3,7 +3,7 @@ import * as THREE from 'three';
 /**
  * One shared mission state for both roles (PAD and HUD read/write the same object).
  * Real inputs: HiRISE 1 m DTM heights, Perseverance's published drive polyline (route) and stops (nodes).
- * Simulated (모의) values: crew position/speed, mission clock, oxygen, radiation, buddy, comm link,
+ * Simulated values: crew position/speed, mission clock, oxygen, radiation, buddy, comm link,
  * and every plan number in PLAN. They are labelled as such wherever they are displayed.
  */
 export const WALK_SPEED = 1.4;   // m/s, demo setting (not a validated EVA walking speed)
@@ -13,8 +13,8 @@ export const BOARD_RANGE = 3;    // m along the route within which boarding is a
 export const EYE_HEIGHT = 1.68;  // m above ground, matches the helmet centre of the 1.92 m suit model
 export const WARP = 4;           // Shift while driving: demo time compression. Clock, oxygen, dose and distance all advance x4; vehicle speed stays 3.5 m/s
 export const PLAN = {            // simulated plan values for the demo (not a validated EVA plan)
-  turnaroundSec: 25 * 60,        // "복귀 개시 기한": mission-elapsed time by which the return must start
-  staySec: 20 * 60,              // planned stay at the destination (v0.2: long enough for the "10분 전 경보" design number to occur)
+  turnaroundSec: 25 * 60,        // "latest return start": mission-elapsed time by which the return must start
+  staySec: 20 * 60,              // planned stay at the destination (v0.2: long enough for the "10 min alert" design number to occur)
   o2PctPerMin: 0.35,             // oxygen model
   doseMsvPerDay: 0.67,           // assumed from Curiosity RAD at Gale (Hassler et al. 2013, as quoted by SwRI); NOT a Jezero measurement
   offRouteWarnM: 5,              // off-route warning threshold (assumption)
@@ -25,9 +25,9 @@ export const PLAN = {            // simulated plan values for the demo (not a va
 // Route = Perseverance's actual drive polyline, in drive order (see public/data/jezero/route.json).
 const SEGMENTS = ['52_7624>53_0', '53_0>53_130', '53_130>54_0', '54_0>54_702', '54_702>54_866', '54_866>54_1010'];
 export const CANDIDATES = [
-  { key: '56_0', lastSeg: '54_866>54_1010', name: 'Cheyava Falls 시료 채취 지점', note: '로버 정지점 site 56 / drive 0 (sol 1210~1218). 시료 25 "Sapphire Canyon" 밀봉 sol 1215가 이 정지 기간 안. 암석 좌표가 아니라 로버 위치(암석은 로봇 팔이 닿는 수 m 안).', evidence: { known: true, label: '공식 설명 있음', ref: 'NASA 시료 25 Sapphire Canyon (sol 1215) · PIA26368 (WATSON, sol 1212)' } },
-  { key: '54_702', lastSeg: '54_0>54_702', name: '로버 정지점', note: 'sol 1182 정지점. 이름·과학 근거는 이 데모에서 수집하지 않음.', evidence: { known: false, label: '근거 미수집' } },
-  { key: '54_0', lastSeg: '53_130>54_0', name: '로버 정지점', note: 'sol 1177 정지점. 이름·과학 근거는 이 데모에서 수집하지 않음.', evidence: { known: false, label: '근거 미수집' } },
+  { key: '56_0', lastSeg: '54_866>54_1010', name: 'Cheyava Falls sampling site', note: 'Rover stop site 56 / drive 0 (sol 1210–1218). Sample 25 "Sapphire Canyon" was sealed on sol 1215, during this stop. Rover position, not rock coordinates (the rock is within a few m of robotic-arm reach).', evidence: { known: true, label: 'Official description exists', ref: 'NASA Sample 25 Sapphire Canyon (sol 1215) · PIA26368 (WATSON, sol 1212)' } },
+  { key: '54_702', lastSeg: '54_0>54_702', name: 'Rover stop', note: 'Sol 1182 stop. Name and science evidence not collected in this demo.', evidence: { known: false, label: 'Evidence not collected' } },
+  { key: '54_0', lastSeg: '53_130>54_0', name: 'Rover stop', note: 'Sol 1177 stop. Name and science evidence not collected in this demo.', evidence: { known: false, label: 'Evidence not collected' } },
 ];
 export const fmtT = (sec) => { const s = Math.max(0, Math.floor(sec)); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
 
@@ -72,8 +72,8 @@ export function createMission(terrain, indoorPath, routeData) {
     const hazards = []; let cur = null;
     for (let i = 1; i < out.length - 1; i++) {
       const p = out[i], dx = out[i + 1].x - out[i - 1].x, dz = out[i + 1].z - out[i - 1].z, l = Math.hypot(dx, dz) || 1, rx = -dz / l, rz = dx / l, L = PLAN.hazardLateralM; // right of travel
-      const sr = slopeAt(p.x + rx * L, p.z + rz * L), sl = slopeAt(p.x - rx * L, p.z - rz * L), side = sr >= PLAN.hazardSlopeDeg && sr >= sl ? '우측' : sl >= PLAN.hazardSlopeDeg ? '좌측' : null;
-      if (side) { if (cur && cur.side === side && p.s - cur.s1 < 4) { cur.s1 = p.s; cur.max = Math.max(cur.max, sr, sl); } else { cur = { s0: p.s, s1: p.s, side, max: Math.max(side === '우측' ? sr : sl) }; hazards.push(cur); } }
+      const sr = slopeAt(p.x + rx * L, p.z + rz * L), sl = slopeAt(p.x - rx * L, p.z - rz * L), side = sr >= PLAN.hazardSlopeDeg && sr >= sl ? 'right' : sl >= PLAN.hazardSlopeDeg ? 'left' : null;
+      if (side) { if (cur && cur.side === side && p.s - cur.s1 < 4) { cur.s1 = p.s; cur.max = Math.max(cur.max, sr, sl); } else { cur = { s0: p.s, s1: p.s, side, max: Math.max(side === 'right' ? sr : sl) }; hazards.push(cur); } }
     }
     return { destKey: cand.key, pts, nodes, length: s, hazards: hazards.filter((h) => h.s1 - h.s0 >= 3), traverseVerts,
       stats: { oneWayM: s, maxSlopeDeg: maxSlope, meanSlopeDeg: cnt ? sum / cnt : 0, gainM: gain, indoorM: pts.filter((p) => p.kind !== 'terrain').slice(-1)[0].s, traverseM: lenOf('traverse'), connectorM: lenOf('connector-base') + lenOf('connector-stop'), traversePlanM: (() => { let l = 0; for (let i = 1; i < pts.length; i++) if (pts[i].src === 'traverse') l += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].z - pts[i - 1].z); return l; })() } };
@@ -82,7 +82,7 @@ export function createMission(terrain, indoorPath, routeData) {
   const base = { x: indoorPath[indoorPath.length - 1].x, z: indoorPath[indoorPath.length - 1].z }; // foot of the base ramp
 
   const st = {
-    planVersion: 1, planStatus: '데모 기본 계획 (미확정)', destKey: '56_0', route: routes['56_0'],
+    planVersion: 1, planStatus: 'Demo default plan (not confirmed)', destKey: '56_0', route: routes['56_0'],
     s: 0, control: 'idle', // 'idle' | 'hud-manual' (stage 2 adds 'pad-auto')
     transport: 'foot', // 'foot' | 'rover' (riding the fictional open rover)
     roverS: routes['56_0'].stats.indoorM + 7, // where the rover is parked / was left, as distance along the same route
@@ -95,7 +95,7 @@ export function createMission(terrain, indoorPath, routeData) {
     comm: { up: true, lastRx: 0 }, padView: { s: 0, o2: 100, transport: 'foot', sim: 0 }, // what the base last received (AC-09)
     minimap: false,
     remote: null, // instruction pushed from the PAD (base remote control): sent -> received -> acknowledged -> executed are distinct
-    departed: false, autoWarp: 1, // departed: the EVA has started (airlock exit or 관제 시작); before that nothing moves and no clock runs
+    departed: false, autoWarp: 1, // departed: the EVA has started (airlock exit or habitat start); before that nothing moves and no clock runs
     habitatPose: null, // Free movement inside the habitat (before departure only) is separate from EVA route distance.
   };
   const active = () => st.control === 'hud-manual' || st.control === 'pad-auto'; // a crew member (person or simulated) is acting
@@ -110,7 +110,7 @@ export function createMission(terrain, indoorPath, routeData) {
     return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t, kind: t < 0.5 ? a.kind : b.kind, src: t < 0.5 ? a.src : b.src, yaw: Math.atan2(-(q1.x - q0.x), -(q1.z - q0.z)) + back, outYaw: Math.atan2(-(q1.x - q0.x), -(q1.z - q0.z)) };
   }
   function rawAt(s) { const p = st.route.pts; let lo = 0, hi = p.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (p[m].s <= s) lo = m; else hi = m; } const a = p[lo], b = p[hi], t = b.s > a.s ? (s - a.s) / (b.s - a.s) : 0; return { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t }; }
-  /** Distance from a world point to the confirmed route polyline (off-route logic; AC for 이탈 경고). */
+  /** Distance from a world point to the confirmed route polyline (off-route logic; AC for the off-route warning). */
   function offRouteM(x, z) { let best = 1e9; const p = st.route.pts; for (let i = 1; i < p.length; i++) { const ax = p[i - 1].x, az = p[i - 1].z, dx = p[i].x - ax, dz = p[i].z - az, l2 = dx * dx + dz * dz || 1e-9, t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / l2)); best = Math.min(best, Math.hypot(x - ax - dx * t, z - az - dz * t)); } return best; }
 
   const api = {
@@ -140,9 +140,9 @@ export function createMission(terrain, indoorPath, routeData) {
     autoControl: () => (st.departed && st.phase !== 'ended' && !st.holdAuto ? 'pad-auto' : 'idle'), // st.holdAuto: test hook that keeps the simulated crew idle so a check can isolate the person-in-the-HUD path
     setPadShift(down) { st.padShift = !!down && st.control === 'pad-auto'; }, // controller-view fast-forward; never moves the crew by itself
     setControl(c) { if (c === 'hud-manual' && !st.habitatPose) st.departed = true; st.padShift = false; st.control = c; st.wHeld = false; st.sHeld = false; st.shiftHeld = false; st.warp = 1; st.moving = false; emit('control'); },
-    setW(down) { const was = st.wHeld; st.wHeld = !!down && st.control === 'hud-manual'; if (st.wHeld && !was && api.autoSteer) api.autoSteer(1); }, // riding: a fresh W keeps / turns the 시연 자동 진행 forward (it never switches it off)
+    setW(down) { const was = st.wHeld; st.wHeld = !!down && st.control === 'hud-manual'; if (st.wHeld && !was && api.autoSteer) api.autoSteer(1); }, // riding: a fresh W keeps / turns the demo auto-advance forward (it never switches it off)
     /** S: step back along the same fixed route (no free movement). Slower than forward; W wins if both are held. */
-    setS(down) { const was = st.sHeld; st.sHeld = !!down && st.control === 'hud-manual'; if (st.sHeld && !was && api.autoSteer) api.autoSteer(-1); }, // riding: a fresh S turns the 시연 자동 진행 backward along the route
+    setS(down) { const was = st.sHeld; st.sHeld = !!down && st.control === 'hud-manual'; if (st.sHeld && !was && api.autoSteer) api.autoSteer(-1); }, // riding: a fresh S turns the demo auto-advance backward along the route
     setShift(down) { st.shiftHeld = !!down && st.control === 'hud-manual'; },
     toggleMinimap() { st.minimap = !st.minimap; emit('minimap'); return st.minimap; },
     /** Integrate exactly one controller per frame. `dt` is real seconds; everything time-based uses dt * warp. */
@@ -155,7 +155,7 @@ export function createMission(terrain, indoorPath, routeData) {
         const auto = st.control === 'pad-auto', canMove = st.phase === 'outbound' || st.phase === 'returning';
         if (st.shiftHeld && (st.wHeld || st.sHeld) && st.transport === 'rover' && canMove) st.warp = WARP; // time compression only while actually driving the rover (forward W or reverse S)
         if (auto) st.warp = st.padShift ? WARP : (st.autoWarp || 1); // demo time compression for the simulated crew: hold Shift in the controller view, or the ×4 toggle
-        const autoManual = !auto && !!(api.ext && api.ext.autoMoveManual && api.ext.autoMoveManual()), autoBack = autoManual && st.autoDir === -1; // 시연 자동 진행 for a person in the suit (field-ops.js); autoDir -1 = backward
+        const autoManual = !auto && !!(api.ext && api.ext.autoMoveManual && api.ext.autoMoveManual()), autoBack = autoManual && st.autoDir === -1; // demo auto-advance for a person in the suit (field-ops.js); autoDir -1 = backward
         if (autoManual && st.transport === 'rover' && canMove) st.warp = WARP; // the automatic rover leg runs at the same ×4 demo compression as Shift (clock, oxygen and dose follow)
         const d = dt * st.warp;
         st.simSeconds += d; st.o2 = Math.max(0, 100 - (st.simSeconds / 60) * PLAN.o2PctPerMin); st.doseUsv = (PLAN.doseMsvPerDay * 1000 * st.simSeconds) / 86400;
@@ -174,7 +174,7 @@ export function createMission(terrain, indoorPath, routeData) {
           if (st.transport === 'rover') st.roverS = st.s;
         }
         if (fwd || !(st.sHeld || autoBack)) st.backing = false;
-        // Re-entry (docs/stage3-v02-field.md §10): after 기지 도착 (ramp) W keeps going along the same fixed indoor leg in reverse: ramp -> outer door -> airlock -> inner door -> standing spot.
+        // Re-entry (docs/stage3-v02-field.md §10): after reaching the habitat (ramp) W keeps going along the same fixed indoor leg in reverse: ramp -> outer door -> airlock -> inner door -> standing spot.
         // api.entry (set by main.js) holds the door interlock gate and the route distance of the inner door. Passing the inner door closes the mission if the crew has not closed it already.
         if (!auto && st.wHeld && (st.phase === 'atBase' || st.phase === 'ended') && st.transport === 'foot' && st.s > 0 && api.entry) {
           const next = Math.max(0, st.s - WALK_SPEED * 0.8 * dt);
@@ -204,7 +204,7 @@ export function createMission(terrain, indoorPath, routeData) {
       st.phase = 'returning'; st.returnStartedAt = st.simSeconds; st.returnBy = st.control; st.arrived = false; if (st.remote && st.remote.ackAt !== null && st.remote.executedAt === null && !st.remote.declined) { st.remote.executedAt = st.simSeconds; st.remote.executedBy = st.control; } if (api.ext) api.ext.onReturnStart(); emit('phase'); return true;
     },
     /** Base remote control (PAD -> HUD). Sending never moves the crew; the crew acknowledges, then decides. */
-    sendRemote(text = '복귀 개시 지시') { if (st.phase === 'returning' || st.phase === 'atBase' || st.phase === 'ended') return false; st.remote = { text, sentAt: st.simSeconds, receivedAt: null, ackAt: null, executedAt: null, declined: false }; emit('remote'); return true; },
+    sendRemote(text = 'Start return instruction') { if (st.phase === 'returning' || st.phase === 'atBase' || st.phase === 'ended') return false; st.remote = { text, sentAt: st.simSeconds, receivedAt: null, ackAt: null, executedAt: null, declined: false }; emit('remote'); return true; },
     ackRemote() { const r = st.remote; if (!r || r.receivedAt === null || r.ackAt !== null || !active()) return false; r.ackAt = st.simSeconds; r.ackBy = st.control; emit('remote'); return true; },
     declineRemote() { const r = st.remote; if (!r || r.ackAt === null) return false; r.declined = true; r.declinedAt = st.simSeconds; r.declinedBy = st.control; emit('remote'); return true; },
     endMission() { if (st.phase !== 'atBase' || !active()) return false; st.phase = 'ended'; st.endedAt = st.simSeconds; st.endedBy = st.control; st.endedHow = 'confirm'; emit('phase'); return true; },
@@ -213,14 +213,14 @@ export function createMission(terrain, indoorPath, routeData) {
     turnaroundLeft: () => PLAN.turnaroundSec - st.simSeconds,
     stayLeft: () => (st.phase === 'onsite' ? PLAN.staySec - (st.simSeconds - st.onsiteSince) : null),
     baseBearing() { const p = poseAt(st.s); return { yaw: Math.atan2(-(base.x - p.x), -(base.z - p.z)), dist: Math.hypot(base.x - p.x, base.z - p.z) }; },
-    nextHazard() { const back = st.phase === 'returning', h = back ? [...st.route.hazards].reverse().find((z) => z.s0 <= st.s && st.s - z.s1 <= PLAN.hazardAheadM) : st.route.hazards.find((z) => z.s1 >= st.s && z.s0 - st.s <= PLAN.hazardAheadM); if (!h || !(st.phase === 'outbound' || back)) return null; const side = back ? (h.side === '우측' ? '좌측' : '우측') : h.side; return { ...h, side, ahead: Math.max(0, back ? st.s - h.s1 : h.s0 - st.s), inside: back ? st.s <= h.s1 : st.s >= h.s0 }; },
+    nextHazard() { const back = st.phase === 'returning', h = back ? [...st.route.hazards].reverse().find((z) => z.s0 <= st.s && st.s - z.s1 <= PLAN.hazardAheadM) : st.route.hazards.find((z) => z.s1 >= st.s && z.s0 - st.s <= PLAN.hazardAheadM); if (!h || !(st.phase === 'outbound' || back)) return null; const side = back ? (h.side === 'right' ? 'left' : 'right') : h.side; return { ...h, side, ahead: Math.max(0, back ? st.s - h.s1 : h.s0 - st.s), inside: back ? st.s <= h.s1 : st.s >= h.s0 }; },
     offRouteNow() { const p = poseAt(st.s), r = { x: Math.cos(p.yaw), z: -Math.sin(p.yaw) }, d = offRouteM(p.x + r.x * st.lateralDebug, p.z + r.z * st.lateralDebug); return { m: d, warn: d > PLAN.offRouteWarnM }; },
     setComm(up) { st.comm.up = !!up; emit('comm'); }, // test hook / future incident stage
     /** Rover track runs parallel to the route, `lateral` metres to its right, so walkers never pass through it. */
     roverWorld(lateral = 2.2) { const p = poseAt(st.roverS); return { x: p.x + Math.cos(p.outYaw) * lateral, z: p.z - Math.sin(p.outYaw) * lateral, yaw: p.yaw }; }, // same physical track both ways; heading follows the travel direction
     speed: () => (st.transport === 'rover' ? ROVER_SPEED : WALK_SPEED),
     canBoard: () => st.transport === 'foot' && st.control === 'hud-manual' && !st.wHeld && Math.abs(st.s - st.roverS) <= BOARD_RANGE && st.roverS <= st.route.length,
-    canDismount: () => st.transport === 'rover' && st.control === 'hud-manual' && !st.wHeld && !st.sHeld, // E also works while the 시연 자동 진행 drives: the vehicle stops and the crew steps off
+    canDismount: () => st.transport === 'rover' && st.control === 'hud-manual' && !st.wHeld && !st.sHeld, // E also works while the demo auto-advance drives: the vehicle stops and the crew steps off
     /** Boarding/dismounting are discrete interactions; they never move the crew freely. */
     board() { if (!api.canBoard()) return false; st.transport = 'rover'; st.s = st.roverS; st.leftRoverAt = null; if (st.phase === 'outbound' && st.s >= st.route.length) { st.arrived = true; st.phase = 'arrived'; } emit('transport'); return true; },
     dismount() { if (!api.canDismount()) return false; st.transport = 'foot'; st.roverS = st.s; st.leftRoverAt = st.s; emit('transport'); return true; }, // leftRoverAt: no automatic re-boarding until the crew has walked away from the rover (or presses E)

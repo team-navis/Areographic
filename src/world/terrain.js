@@ -49,7 +49,7 @@ export async function loadTerrain() {
     for (let i = 0; i < p.length; i += 4) { const t = Math.pow(p[i] / 255, gamma); p[i] = lo[0] + (hi[0] - lo[0]) * t; p[i + 1] = lo[1] + (hi[1] - lo[1]) * t; p[i + 2] = lo[2] + (hi[2] - lo[2]) * t; }
     g.putImageData(d, 0, 0); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16; return { tex: t, canvas: c };
   };
-  // Colour policy (docs/stage3-v02-field.md 2-2): 자연색 근사, not an observation. The orthos are panchromatic; this ramp only sets a tan-brown
+  // Colour policy (docs/stage3-v02-field.md 2-2): approximate natural colour, not an observation. The orthos are panchromatic; this ramp only sets a tan-brown
   // soil tone whose relation to rock and sky was eyeballed against the same-site Mastcam-Z view PIA26401 (its caption does not state the colour processing).
   const LO = [60, 45, 36], HI = [208, 174, 142];
   const nearTint = tint(nearImg, LO, HI, 0.95);
@@ -131,7 +131,7 @@ export async function loadTerrain() {
   // ---- scattered rocks (presentation only; positions are procedural, not mapped rocks) ----
   function addRocks(route, exclude) {
     const r = rng(20261114), diff = ph('rock_face_diff', { srgb: true, defer: [98, 70, 50] }), nor = ph('rock_face_nor', { defer: FLAT_NORMAL });
-    const mat = new THREE.MeshStandardMaterial({ map: diff, normalMap: nor, roughness: 0.95, color: new THREE.Color(1.5, 1.24, 1.06) }); // greyer and a little lighter than the soil (연출 rocks; relation eyeballed against PIA26401)
+    const mat = new THREE.MeshStandardMaterial({ map: diff, normalMap: nor, roughness: 0.95, color: new THREE.Color(1.5, 1.24, 1.06) }); // greyer and a little lighter than the soil (presentation rocks; relation eyeballed against PIA26401)
     const shape = (v, detail) => {
       const g = new THREE.IcosahedronGeometry(1, detail), p = g.attributes.position, rv = rng(77 + v * 13), ph_ = [rv() * 6, rv() * 6, rv() * 6];
       for (let i = 0; i < p.count; i++) {
@@ -142,7 +142,7 @@ export async function loadTerrain() {
       }
       g.computeVertexNormals(); return g;
     };
-    // Perf + honesty (rendering review §5): fewer rocks, clearly 연출. Small ones (the majority) use an 80-triangle shape and cast no shadow;
+    // Perf + honesty (rendering review §5): fewer rocks, clearly presentation. Small ones (the majority) use an 80-triangle shape and cast no shadow;
     // only rocks larger than 14 cm keep the 320-triangle shape and cast. Same fixed seed, so the layout is stable between loads.
     const variants = [0, 1, 2, 3].map((v) => shape(v, 2)), small = [0, 1, 2, 3].map((v) => shape(v, 1)), BIG = 0.14;
     const N = 1100, per = Math.ceil(N / variants.length), dummy = new THREE.Object3D();

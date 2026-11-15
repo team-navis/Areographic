@@ -1,7 +1,7 @@
-/* 우주복·임무 상태 layer (content from feat/immersive-mission-control, restyled to the evidence-based HUD in style.css).
+/* Suit & mission status layer (content from feat/immersive-mission-control, restyled to the evidence-based HUD in style.css).
    Integration note: the teammate's full instrument stylesheet (sage/amber panels, clickable toggle and E button) is not used
    outdoors; the outdoor HUD keeps the green-on-dark-plate design of docs/hud-design-basis.md. This layer is display only:
-   it opens with button 2 or the voice word "상세" and takes no pointer input (.hud * { pointer-events: none } in style.css). */
+   it opens with button 2 or the voice word "detail" and takes no pointer input (.hud * { pointer-events: none } in style.css). */
 .hud-detail { left: 8.5%; top: 17.5%; width: 20.6em; border-left: 2px solid var(--g); }
 .hud-detail dl { display: grid; grid-template-columns: 8.2em 1fr; gap: .12em .6em; margin: .2em 0; }
 .hud-detail dt { color: var(--g); white-space: nowrap; } .hud-detail dd { margin: 0; color: var(--gv); }

@@ -19,7 +19,7 @@
 .hud.fx .fx-voice:not(.hidden) ~ .fx-note { display: none; } /* the voice bar already shows the result */
 .fx-voice label { display: block; font-size: .93em; margin-top: .2em; } .fx-voice input { width: 100%; font: inherit; color: var(--gv); background: #000; border: 1px solid var(--g); margin: .2em 0; padding: .1em .4em; }
 #hud-voice-note { color: var(--gv); min-height: 1.35em; }
-/* ---- 관찰 대조 board (design proposal d) ---- */
+/* ---- observation check board (design proposal d) ---- */
 .hud.fx.has-board .hud-brand, .hud.fx.has-board .hud-tc, .hud.fx.has-board .hud-bl, .hud.fx.has-board .hud-br, .hud.fx.has-board .hud-tr, .hud.fx.has-board .hud-bc, .hud.fx.has-board .hud-cue { display: none; }
 .hud.fx .fx-board { left: 10.75%; right: 10.75%; top: 14%; padding: .7em 1em .6em; font-size: clamp(13.5px, 1.72vh, 19px); }
 .fx-board .b-head { display: flex; align-items: baseline; gap: 1em; margin-bottom: .45em; white-space: nowrap; } .fx-board h1 { margin: 0; font-size: 1.2em; font-weight: 700; color: #fff; } .fx-board .vit { margin-left: auto; }
@@ -46,11 +46,11 @@
 @media (max-width: 1400px) { .fx-board .b-items { grid-template-columns: 1fr 1fr; } }
 .fx-voice input::placeholder { color: var(--g); opacity: .8; }
 .hud.fx .fx-chip { border: 1px solid var(--cau); border-radius: 3px; padding: 0 .4em; font-size: .93em; }
-/* 이동 중 안내 (joint demo feedback 2026-11-15): a short line under the compass while moving; hidden whenever an alert / plan / package card needs the crew */
+/* en-route brief (joint demo feedback 2026-11-15): a short line under the compass while moving; hidden whenever an alert / plan / package card needs the crew */
 .hud.fx .fx-brief { position: absolute; left: 50%; top: 25.5%; transform: translateX(-50%); max-width: min(30em, 38vw); font-size: .86em; line-height: 1.4; text-align: center; color: #fff; background: rgba(4, 10, 14, .55); border-radius: 6px; padding: .45em .9em; z-index: 2; pointer-events: none; }
 .hud.fx .fx-brief #hud-brief-auto { color: #ffd84d; font-weight: 600; margin-bottom: .15em; } .hud.fx .fx-brief #hud-brief-auto.hidden { display: none; }
 .hud.fx.has-board .fx-brief, .hud.fx.has-card .fx-brief, .hud.fx.detail-open .fx-brief { display: none; } /* never over a card that needs the crew */
-/* 촬영 (suit button 3): viewfinder corners close in, a short flash, then the captured demo frame shrinks toward the bottom-left record corner */
+/* photo (suit button 3): viewfinder corners close in, a short flash, then the captured demo frame shrinks toward the bottom-left record corner */
 .hud.fx .fx-shutter { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 .fx-shutter .c { position: absolute; width: 9vmin; height: 9vmin; border: 0 solid #fff; opacity: 0; filter: drop-shadow(0 0 4px #000a); }
 .fx-shutter .tl { left: 24%; top: 22%; border-left-width: 3px; border-top-width: 3px; } .fx-shutter .tr { right: 24%; top: 22%; border-right-width: 3px; border-top-width: 3px; }

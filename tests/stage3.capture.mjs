@@ -61,18 +61,18 @@ check('line-extraction-deterministic', ex.again.every((h) => h === ex.hash) && e
 check('line-extraction-output-sane', ex.w === 1024 && ex.h === 559 && ex.inRange && ex.minPts >= 2 && ex.counts.every((c) => c >= 5 && c <= 32) && new Set(ex.hashes).size >= 2, `1024x559 input (measured mesh texture, half size); ${ex.counts[1]} polylines / ${ex.points} vertices, all inside 0..1; only the longest lines inside the rock's image box are kept (max 32); detail presets give ${ex.counts.join(' / ')} lines; ${ex.ms.toFixed(0)} ms`);
 const pre = await txt('#fp-state');
 const preT = await mw(() => window.__mw.fieldPad.ui.targets.map((t) => ({ ...t })));
-check('package-draft-not-sent', /전송 —/.test(pre) && /HUD 수신 —/.test(pre) && /대원 확인 —/.test(pre) && preT.length === 1 && preT[0].preset === 'B' && (await mw(() => window.__mw.mission.st.pkg)) === null, 'nothing sent yet; the planner target defaults to point B (core area, raw-metadata estimate)');
+check('package-draft-not-sent', /Sent —/.test(pre) && /HUD received —/.test(pre) && /Acknowledged —/.test(pre) && preT.length === 1 && preT[0].preset === 'B' && (await mw(() => window.__mw.mission.st.pkg)) === null, 'nothing sent yet; the planner target defaults to point B (core area, raw-metadata estimate)');
 await page.click('#fp-clear'); await wait(200);
 const cvb = await page.locator('#fp-cv').boundingBox(); await page.mouse.click(cvb.x + cvb.width * 0.42, cvb.y + cvb.height * 0.52); await wait(300);
 const tg = await mw(() => window.__mw.fieldPad.ui.targets);
 check('target-marked-by-mouse-on-pad', tg.length === 1 && Math.abs(tg[0].u - 0.42) < 0.06 && Math.abs(tg[0].v - 0.52) < 0.06 && !(await page.isDisabled('#fp-send')), `one click on the photo -> target at (${(tg[0].u * 100).toFixed(1)} %, ${(tg[0].v * 100).toFixed(1)} %) of the image`);
 const padTxt = await txt('#fp-body');
-check('pad-photo-credit-and-limits', /Hazcam/.test(padTxt) && /sol 1215/.test(padTxt) && /NASA\/JPL-Caltech/.test(padTxt) && /인식\/분석 아님/.test(padTxt) && /자동 인식 없음/.test(padTxt) && /실측 메시/.test(padTxt) && /raw 메타데이터 기반 추정/.test(padTxt), 'panel names the measured source, credit, "not recognition", crew decides the match, single-view decimated mesh, estimated points');
+check('pad-photo-credit-and-limits', /Hazcam/.test(padTxt) && /sol 1215/.test(padTxt) && /NASA\/JPL-Caltech/.test(padTxt) && /not recognition or analysis/.test(padTxt) && /no automatic recognition/.test(padTxt) && /measured mesh/.test(padTxt) && /estimated from raw metadata/.test(padTxt), 'panel names the measured source, credit, "not recognition", crew decides the match, single-view decimated mesh, estimated points');
 await shot('01-pad-line-extraction-target', 'PAD: line drawing traced from PIA26368 over the photo, planner-marked sampling target, package not yet sent');
 await page.uncheck('#fp-photo'); await wait(250); await shot('02-pad-lines-only', 'PAD: the line drawing alone (what the HUD will receive)'); await page.check('#fp-photo');
 await page.click('#fp-send'); await wait(700);
 const p1 = await mw(() => { const p = window.__mw.mission.st.pkg; return p && { rev: p.rev, planVersion: p.planVersion, n: p.lines.length, hash: p.lineHash, targets: p.targets, source: p.source, credit: p.credit, sentAt: p.sentAt, receivedAt: p.receivedAt, ackAt: p.ackAt }; }), sentTxt = await txt('#fp-state');
-check('package-sent-not-yet-received', p1 && p1.sentAt !== null && p1.receivedAt === null && p1.ackAt === null && /전송 T\+/.test(sentTxt) && /HUD 수신 —/.test(sentTxt), sentTxt.replace(/\s+/g, ' '));
+check('package-sent-not-yet-received', p1 && p1.sentAt !== null && p1.receivedAt === null && p1.ackAt === null && /Sent T\+/.test(sentTxt) && /HUD received —/.test(sentTxt), sentTxt.replace(/\s+/g, ' '));
 check('package-contents', p1.hash === ex.hash && p1.n === ex.counts[1] && p1.targets.length === 1 && /Hazcam/.test(p1.source) && p1.credit === 'NASA/JPL-Caltech' && p1.planVersion === 1 && p1.rev === 1, `lines ${p1.n} (fingerprint ${p1.hash}), target 1, source "${p1.source}", credit ${p1.credit}, plan v${p1.planVersion}, package r${p1.rev}`);
 await page.click('#fp-close');
 
@@ -84,7 +84,7 @@ await lay('package card in the base'); await shot('03-hud-package-received', 'HU
 await b1(); const p3 = await mw(() => window.__mw.mission.st.pkg.ackAt);
 check('package-acknowledged-with-button1', p3 !== null && !(await page.isVisible('#hud-card')), 'button 1 acknowledges; received and acknowledged are separate timestamps');
 await sw('pad'); await page.click('#fp-open'); await wait(700); const ackTxt = await txt('#fp-state');
-check('pad-shows-three-package-states', /전송 T\+/.test(ackTxt) && /HUD 수신 T\+/.test(ackTxt) && /대원 확인 T\+/.test(ackTxt), ackTxt.replace(/\s+/g, ' '));
+check('pad-shows-three-package-states', /Sent T\+/.test(ackTxt) && /HUD received T\+/.test(ackTxt) && /Acknowledged T\+/.test(ackTxt), ackTxt.replace(/\s+/g, ' '));
 await page.click('#fp-close'); await sw('hud');
 
 // ====================== drive to the site with W, voice "탑승", button 1 ======================

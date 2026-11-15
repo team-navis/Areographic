@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Areographic - 화성 탐사 관제 대시보드</title>
+<title>Areographic - Habitat Planning Display</title>
 <link rel="icon" type="image/png" href="/assets/brand/mark-64.png"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -31,7 +31,7 @@
   :focus-visible{outline:2px solid var(--orange);outline-offset:1px}
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 
-  /* 상단 바 */
+  /* Top bar */
   #topbar{position:absolute;top:0;left:0;right:0;height:49px;z-index:1200;display:flex;align-items:center;gap:14px;
     padding:8px 16px;background:#ffffff;border-bottom:1px solid #dfe3ec}
   #logoChip{display:flex;align-items:center}
@@ -45,7 +45,7 @@
   .modebadge{border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-weight:700;color:var(--dim);white-space:nowrap}
   .modebadge.ctrl{background:var(--cyan);border-color:var(--cyan);color:#071022}
 
-  /* 좌측 내비 (도킹 · 접기) */
+  /* Left nav (dock / collapse) */
   #nav{position:absolute;top:49px;left:0;bottom:0;width:var(--navw);z-index:1150;display:flex;flex-direction:column;
     background:var(--card);border-right:1px solid var(--line);padding:10px 8px;transition:width .18s}
   #nav.min{width:58px}
@@ -59,7 +59,7 @@
   #nav .spacer{flex:1}
   #navToggle{margin:6px 4px 2px;text-align:center}
 
-  /* KPI 스트립 (관제) */
+  /* KPI strip (habitat) */
   #kpibar{position:absolute;top:49px;left:var(--navw);right:0;z-index:1140;display:none;align-items:center;gap:16px;
     padding:7px 18px;background:rgba(9,13,32,.94);border-bottom:1px solid var(--line);transition:left .18s}
   #kpibar .ev{font-weight:800}
@@ -68,7 +68,7 @@
   #kpiTrack{width:120px;height:5px;border-radius:3px;background:#1a2450;overflow:hidden}
   #kpiFill{height:5px;border-radius:3px;background:var(--cyan);width:0%;display:block}
 
-  /* 플로우 패널 */
+  /* Flow panel */
   #panel{position:absolute;top:62px;left:calc(var(--navw) + 14px);bottom:14px;width:372px;z-index:1100;display:none;flex-direction:column;
     background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;transition:left .18s}
   #panelHead{padding:13px 16px 11px;border-bottom:1px solid var(--line)}
@@ -85,7 +85,7 @@
   .kv span:first-child{color:var(--dim)}
   .kv b{font-family:var(--mono);font-weight:600}
 
-  /* 지표 우선순위 */
+  /* Indicator priority */
   .indrow{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-bottom:6px;cursor:grab}
   .indrow.dragging{opacity:.45;border-style:dashed}
   .indrow.dragover{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan)}
@@ -101,7 +101,7 @@
   .lockbox .kv b{font-family:inherit}
   .lockbox .ttl{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:5px}
 
-  /* 후보 카드 */
+  /* Candidate site cards */
   .cand{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;cursor:pointer}
   .cand:hover{border-color:#3d4f92}
   .cand.sel{border-color:var(--orange);box-shadow:0 0 0 1px var(--orange)}
@@ -123,7 +123,7 @@
   .bar{height:7px;border-radius:4px;background:#1a2450;overflow:hidden;margin:4px 0 2px}
   .fill{height:100%;background:var(--cyan);transition:width .4s}
 
-  /* 레이어 패널 */
+  /* Layer panel */
   #layerbox{position:absolute;right:62px;bottom:14px;z-index:1210;width:282px;background:var(--card);
     border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;display:none}
   .hintbtn{width:18px;height:18px;border-radius:99px;border:1px solid var(--line);background:var(--card2);color:var(--cyan);
@@ -145,7 +145,7 @@
   #presets button{flex:1;font-size:11.5px;padding:5px 4px;border-radius:7px;white-space:nowrap}
   #presets button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
 
-  /* 전체 화면 페이지 (탐사 현황 · 탐색 분석) */
+  /* Full-screen pages (status / analysis) */
   #page{position:absolute;top:49px;left:var(--navw);right:0;bottom:0;z-index:1050;display:none;overflow-y:auto;
     background:var(--paper);padding:22px 28px;transition:left .18s}
   #page h2{font-size:18px;font-weight:800}
@@ -156,7 +156,7 @@
   .pagecard h3{margin:0 0 10px;font-size:12.5px;font-weight:800;color:var(--dim);letter-spacing:.03em}
   .arcitem{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:7px;background:var(--card2)}
 
-  /* 내비 하단 대원 요약 */
+  /* Crew summary at nav bottom */
   #crewbox{border-top:1px solid var(--line);margin:8px 2px 0;padding-top:8px;cursor:pointer}
   .cmini{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px}
   .cmini:hover{background:#18224c}
@@ -166,11 +166,11 @@
   .cmini .cinfo small{color:var(--dim);font-size:10.5px;font-family:var(--mono)}
   #nav.min .cmini .cinfo{display:none}
 
-  /* 데이터 출처 (상단 · 배경 없음) */
+  /* Data source (top, no background) */
   #datasrc{position:absolute;top:57px;right:16px;z-index:1040;color:#fff;font-size:10.5px;letter-spacing:.01em;
     text-shadow:0 1px 4px rgba(0,0,0,.7), 0 0 2px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap}
 
-  /* 지도 범례 */
+  /* Map legend */
   #maplegend{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:1040;display:flex;gap:14px;align-items:center;
     background:rgba(13,20,46,.88);border:1px solid var(--line);border-radius:99px;padding:6px 16px;font-size:10.5px;color:var(--dim);white-space:nowrap}
   #maplegend span{display:flex;align-items:center;gap:5px}
@@ -182,7 +182,7 @@
   .lg-crew{width:9px;height:9px;border-radius:99px;background:#f5a623;border:1.5px solid #fff;box-shadow:12px 0 0 -1px #2b6fd4, 12px 0 0 0 #fff}
   @media (max-width:1100px){#maplegend{display:none}}
 
-  /* 관제 카드들 */
+  /* Habitat cards */
   #envcard{position:absolute;top:104px;left:58%;transform:translateX(-50%);z-index:1100;width:250px;display:none;
     background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);padding:12px 14px}
   #envcard h3{margin:0 0 6px;font-size:12.5px;font-weight:800}
@@ -198,7 +198,7 @@
   #ctrlpanel{position:absolute;top:104px;left:calc(var(--navw) + 14px);z-index:1090;width:286px;max-height:52%;overflow-y:auto;display:none;
     background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;transition:left .18s}
 
-  /* 이상 감지 연출 */
+  /* Anomaly effects */
   #alertglow{position:absolute;inset:0;z-index:1240;pointer-events:none;display:none;
     box-shadow:inset 0 0 130px 34px rgba(255,93,108,.62)}
   body.alerting #alertglow{display:block;animation:glowpulse 1.1s ease-in-out infinite}
@@ -209,7 +209,7 @@
   body.alerting #ctrlpanel,body.alerting #envcard,body.alerting #guidecard,
   body.alerting #layerbox,body.alerting #maplegend{opacity:.3;transition:opacity .3s}
 
-  /* 경보·시트·모달 */
+  /* Alerts / sheet / modals */
   #alertbar{position:absolute;top:88px;left:50%;transform:translateX(-50%);z-index:1300;display:none;
     background:var(--danger-bg);border:1.5px solid var(--danger);color:var(--danger);border-radius:11px;padding:9px 18px;font-weight:700;box-shadow:var(--shadow)}
   #sheet{position:absolute;left:calc(var(--navw) + 14px);right:278px;bottom:14px;z-index:1260;display:none;
@@ -251,12 +251,12 @@
 <div id="nav"></div>
 
 <div id="kpibar">
-  <span class="ev">EVA-01</span><span class="pill ok" id="kpiState">탐사 진행 중</span>
-  <span class="kpi">경과 <b id="kpiElapsed">00:00:00</b></span>
-  <span class="kpi">복귀 소요 <b id="kpiHome">–</b></span>
-  <span class="kpi">이동거리 <b id="kpiDist">–</b></span>
+  <span class="ev">EVA-01</span><span class="pill ok" id="kpiState">Marswalk in progress</span>
+  <span class="kpi">Elapsed <b id="kpiElapsed">00:00:00</b></span>
+  <span class="kpi">Return time <b id="kpiHome">–</b></span>
+  <span class="kpi">Distance <b id="kpiDist">–</b></span>
   <span id="kpiTrack"><span id="kpiFill"></span></span>
-  <span class="kpi">현 위치 생명점수 <b id="kpiIdx">–</b></span>
+  <span class="kpi">Biosignature potential here <b id="kpiIdx">–</b></span>
 </div>
 
 <div id="panel">
@@ -266,13 +266,13 @@
 </div>
 
 <div id="page"></div>
-<div id="datasrc">NASA Trek · 격자 = CRISM / SIM3464 / DEM 실데이터 (marswalk_handoff)</div>
+<div id="datasrc">NASA Trek · grid = CRISM / SIM3464 / DEM real data (marswalk_handoff)</div>
 <div id="maplegend">
-  <span><i class="lg-sq"></i>생명점수 격자 (파랑 낮음 → 빨강 높음)</span>
-  <span><i class="lg-dot"></i>탐사 지점 · 점선 = 안전 제외</span>
-  <span><i class="lg-dia"></i>로봇 발견 지점</span>
-  <span><i class="lg-ring"></i>복귀 가능 반경</span>
-  <span><i class="lg-crew" style="margin-right:12px"></i>대원 A·B</span>
+  <span><i class="lg-sq"></i>Potential biosignature score grid (blue low → red high)</span>
+  <span><i class="lg-dot"></i>Candidate site · dashed = excluded for safety</span>
+  <span><i class="lg-dia"></i>Rover finds</span>
+  <span><i class="lg-ring"></i>Return range</span>
+  <span><i class="lg-crew" style="margin-right:12px"></i>Astronauts A·B</span>
 </div>
 <div id="layerbox"></div>
 <div id="ctrlpanel"></div>
@@ -291,27 +291,27 @@
 
 <script>
 'use strict';
-/* ════════ 설정 (localStorage 영속 - 매번 조정 불필요) ════════ */
+/* ════════ Settings (persisted in localStorage) ════════ */
 const SET_DEFAULT = {
-  preset: '과학 권장 (기본)', order: ['S1', 'S2', 'S4', 'S3', 'S5'], formula: 'ROC',
+  preset: 'Science default', order: ['S1', 'S2', 'S4', 'S3', 'S5'], formula: 'ROC',
   rangeKm: 3.0,
-  crewA: { name: '장원영', mass: 65, load: 18 },
-  crewB: { name: '박보검', mass: 80, load: 22 },
+  crewA: { name: 'Jang Won-young', mass: 65, load: 18 },
+  crewB: { name: 'Park Bo-gum', mass: 80, load: 22 },
   safety: { slopeMax: 25, reserve: 0.15, doseBudget: 1.0, unlocked: false }
 };
 let SET;
 try { SET = Object.assign({}, SET_DEFAULT, JSON.parse(localStorage.getItem('areo_set_v1') || '{}')); }
 catch (e) { SET = JSON.parse(JSON.stringify(SET_DEFAULT)); }
 SET.safety = Object.assign({}, SET_DEFAULT.safety, SET.safety || {});
-['crewA', 'crewB'].forEach(k => {   // 구버전(문자열 이름 + 공용 체중) 마이그레이션
+['crewA', 'crewB'].forEach(k => {   // migrate old format (string name + shared mass)
   if (typeof SET[k] === 'string') SET[k] = { name: SET[k], mass: SET.mass || 80, load: SET.load || 20 };
   SET[k] = Object.assign({}, SET_DEFAULT[k], SET[k] || {});
 });
-if (SET.crewA.name === '박채원') SET.crewA.name = '장원영';   // 구 기본값 이관
-if (SET.crewB.name === '김민준') SET.crewB.name = '박보검';
+['crewA', 'crewB'].forEach(k => { if (/[\uAC00-\uD7A3]/.test(SET[k].name)) SET[k].name = SET_DEFAULT[k].name; });   // migrate old Korean default names
+if (SET.preset && !PRESET_RANKS[SET.preset]) SET.preset = SET_DEFAULT.preset;   // migrate old Korean preset key
 function saveSet() { localStorage.setItem('areo_set_v1', JSON.stringify(SET)); }
 
-/* 가중치 - 순위에서 공식으로 계산 (Barron & Barrett 1996, 손으로 안 고름) */
+/* Weights - computed from rank by formula (Barron & Barrett 1996, not hand-picked) */
 function calcWeights(order, formula) {
   const N = order.length, W = {};
   order.forEach((k, idx) => {
@@ -323,7 +323,7 @@ function calcWeights(order, formula) {
 }
 let WEIGHTS = calcWeights(SET.order, SET.formula);
 
-/* ════════ 격자 (실데이터 3,067칸) ════════ */
+/* ════════ Grid (3,067 real-data cells) ════════ */
 const CELLS = GRID.features.map(f => {
   const ring = f.geometry.coordinates[0];
   const xs = ring.map(p => p[0]), ys = ring.map(p => p[1]);
@@ -343,7 +343,7 @@ function cellScore(p) {
 }
 function scoreColor(v) { return v == null ? '#999' : v < 30 ? '#4a7fc1' : v < 45 ? '#3fae6a' : v < 62 ? '#d7c427' : v < 80 ? '#e8872a' : '#dd4a1e'; }
 
-/* ════════ 지도 ════════ */
+/* ════════ Map ════════ */
 const MarsCRS = L.Util.extend({}, L.CRS.EPSG4326, { R: 3389500 });
 const map = L.map('map', { crs: MarsCRS, zoomControl: false, attributionControl: false, minZoom: 3, maxZoom: 17 })
   .setView([BASE.lat + 0.015, BASE.lon - 0.012], 13);
@@ -353,7 +353,7 @@ const LayerCtl = L.Control.extend({
   onAdd() {
     const d = L.DomUtil.create('div', 'leaflet-bar');
     const a = L.DomUtil.create('a', '', d);
-    a.href = '#'; a.id = 'layerBtn'; a.title = '지도 레이어'; a.innerHTML = '≋';
+    a.href = '#'; a.id = 'layerBtn'; a.title = 'Data layers'; a.innerHTML = '≋';
     L.DomEvent.on(a, 'click', e => { L.DomEvent.stop(e); S.layerOpen = !S.layerOpen; render(); });
     return d;
   }
@@ -372,7 +372,7 @@ map.createPane('p_optical').style.zIndex = 215;
 trekLayer('NES_JEZ_MID_Visible_Mosaic_HiRISE_CTX_HRSC_GCS_MARS_07-10-2018', 'png', 17, 'p_optical',
   { bounds: [[17.579, 76.791], [18.693, 77.731]] }).addTo(map);
 
-/* 격자 레이어 4종 (canvas 렌더) */
+/* 4 grid layers (canvas render) */
 function gridLayer(pane, styleFn) {
   map.createPane(pane);
   return L.geoJSON(GRID, { renderer: L.canvas({ pane }), pane, style: styleFn, interactive: false });
@@ -396,11 +396,11 @@ const rockL = gridLayer('p_rock', f => {
   return { stroke: r >= 0.3, color: '#c98a4b', weight: 1, opacity: .8, fillColor: '#8a5c33', fillOpacity: r * .5 };
 });
 
-/* 벡터·핀 레이어 */
+/* Vector / pin layers */
 map.createPane('p_water'); map.createPane('p_pin');
 const waterG = L.layerGroup();
 WATER.polys.forEach(p => L.polygon(p.pts, { pane: 'p_water', color: p.color, weight: 1.5, fillColor: p.color, fillOpacity: .25 })
-  .bindTooltip(p.name + ' · 근사').addTo(waterG));
+  .bindTooltip(p.name + ' · approx.').addTo(waterG));
 WATER.dots.forEach(d => L.circleMarker([d.lat, d.lon], { pane: 'p_water', radius: 5, color: '#fff', weight: 1.5, fillColor: '#3b86d4', fillOpacity: .95 }).bindTooltip(d.name).addTo(waterG));
 const pinG = L.layerGroup();
 PINS.forEach(p => L.marker([p.lat, p.lon], { pane: 'p_pin',
@@ -408,14 +408,14 @@ PINS.forEach(p => L.marker([p.lat, p.lon], { pane: 'p_pin',
   .bindPopup('<b>' + p.name + '</b><br><span style="color:#76808c">' + p.desc + '</span>').addTo(pinG));
 
 const OVL = {
-  score:  { name: '생명점수 격자 (실데이터)', on: true,  op: 1,  lyr: scoreL, legend: true },
-  water:  { name: '수분·광물 흔적', on: false, op: .85, lyr: waterG },
-  pins:   { name: '로봇 발견 핀', on: true,  op: 1,  lyr: pinG },
-  slope:  { name: '경사 (안전 게이트)', on: false, op: .9, lyr: slopeL },
-  comm:   { name: '교신 음영 (DEM 가시선)', on: false, op: .8, lyr: commL },
-  rock:   { name: '암석 피복 (THEMIS 열관성)', on: false, op: .8, lyr: rockL },
-  terrain:{ name: '지형 MOLA', on: false, op: .7, lyr: (map.createPane('p_terrain'), trekLayer('Mars_MGS_MOLA_ClrShade_merge_global_463m', 'jpg', 7, 'p_terrain')) },
-  thermal:{ name: '온도 THEMIS 야간', on: false, op: .6, lyr: (map.createPane('p_thermal'), trekLayer('THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018', 'png', 9, 'p_thermal')) }
+  score:  { name: 'Biosignature potential grid (real data)', on: true,  op: 1,  lyr: scoreL, legend: true },
+  water:  { name: 'Water & mineral traces', on: false, op: .85, lyr: waterG },
+  pins:   { name: 'Rover find pins', on: true,  op: 1,  lyr: pinG },
+  slope:  { name: 'Slope (safety gate)', on: false, op: .9, lyr: slopeL },
+  comm:   { name: 'Comm shadow (DEM line of sight)', on: false, op: .8, lyr: commL },
+  rock:   { name: 'Rock cover (THEMIS thermal inertia)', on: false, op: .8, lyr: rockL },
+  terrain:{ name: 'Topography MOLA', on: false, op: .7, lyr: (map.createPane('p_terrain'), trekLayer('Mars_MGS_MOLA_ClrShade_merge_global_463m', 'jpg', 7, 'p_terrain')) },
+  thermal:{ name: 'Thermal THEMIS night', on: false, op: .6, lyr: (map.createPane('p_thermal'), trekLayer('THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018', 'png', 9, 'p_thermal')) }
 };
 const ovlOrder = ['score', 'water', 'pins', 'slope', 'comm', 'rock', 'terrain', 'thermal'];
 const paneOf = { score: 'p_score', water: 'p_water', pins: 'p_pin', slope: 'p_slope', comm: 'p_comm', rock: 'p_rock', terrain: 'p_terrain', thermal: 'p_thermal' };
@@ -428,12 +428,12 @@ function applyOvl(k) {
 Object.keys(OVL).forEach(applyOvl);
 
 const LPRESETS = {
-  '생명 탐사': ['score', 'water', 'pins'],
-  '안전 점검': ['slope', 'comm', 'rock'],
-  '지질·지형': ['terrain', 'water', 'pins'],
-  '온도 분석': ['thermal', 'pins']
+  'Biosignature': ['score', 'water', 'pins'],
+  'Safety': ['slope', 'comm', 'rock'],
+  'Geology': ['terrain', 'water', 'pins'],
+  'Thermal': ['thermal', 'pins']
 };
-let activePreset = '생명 탐사';
+let activePreset = 'Biosignature';
 function applyLPreset(name) {
   activePreset = name;
   Object.keys(OVL).forEach(k => { OVL[k].on = LPRESETS[name].includes(k); applyOvl(k); });
@@ -441,14 +441,14 @@ function applyLPreset(name) {
 }
 function renderLayerbox() {
   const lb = document.getElementById('layerbox');
-  lb.innerHTML = '<h3>지도 레이어 (중첩) <button class="hintbtn" id="lbGuide">?</button></h3>' +
+  lb.innerHTML = '<h3>Data layers (stacked) <button class="hintbtn" id="lbGuide">?</button></h3>' +
     ovlOrder.map(k => {
       const o = OVL[k];
-      return (o.legend && o.on ? '<div class="legend"></div><div class="legend-lab"><span>25</span><span>생명점수</span><span>100</span></div>' : '') +
+      return (o.legend && o.on ? '<div class="legend"></div><div class="legend-lab"><span>25</span><span>Biosignature potential</span><span>100</span></div>' : '') +
         '<div class="lrow"><input type="checkbox" id="ck_' + k + '" ' + (o.on ? 'checked' : '') + '>' +
         '<label for="ck_' + k + '">' + o.name + '</label></div>';
     }).join('') +
-    '<div class="note" style="margin-top:6px">추천 조합</div><div id="presets">' +
+    '<div class="note" style="margin-top:6px">Suggested sets</div><div id="presets">' +
     Object.keys(LPRESETS).map(n => '<button class="' + (activePreset === n ? 'on' : '') + '" data-pre="' + n + '">' + n + '</button>').join('') + '</div>';
   ovlOrder.forEach(k => {
     document.getElementById('ck_' + k).onchange = e => { OVL[k].on = e.target.checked; activePreset = null; applyOvl(k); renderLayerbox(); };
@@ -457,10 +457,10 @@ function renderLayerbox() {
   document.getElementById('lbGuide').onclick = openGuide;
 }
 
-/* ════════ 공통 ════════ */
-L.marker([BASE.lat, BASE.lon], { icon: L.divIcon({ className: '', html: '<div class="basepin">🚩 기지</div>', iconSize: [44, 16] }) }).addTo(map);
+/* ════════ Common ════════ */
+L.marker([BASE.lat, BASE.lon], { icon: L.divIcon({ className: '', html: '<div class="basepin">🚩 Habitat</div>', iconSize: [60, 16] }) }).addTo(map);
 const wbRing = L.circle([BASE.lat, BASE.lon], { radius: 3000, color: '#35c58f', weight: 1.5, fillColor: '#35c58f', fillOpacity: .04, dashArray: '4 4' })
-  .bindTooltip('복귀 가능 반경 (소모품 기준 · 왕복 계산)').addTo(map);
+  .bindTooltip('Return range (consumables, round trip)').addTo(map);
 const routeG = L.layerGroup().addTo(map);
 const simG = L.layerGroup().addTo(map);
 const siteG = L.layerGroup().addTo(map);
@@ -488,31 +488,31 @@ function toast(msg, ms) {
   clearTimeout(t._tm); t._tm = setTimeout(() => t.style.display = 'none', ms || 2800);
 }
 const fmtT = m => String(Math.floor(m / 60) % 24).padStart(2, '0') + ':' + String(Math.round(m % 60)).padStart(2, '0');
-const fmtDur = m => m >= 60 ? Math.floor(m / 60) + '시간 ' + Math.round(m % 60) + '분' : Math.round(m) + '분';
+const fmtDur = m => m >= 60 ? Math.floor(m / 60) + 'h ' + Math.round(m % 60) + 'min' : Math.round(m) + 'min';
 
-/* ════════ 모델 (1_model_spec - 순수 함수) ════════ */
-const SPEED_MS = 0.75, SPEED = SPEED_MS * 60;   // 45 m/분
+/* ════════ Model (1_model_spec - pure functions) ════════ */
+const SPEED_MS = 0.75, SPEED = SPEED_MS * 60;   // 45 m/min
 const WORKMIN = 90;
 function pandolf(slopeDeg, uphill) {
   const M = (SET.crewA.mass + SET.crewB.mass) / 2, L = (SET.crewA.load + SET.crewB.load) / 2, v = SPEED_MS;
-  const G = uphill ? Math.tan(slopeDeg * Math.PI / 180) * 100 : 0;   // 복귀(내리막)=0 보수
+  const G = uphill ? Math.tan(slopeDeg * Math.PI / 180) * 100 : 0;   // return (downhill) = 0, conservative
   return 1.5 * M + 2 * (M + L) * Math.pow(L / M, 2) + MODEL.eta * (M + L) * (1.5 * v * v + 0.35 * v * G * MODEL.gMars);
 }
 function walkRadiusM(minRemainMin) {
-  // 복귀 한계: 왕복 ÷2 + 예비분 (§3) - 작업 시간 제외한 보행 예산
+  // return limit: round trip ÷2 + reserve (§3) - walking budget excluding task time
   const budget = Math.max(minRemainMin - WORKMIN, 0);
   return budget * SPEED * (1 - SET.safety.reserve) / 2;
 }
 const FULL_RADIUS_KM = walkRadiusM(Math.min(...MODEL.consumables.map(c => c.cap))) / 1000;
 
-/* ════════ 상태 ════════ */
+/* ════════ State ════════ */
 const S = {
   screen: 'home', site: null, planB: false, emergOk: false,
   ctrlTab: 'mon', layerOpen: false, analyzed: false, actions: { sample: false, analysis: false, crew: false },
   log: [], sim: null, archive: []
 };
 
-/* 지점 평가 - 점수는 격자 실데이터, 게이트는 안전 기준 */
+/* Site evaluation - score from real grid data, gates from safety limits */
 function distKm(a, b) { return map.distance(a, b) / 1000; }
 function evalSpot(sp) {
   const cell = cellAt(sp.lat, sp.lon);
@@ -520,8 +520,8 @@ function evalSpot(sp) {
   const d = distKm([BASE.lat, BASE.lon], [sp.lat, sp.lon]);
   const effRange = Math.min(SET.rangeKm, FULL_RADIUS_KM);
   const locks = [];
-  if (d > effRange) locks.push('탐색 범위 밖 (' + d.toFixed(1) + ' km > ' + effRange.toFixed(1) + ' km)');
-  if (cell && cell.slope_deg > SET.safety.slopeMax) locks.push('경사 ' + cell.slope_deg + '° > 한계 ' + SET.safety.slopeMax + '°');
+  if (d > effRange) locks.push('Out of search range (' + d.toFixed(1) + ' km > ' + effRange.toFixed(1) + ' km)');
+  if (cell && cell.slope_deg > SET.safety.slopeMax) locks.push('Slope ' + cell.slope_deg + '° > limit ' + SET.safety.slopeMax + '°');
   return { sp, cell, sc, d, locks, comm: cell ? cell.comm : null };
 }
 function evalAll() { return SPOTS.map(evalSpot).sort((a, b) => (b.sc || 0) - (a.sc || 0)); }
@@ -541,23 +541,23 @@ function drawSites() {
     const popup =
       '<div style="min-width:198px"><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">' +
       '<b style="flex:1">' + ev.sp.name + '</b>' +
-      '<span style="font-family:var(--mono);font-weight:800;font-size:17px;color:' + (locked ? '#8295c2' : '#f5a623') + '">' + (ev.sc == null ? '-' : ev.sc + '<small style=\"font-size:11px\"> 점</small>') + '</span></div>' +
-      '<div class="note" style="margin-bottom:6px">생명점수 (격자 실데이터) · 기지에서 ' + ev.d.toFixed(1) + ' km</div>' +
+      '<span style="font-family:var(--mono);font-weight:800;font-size:17px;color:' + (locked ? '#8295c2' : '#f5a623') + '">' + (ev.sc == null ? '-' : ev.sc + '<small style=\"font-size:11px\"> pts</small>') + '</span></div>' +
+      '<div class="note" style="margin-bottom:6px">Biosignature potential (real grid data) · from habitat ' + ev.d.toFixed(1) + ' km</div>' +
       (fit
-        ? '<span class="pill ok">탐사 적합</span>' + (ev.comm === 'shadow' ? ' <span class="pill warn">교신 음영 - 분기 필요</span>' : '')
-        : '<span class="pill danger">탐사 부적합</span><div class="note" style="margin-top:5px">' + (ev.locks.join('<br>') || '경로 미정의') + '</div>') +
-      (fit && !simActive ? '<button class="cta sm" style="width:100%;margin-top:9px" onclick="goPin(\'' + ev.sp.id + '\')">탐사 진행 →</button>' : '') +
+        ? '<span class="pill ok">Suitable</span>' + (ev.comm === 'shadow' ? ' <span class="pill warn">Comm shadow - contingency needed</span>' : '')
+        : '<span class="pill danger">Not suitable</span><div class="note" style="margin-top:5px">' + (ev.locks.join('<br>') || 'No route defined') + '</div>') +
+      (fit && !simActive ? '<button class="cta sm" style="width:100%;margin-top:9px" onclick="goPin(\'' + ev.sp.id + '\')">Plan Marswalk →</button>' : '') +
       '</div>';
     L.circleMarker([ev.sp.lat, ev.sp.lon], {
       radius: 8.5, color: '#fff', weight: 2,
       fillColor: locked ? '#55658f' : scoreColor(ev.sc), fillOpacity: .95, dashArray: locked ? '2 3' : null
-    }).bindTooltip(ev.sp.name + ' · ' + (ev.sc == null ? '격자 밖' : '생명점수 ' + ev.sc) + (locked ? ' · 잠금' : ''))
+    }).bindTooltip(ev.sp.name + ' · ' + (ev.sc == null ? 'off grid' : 'Biosignature potential ' + ev.sc) + (locked ? ' · locked' : ''))
       .bindPopup(popup)
       .addTo(siteG);
   });
 }
 
-/* ════════ 좌측 내비 ════════ */
+/* ════════ Left nav ════════ */
 function collapseNav(on) {
   document.body.classList.toggle('navmin', on);
   document.getElementById('nav').classList.toggle('min', on);
@@ -565,10 +565,10 @@ function collapseNav(on) {
 }
 function navItems() {
   const simActive = S.sim && !S.sim.done;
-  const items = [['home', '🗺', '지도 홈'], ['status', '🗂', '탐사 현황']];
-  if (!simActive) items.push(['auto', '🧬', '탐사지역 탐색·분석']);   // 경로 계획·출발 점검은 탐색·분석을 통해서만 진입
-  if (S.sim) items.push(['ctrl', '📡', '실시간 관제']);
-  items.push(null, ['settings', '⚙', '상세 설정'], ['guide', '❔', '가이드']);
+  const items = [['home', '🗺', 'Map home'], ['status', '🗂', 'Marswalk status']];
+  if (!simActive) items.push(['auto', '🧬', 'Site search & analysis']);   // route plan / pre-departure check reachable only via analysis
+  if (S.sim) items.push(['ctrl', '📡', 'Live monitor']);
+  items.push(null, ['settings', '⚙', 'Settings'], ['guide', '❔', 'Guide']);
   return items;
 }
 function crewVitals() {
@@ -589,32 +589,32 @@ function renderNav() {
   }).join('') +
     '<div class="spacer"></div>' +
     '<div id="crewbox">' + crewVitals().map((c, i) =>
-      '<div class="cmini" data-cw="' + (i ? 'crewB' : 'crewA') + '" title="' + c.n + ' 정보 수정"><span class="av" style="background:' + c.c + '">' + (i ? 'B' : 'A') + '</span>' +
-      '<span class="cinfo"><b>' + c.n + '</b><small id="cv' + i + '">심박 ' + c.hr + ' · O₂ ' + c.o2 + '%</small></span></div>').join('') + '</div>' +
-    '<button class="sm" id="navToggle">' + (document.body.classList.contains('navmin') ? '»' : '« 최소화') + '</button>';
+      '<div class="cmini" data-cw="' + (i ? 'crewB' : 'crewA') + '" title="' + 'Edit ' + c.n + '"><span class="av" style="background:' + c.c + '">' + (i ? 'B' : 'A') + '</span>' +
+      '<span class="cinfo"><b>' + c.n + '</b><small id="cv' + i + '">HR ' + c.hr + ' · O₂ ' + c.o2 + '%</small></span></div>').join('') + '</div>' +
+    '<button class="sm" id="navToggle">' + (document.body.classList.contains('navmin') ? '»' : '« Collapse') + '</button>';
   nav.querySelectorAll('.mi').forEach(el => el.onclick = () => {
     const k = el.dataset.k;
     if (k === 'settings') { openSettings(); return; }
     if (k === 'guide') { openGuide(); return; }
-    collapseNav(k === 'auto');   // 탐색·분석에서만 자동 최소화, 그 외 = 펼침(기본)
+    collapseNav(k === 'auto');   // auto-collapse only in analysis, otherwise expanded (default)
     S.screen = k; render();
   });
   document.querySelectorAll('#crewbox .cmini').forEach(el => el.onclick = () => openCrewModal(el.dataset.cw));
   document.getElementById('navToggle').onclick = () => { collapseNav(!document.body.classList.contains('navmin')); renderNav(); };
 }
 
-/* ════════ 대원 정보 수정 (대원별) ════════ */
+/* ════════ Edit astronaut info (per astronaut) ════════ */
 function openCrewModal(which) {
-  const c = SET[which]; const label = which === 'crewA' ? '대원 A' : '대원 B';
+  const c = SET[which]; const label = which === 'crewA' ? 'Astronaut A' : 'Astronaut B';
   const cb = document.getElementById('crewBox');
-  cb.innerHTML = '<h2>' + label + ' 정보</h2><div class="note">이 대원의 정보만 수정됩니다 - 저장 시 유지 · 대사율은 2인 평균으로 계산</div>' +
-    '<div class="set-kv"><span>이름</span><input type="text" id="cw_n" value="' + c.name + '" style="width:120px;border:1px solid var(--line);border-radius:7px;padding:4px 8px;font:inherit;background:var(--card2);color:var(--ink)"></div>' +
-    '<div class="set-kv"><span>체중 (kg)</span><input type="number" id="cw_m" step="1" min="50" max="120" value="' + c.mass + '"></div>' +
-    '<div class="set-kv"><span>적재 하중 (kg)</span><input type="number" id="cw_l" step="1" min="0" max="50" value="' + c.load + '"></div>' +
-    '<div class="kv" style="margin-top:8px"><span>안정 심박 / 최대 심박</span><b>70.5 / 186 bpm</b></div>' +
-    '<div class="kv"><span>지속 가능 강도</span><b>VO₂peak 35%</b></div>' +
-    '<div class="note">심박 모델 = PhysioNet 992명 실측 보정 · 소모품 = 아폴로 PLSS 실측</div>' +
-    '<div style="display:flex;gap:8px;margin-top:14px"><button id="cw_close">닫기</button><button class="pri" id="cw_save" style="flex:1">저장</button></div>';
+  cb.innerHTML = '<h2>' + label + ' info</h2><div class="note">Edits this astronaut only - kept after save · metabolic rate uses the pair average</div>' +
+    '<div class="set-kv"><span>Name</span><input type="text" id="cw_n" value="' + c.name + '" style="width:120px;border:1px solid var(--line);border-radius:7px;padding:4px 8px;font:inherit;background:var(--card2);color:var(--ink)"></div>' +
+    '<div class="set-kv"><span>Body mass (kg)</span><input type="number" id="cw_m" step="1" min="50" max="120" value="' + c.mass + '"></div>' +
+    '<div class="set-kv"><span>Carried load (kg)</span><input type="number" id="cw_l" step="1" min="0" max="50" value="' + c.load + '"></div>' +
+    '<div class="kv" style="margin-top:8px"><span>Resting / max HR</span><b>70.5 / 186 bpm</b></div>' +
+    '<div class="kv"><span>Sustainable effort</span><b>VO₂peak 35%</b></div>' +
+    '<div class="note">HR model = calibrated on PhysioNet (992 people, measured) · consumables = Apollo PLSS measured</div>' +
+    '<div style="display:flex;gap:8px;margin-top:14px"><button id="cw_close">Close</button><button class="pri" id="cw_save" style="flex:1">Save</button></div>';
   document.getElementById('crewModal').style.display = 'flex';
   document.getElementById('cw_close').onclick = () => document.getElementById('crewModal').style.display = 'none';
   document.getElementById('cw_save').onclick = () => {
@@ -622,42 +622,42 @@ function openCrewModal(which) {
     c.mass = +document.getElementById('cw_m').value || c.mass;
     c.load = +document.getElementById('cw_l').value || c.load;
     saveSet(); document.getElementById('crewModal').style.display = 'none';
-    toast(c.name + ' 정보 저장됨'); render();
+    toast(c.name + ' info saved'); render();
   };
 }
 
-/* ════════ 화면: 지도 홈 (지도만) ════════ */
-function renderHome() { setTitle('지도 홈'); }
+/* ════════ Screen: map home (map only) ════════ */
+function renderHome() { setTitle('Map home'); }
 
-/* ════════ 화면: 탐사 현황 (기록 아카이브) ════════ */
+/* ════════ Screen: Marswalk status (record archive) ════════ */
 function renderStatus() {
-  setTitle('탐사 현황');
+  setTitle('Marswalk status');
   const evs = evalAll();
   document.getElementById('page').innerHTML =
-    '<h2 style="margin:0 0 3px">탐사 현황</h2><div class="note" style="margin-bottom:16px">Jezero 전진기지 · 격자 3,067칸 실데이터 · EVA 기록 아카이브</div>' +
+    '<h2 style="margin:0 0 3px">Marswalk status</h2><div class="note" style="margin-bottom:16px">Jezero forward habitat · 3,067 real-data grid cells · Marswalk record archive</div>' +
     '<div class="statgrid">' +
-    '<div class="pagecard"><h3>오늘의 기상 (MEDA 모의)</h3>' +
-    '<div class="kv"><span>기온</span><b>' + WEATHER.tempC + ' ℃</b></div>' +
-    '<div class="kv"><span>풍속</span><b>' + WEATHER.wind + ' m/s</b></div>' +
-    '<div class="kv"><span>먼지 광학두께 τ</span><b>' + WEATHER.tau + '</b></div>' +
-    '<div class="kv"><span>기압</span><b>' + WEATHER.pressure + ' Pa</b></div>' +
-    '<div class="kv"><span>우주기상</span><span class="pill warn">주의 · DONKI 리플레이</span></div></div>' +
-    '<div class="pagecard"><h3>탐사 지점 현황 (생명점수 실데이터)</h3>' +
-    evs.map(ev => '<div class="kv"><span>' + ev.sp.name + '</span><span><b>' + (ev.sc == null ? '-' : ev.sc + '점') + '</b> ' +
-      (ev.locks.length ? '<span class="pill dim">잠금</span>' : '<span class="pill ok">가능</span>') + '</span></div>').join('') +
-    '<div class="note" style="margin-top:7px">잠금 = 안전 기준 적용 ' + hint('안전 기준(탐색 범위·경사)은 점수와 무관한 하드 게이트입니다. 조정은 상세 설정에서만 가능합니다.') + '</div></div>' +
-    '<div class="pagecard"><h3>EVA 기록 아카이브</h3>' +
+    '<div class="pagecard"><h3>Weather today (MEDA, simulated)</h3>' +
+    '<div class="kv"><span>Temperature</span><b>' + WEATHER.tempC + ' ℃</b></div>' +
+    '<div class="kv"><span>Wind</span><b>' + WEATHER.wind + ' m/s</b></div>' +
+    '<div class="kv"><span>Dust opacity τ</span><b>' + WEATHER.tau + '</b></div>' +
+    '<div class="kv"><span>Pressure</span><b>' + WEATHER.pressure + ' Pa</b></div>' +
+    '<div class="kv"><span>Space weather</span><span class="pill warn">Caution · DONKI replay</span></div></div>' +
+    '<div class="pagecard"><h3>Candidate sites (biosignature potential, real data)</h3>' +
+    evs.map(ev => '<div class="kv"><span>' + ev.sp.name + '</span><span><b>' + (ev.sc == null ? '-' : ev.sc + ' pts') + '</b> ' +
+      (ev.locks.length ? '<span class="pill dim">Locked</span>' : '<span class="pill ok">Open</span>') + '</span></div>').join('') +
+    '<div class="note" style="margin-top:7px">Locked = safety limits applied ' + hint('Safety limits (search range, slope) are hard gates, independent of the score. They can only be changed in Settings.') + '</div></div>' +
+    '<div class="pagecard"><h3>Marswalk record archive</h3>' +
     (S.archive.length ? S.archive.map(a =>
       '<div class="arcitem"><span class="pill ok">EVA-' + String(a.seq).padStart(2, '0') + '</span><span style="flex:1"><b>' + a.site + '</b><br>' +
-      '<small class="note">이동 ' + a.dist + ' km · 피폭 ' + a.dose + ' mSv · ' + a.acts + '</small></span></div>').join('')
-      : '<div class="note">아직 완료된 EVA가 없습니다 - 탐사를 완료하면 자동으로 축적됩니다</div>') + '</div>' +
-    '<div class="pagecard"><h3>최근 활동 로그</h3>' +
+      '<small class="note">Distance ' + a.dist + ' km · dose ' + a.dose + ' mSv · ' + a.acts + '</small></span></div>').join('')
+      : '<div class="note">No Marswalk completed yet - records are added automatically when one ends</div>') + '</div>' +
+    '<div class="pagecard"><h3>Recent activity log</h3>' +
     (S.log.length ? S.log.slice(0, 10).map(l => '<div class="kv"><span style="font-family:var(--mono)">' + fmtT(540 + l.t) + '</span><span>' + l.msg + '</span></div>').join('')
-      : '<div class="note">기록 없음 - 관제 중 활동이 여기에 쌓입니다</div>') + '</div>' +
+      : '<div class="note">No records - activity during monitoring appears here</div>') + '</div>' +
     '</div>';
 }
 
-/* ════════ 화면: 탐사지역 탐색·분석 (전체 화면 · 즉시 반영) ════════ */
+/* ════════ Screen: site search & analysis (full screen, live update) ════════ */
 function renderIndRows() {
   return SET.order.map((k, i) => {
     const ind = INDICATORS.find(x => x.key === k);
@@ -693,61 +693,61 @@ function applyWeights() {
 function basisTags(cell) {
   if (!cell) return '';
   const t = [];
-  if (cell.S1 != null) t.push('<span class="tag sci">S1 점토광물 ' + cell.S1 + '/4 (CRISM)</span>');
-  if (cell.S2 != null) t.push('<span class="tag sci">S2 퇴적·델타 ' + cell.S2 + '/4 (SIM3464)</span>');
-  if (cell.comm === 'shadow') t.push('<span class="tag warn2">교신 음영 - 분기 필요</span>');
-  if (cell.rock >= 0.15) t.push('<span class="tag">암석 피복 ' + Math.round(cell.rock * 100) + '%</span>');
+  if (cell.S1 != null) t.push('<span class="tag sci">S1 clay minerals ' + cell.S1 + '/4 (CRISM)</span>');
+  if (cell.S2 != null) t.push('<span class="tag sci">S2 sediment/delta ' + cell.S2 + '/4 (SIM3464)</span>');
+  if (cell.comm === 'shadow') t.push('<span class="tag warn2">Comm shadow - contingency needed</span>');
+  if (cell.rock >= 0.15) t.push('<span class="tag">Rock cover ' + Math.round(cell.rock * 100) + '%</span>');
   return t.join('');
 }
 function renderAuto() {
-  setTitle('탐사지역 탐색·분석');
+  setTitle('Site search & analysis');
   const PRESET_DESC = {
-    '과학 권장 (기본)': '점토광물 중심 - iMOST 보존광물 우선순위 그대로 (유기물 보존에 가장 유리)',
-    '물 추적': '물 활동 흔적 최우선 - 수로·수화광물부터 탐색',
-    '검증 우선': '로버 실측 지점 우선 - 확인된 신뢰도부터 (완만한 가중)'
+    'Science default': 'Clay minerals first - iMOST preservation-mineral priority as is (best for organic preservation)',
+    'Follow the water': 'Water activity first - channels and hydrated minerals',
+    'Verified first': 'Rover-measured sites first - confirmed evidence first (gentle weighting)'
   };
   const evs = evalAll();
   const ok = evs.filter(e => !e.locks.length), locked = evs.filter(e => e.locks.length);
   if (!S.site || !ok.find(e => e.sp.id === S.site.id)) S.site = ok.length ? ok[0].sp : null;
   document.getElementById('page').innerHTML =
-    '<h2 style="margin:0 0 3px">탐사지역 탐색·분석</h2>' +
-    '<div class="note" style="margin-bottom:16px">우선순위를 바꾸면 격자 3,067칸이 즉시 재채점됩니다 - 지표 충족도는 실데이터(CRISM·지질·DEM)에서 자동 채점</div>' +
+    '<h2 style="margin:0 0 3px">Site search & analysis</h2>' +
+    '<div class="note" style="margin-bottom:16px">Changing the priority rescores all 3,067 grid cells at once - indicator levels are scored automatically from real data (CRISM, geology, DEM)</div>' +
     '<div class="pagegrid">' +
     '<div>' +
-    '<div class="pagecard"><h3>추천 우선순위</h3><div class="chips">' +
+    '<div class="pagecard"><h3>Suggested priorities</h3><div class="chips">' +
     Object.keys(PRESET_RANKS).map(n => '<button class="' + (S.analyzed && SET.preset === n ? 'on' : '') + '" data-rp="' + n + '">' + n + '</button>').join('') + '</div>' +
     (S.analyzed ? (SET.preset && PRESET_DESC[SET.preset] ? '<div class="presetdesc">' + PRESET_DESC[SET.preset] + '</div>'
-      : '<div class="note" style="margin-top:7px">직접 조정 중 - 프리셋을 누르면 권장 순서로 돌아갑니다</div>')
-      : '<div class="note" style="margin-top:7px">프리셋을 선택하거나 아래 지표 순서를 조정하면 분석이 시작됩니다</div>') + '</div>' +
-    '<div class="pagecard" style="margin-top:14px"><h3>지표 우선순위 (드래그로 순서 변경) ' +
-    hint('지표 충족도(0~4)는 격자 실데이터에서 자동 채점됩니다. 여기서는 어떤 지표를 중요하게 볼지 순서만 정하며, 반영 비중은 순위에 따라 공식(Barron ' + SET.formula + ')이 자동 계산합니다.') + '</h3>' +
+      : '<div class="note" style="margin-top:7px">Custom order - pick a preset to return to a suggested order</div>')
+      : '<div class="note" style="margin-top:7px">Pick a preset or reorder the indicators below to start the analysis</div>') + '</div>' +
+    '<div class="pagecard" style="margin-top:14px"><h3>Indicator priority (drag to reorder) ' +
+    hint('Indicator levels (0-4) are scored automatically from real grid data. Here you only set which indicators matter most; the weights follow from the rank by formula (Barron ' + SET.formula + ').') + '</h3>' +
     renderIndRows() + '</div>' +
-    '<div class="pagecard" style="margin-top:14px"><h3>안전 기준 (변경 불가 - 항상 적용) 🔒</h3>' +
-    '<div class="kv"><span>탐색 범위</span><b>' + Math.min(SET.rangeKm, FULL_RADIUS_KM).toFixed(1) + ' km (복귀 가능 반경 내)</b></div>' +
-    '<div class="kv"><span>경사 한계</span><b>' + SET.safety.slopeMax + '° 초과 잠금</b></div>' +
-    '<div class="kv"><span>소모품 예비분</span><b>' + Math.round(SET.safety.reserve * 100) + '% (왕복 ÷2)</b></div>' +
-    '<div class="kv"><span>피폭 예산</span><b>' + SET.safety.doseBudget.toFixed(1) + ' mSv/EVA</b></div>' +
-    '<div class="note" style="margin-top:5px">수동 조정은 상세 설정에서만 ' + hint('안전 기준은 점수에 합산하지 않는 하드 게이트입니다. 생명점수가 높아도 기준 밖이면 추천하지 않으며, 해제는 상세 설정에서 명시적 확인 후에만 가능합니다.') + '</div></div>' +
+    '<div class="pagecard" style="margin-top:14px"><h3>Safety limits (fixed - always applied) 🔒</h3>' +
+    '<div class="kv"><span>Search range</span><b>' + Math.min(SET.rangeKm, FULL_RADIUS_KM).toFixed(1) + ' km (within return range)</b></div>' +
+    '<div class="kv"><span>Slope limit</span><b>' + SET.safety.slopeMax + '° max, locked above</b></div>' +
+    '<div class="kv"><span>Consumables reserve</span><b>' + Math.round(SET.safety.reserve * 100) + '% (round trip ÷2)</b></div>' +
+    '<div class="kv"><span>Dose budget</span><b>' + SET.safety.doseBudget.toFixed(1) + ' mSv/EVA</b></div>' +
+    '<div class="note" style="margin-top:5px">Manual changes only in Settings ' + hint('Safety limits are hard gates, never added to the score. A site outside the limits is not suggested even with a high potential biosignature score; unlocking needs explicit confirmation in Settings.') + '</div></div>' +
     '</div>' +
-    '<div><div class="pagecard"><h3>분석 결과 - 생명점수 순 (실데이터)</h3>' +
+    '<div><div class="pagecard"><h3>Results - by biosignature potential (real data)</h3>' +
     (!S.analyzed ?
       '<div style="padding:46px 20px;text-align:center;color:var(--dim)">' +
       '<div style="font-size:26px;margin-bottom:10px">🧬</div>' +
-      '<b style="color:var(--ink)">추천 우선순위를 선택해서 탐사 지역을 분석해보세요.</b>' +
-      '<div class="note" style="margin-top:7px">지표 순서를 드래그로 직접 조정해도 분석이 시작됩니다</div></div>' :
+      '<b style="color:var(--ink)">Pick a suggested priority to analyze the candidate sites.</b>' +
+      '<div class="note" style="margin-top:7px">Dragging the indicator order also starts the analysis</div></div>' :
     ok.map((ev, i) =>
       '<div class="cand' + (S.site && S.site.id === ev.sp.id ? ' sel' : '') + '" data-id="' + ev.sp.id + '">' +
       '<div class="r1"><span class="rank">' + (i + 1) + '</span><b>' + ev.sp.name + '</b>' + hint(ev.sp.desc) +
-      '<span class="dist">' + ev.d.toFixed(1) + ' km</span><span class="sc">' + ev.sc + '<small style="font-size:11px;font-weight:700"> 점</small></span></div>' +
+      '<span class="dist">' + ev.d.toFixed(1) + ' km</span><span class="sc">' + ev.sc + '<small style="font-size:11px;font-weight:700"> pts</small></span></div>' +
       '<div class="tags">' + basisTags(ev.cell) + '</div></div>').join('') +
     (locked.length ?
-      '<div class="note" style="margin:12px 0 7px;font-weight:700">안전 기준으로 제외 (' + locked.length + ')</div>' +
+      '<div class="note" style="margin:12px 0 7px;font-weight:700">Excluded by safety limits (' + locked.length + ')</div>' +
       locked.map(ev =>
         '<div class="cand lock"><div class="r1"><span class="rank" style="background:#55658f">🔒</span><b>' + ev.sp.name + '</b>' +
-        '<span class="dist">' + ev.d.toFixed(1) + ' km</span><span class="sc" style="color:#8e97a3">' + (ev.sc == null ? '-' : ev.sc + '<small style=\"font-size:11px;font-weight:700\"> 점</small>') + '</span></div>' +
+        '<span class="dist">' + ev.d.toFixed(1) + ' km</span><span class="sc" style="color:#8e97a3">' + (ev.sc == null ? '-' : ev.sc + '<small style=\"font-size:11px;font-weight:700\"> pts</small>') + '</span></div>' +
         '<div class="note">' + ev.locks.join(' · ') + '</div></div>').join('') : '') +
-    '<div class="note" style="margin-top:8px">발견 지점 = 실측 · 그 외 = 데이터 기반 추정 ' + hint('점수 = Σ(가중치×지표) ÷ 가용 가중치 ÷ 4 × 100. 가용 지표만 재정규화하며 가짜값을 채우지 않습니다. 안전은 점수에 합산하지 않고 게이트로 적용됩니다.') + '</div>' +
-    '<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="cta" id="goRoute" ' + (S.site ? '' : 'disabled') + '>선택 지점으로 경로 계획 →</button></div>') +
+    '<div class="note" style="margin-top:8px">Rover finds = measured · others = estimated from data ' + hint('Score = Σ(weight × indicator) ÷ available weight ÷ 4 × 100. Only available indicators are renormalized; no fake values are filled in. Safety is applied as a gate, never added to the score.') + '</div>' +
+    '<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="cta" id="goRoute" ' + (S.site ? '' : 'disabled') + '>Plan route to selected site →</button></div>') +
     '</div></div></div>';
   bindIndRows(renderAuto);
   document.querySelectorAll('[data-rp]').forEach(b => b.onclick = () => {
@@ -762,7 +762,7 @@ function renderAuto() {
   if (gr) gr.onclick = () => { collapseNav(false); S.screen = 'route'; S.planB = false; render(); };
 }
 
-/* ════════ 화면: 경로 계획 ════════ */
+/* ════════ Screen: route plan ════════ */
 function activeWp() {
   const r = ROUTES[S.site.id];
   return (S.planB && r.altWp) ? r.altWp : r.wp;
@@ -784,77 +784,77 @@ function drawRoute() {
   L.polyline(wp, { color: '#45cfee', weight: 3, opacity: .95 }).addTo(routeG);
   if (!S.planB && r.hiddenSeg != null)
     L.polyline([r.wp[r.hiddenSeg], r.wp[r.hiddenSeg + 1]], { color: '#ff5d6c', weight: 5, dashArray: '6 7' })
-      .bindTooltip('교신 음영 구간 (DEM 가시선 실데이터) · 교신 끊김 분기 적용').addTo(routeG);
+      .bindTooltip('Comm shadow segment (DEM line of sight, real data) · comm-loss contingency applies').addTo(routeG);
   if (r.blocked) {
     const b = r.blocked, d = 0.0032;
     L.rectangle([[b.lat - d, b.lon - d], [b.lat + d, b.lon + d]],
       { color: '#f5a623', weight: 1.4, dashArray: '4 4', fillColor: '#f5a623', fillOpacity: .14 }).bindTooltip('⚠ ' + b.note).addTo(routeG);
   }
   wp.slice(1, -1).forEach((w, i) => L.circleMarker(w, { radius: 5, color: '#45cfee', fillColor: '#111a3d', fillOpacity: 1, weight: 2 })
-    .bindTooltip('경유 (' + (i + 2) + ')').addTo(routeG));
+    .bindTooltip('Waypoint (' + (i + 2) + ')').addTo(routeG));
   L.circleMarker(wp[wp.length - 1], { radius: 9, color: '#fff', fillColor: '#f5a623', fillOpacity: 1, weight: 2.5 })
-    .bindTooltip('목적지 (1) · ' + S.site.name, { permanent: true, direction: 'top' }).addTo(routeG);
+    .bindTooltip('Destination (1) · ' + S.site.name, { permanent: true, direction: 'top' }).addTo(routeG);
   map.fitBounds(L.latLngBounds(wp).pad(.35));
 }
 function renderRoute() {
-  setTitle('경로 계획', '');
+  setTitle('Route plan', '');
   show('panel', true, 'flex');
   const P = planCalc(); const r = ROUTES[S.site.id]; const wp = activeWp();
   drawRoute();
-  head('경로 계획', '목적지 ' + S.site.name + ' · 세부 정보를 지도에서 확인');
+  head('Route plan', 'Destination ' + S.site.name + ' · see details on the route map');
   const cell = cellAt(S.site.lat, S.site.lon);
   body(
-    '<div class="sec"><h3>경로 요약 ' + (S.planB ? '<span class="pill warn">플랜 B 적용</span>' : '') + '</h3><div class="cardbox">' +
-    '<div class="kv"><span>이동 거리</span><b>' + (P.total / 1000).toFixed(1) + ' km (왕복)</b></div>' +
-    '<div class="kv"><span>예상 소요 시간</span><b>' + fmtDur(P.eta) + '</b> <span class="note">(작업 ' + WORKMIN + '분 포함)</span></div>' +
-    '<div class="kv"><span>경유 지점</span><b>' + (wp.length - 2) + '개</b></div>' +
-    '<div class="kv"><span>복귀 개시 시각</span><b>' + fmtT(P.turn) + '</b> <span class="note">(출발 09:00 기준)</span></div></div></div>' +
-    '<div class="sec"><h3>경로 세부 (격자 실데이터)</h3><div class="cardbox">' +
-    '<div class="kv"><span>목적지 경사</span><b>' + (cell ? cell.slope_deg + '°' : '-') + '</b></div>' +
-    '<div class="kv"><span>교신</span><span>' + (S.planB ? '양호 (음영 회피)' : (r.hiddenSeg != null ? '음영 구간 1곳 - 분기 합의됨' : (cell && cell.comm === 'shadow' ? '목적지 음영' : '양호'))) + '</span></div>' +
-    '<div class="kv"><span>암석 피복</span><b>' + (cell ? Math.round((cell.rock || 0) * 100) + '%' : '-') + '</b> <span class="note">(경로 비용 가중)</span></div>' +
-    '<div class="kv"><span>에너지 소모</span><b>약 ' + Math.round(pandolf(cell ? cell.slope_deg : 5, true) * 0.86 * P.eta / 60) + ' kcal</b> <span class="note">(Pandolf)</span></div></div></div>' +
-    (r.altWp ? '<div class="sec"><button id="planBBtn" style="width:100%">✎ 경로 수정 - ' + (S.planB ? '플랜 A로 복귀' : r.altNote) + '</button></div>' : '')
+    '<div class="sec"><h3>Route summary ' + (S.planB ? '<span class="pill warn">Plan B active</span>' : '') + '</h3><div class="cardbox">' +
+    '<div class="kv"><span>Distance</span><b>' + (P.total / 1000).toFixed(1) + ' km (round trip)</b></div>' +
+    '<div class="kv"><span>Estimated duration</span><b>' + fmtDur(P.eta) + '</b> <span class="note">(incl. ' + WORKMIN + ' min tasks)</span></div>' +
+    '<div class="kv"><span>Waypoints</span><b>' + (wp.length - 2) + '</b></div>' +
+    '<div class="kv"><span>Turnaround time</span><b>' + fmtT(P.turn) + '</b> <span class="note">(departure 09:00)</span></div></div></div>' +
+    '<div class="sec"><h3>Route details (real grid data)</h3><div class="cardbox">' +
+    '<div class="kv"><span>Destination slope</span><b>' + (cell ? cell.slope_deg + '°' : '-') + '</b></div>' +
+    '<div class="kv"><span>Comm link</span><span>' + (S.planB ? 'Good (shadow avoided)' : (r.hiddenSeg != null ? '1 shadow segment - contingency agreed' : (cell && cell.comm === 'shadow' ? 'Destination in shadow' : 'Good'))) + '</span></div>' +
+    '<div class="kv"><span>Rock cover</span><b>' + (cell ? Math.round((cell.rock || 0) * 100) + '%' : '-') + '</b> <span class="note">(weights route cost)</span></div>' +
+    '<div class="kv"><span>Energy use</span><b>~' + Math.round(pandolf(cell ? cell.slope_deg : 5, true) * 0.86 * P.eta / 60) + ' kcal</b> <span class="note">(Pandolf)</span></div></div></div>' +
+    (r.altWp ? '<div class="sec"><button id="planBBtn" style="width:100%">✎ Edit route - ' + (S.planB ? 'Back to plan A' : r.altNote) + '</button></div>' : '')
   );
-  foot('<button id="backRes">← 탐색·분석</button><button class="cta" id="goCheck">출발 점검 →</button>');
+  foot('<button id="backRes">← Analysis</button><button class="cta" id="goCheck">Pre-departure check →</button>');
   const pb = document.getElementById('planBBtn');
   if (pb) pb.onclick = () => { S.planB = !S.planB; renderRoute(); };
   document.getElementById('backRes').onclick = () => { S.screen = 'auto'; render(); };
   document.getElementById('goCheck').onclick = () => { S.screen = 'check'; render(); };
 }
 
-/* ════════ 화면: 출발 점검 ════════ */
+/* ════════ Screen: pre-departure check ════════ */
 function renderCheck() {
-  setTitle('출발 점검', '');
+  setTitle('Pre-departure check', '');
   show('panel', true, 'flex');
   const P = planCalc();
-  head('출발 점검', '장비·환경 점검 후 탐사 시작');
+  head('Pre-departure check', 'Check equipment and conditions, then start the Marswalk');
   const fits = P.eta <= Math.min(...MODEL.consumables.map(c => c.cap)) * (1 - SET.safety.reserve);
   const items = [
-    [fits ? 'ok' : 'danger', fits ? '✓' : '!', '전체 일정이 복귀 개시 시각(' + fmtT(P.turn) + ') 내 완료'],
-    ['ok', '✓', '버디 2인 연결: 대원 A · 대원 B 바이탈 수신 정상'],
-    ['ok', '✓', 'EVA 수트·소모품 4종 만충 (산소 480분 기준)'],
-    ['ok', '✓', '기상 양호: 풍속 ' + WEATHER.wind + ' m/s · τ ' + WEATHER.tau + ' (MEDA 모의)'],
-    ['warn', '!', '우주기상 주의: ' + DONKI.note + ' - 경보 시 분기 적용'],
-    [S.emergOk ? 'ok' : 'warn', S.emergOk ? '✓' : '!', '비상 복귀 경로 확인 완료']
+    [fits ? 'ok' : 'danger', fits ? '✓' : '!', 'Whole plan finishes before turnaround time (' + fmtT(P.turn) + ')'],
+    ['ok', '✓', 'Pair linked: Astronaut A · Astronaut B vitals received'],
+    ['ok', '✓', 'Spacesuits and 4 consumables full (O2 480 min)'],
+    ['ok', '✓', 'Weather OK: wind ' + WEATHER.wind + ' m/s · τ ' + WEATHER.tau + ' (MEDA, simulated)'],
+    ['warn', '!', 'Space weather caution: ' + DONKI.note + ' - contingency on alert'],
+    [S.emergOk ? 'ok' : 'warn', S.emergOk ? '✓' : '!', 'Emergency return route checked']
   ];
   body(
-    '<div class="sec"><h3>출발 전 최종 확인</h3>' +
+    '<div class="sec"><h3>Final pre-departure check</h3>' +
     items.map((c, i) => '<div class="chk"><span class="ic2 ' + c[0] + '">' + c[1] + '</span><span>' + c[2] + '</span>' +
-      (i === 5 && !S.emergOk ? '<button class="sm" id="emBtn">확인</button>' : '') + '</div>').join('') + '</div>' +
-    '<div class="cardbox"><div class="note">대시보드는 \'안전함\'을 판정하지 않습니다 - 주의 항목을 보고 대원이 출발을 결정 · 확정 시 경로·복귀 개시 시각·비상 분기가 HUD로 전송됩니다</div></div>'
+      (i === 5 && !S.emergOk ? '<button class="sm" id="emBtn">Check</button>' : '') + '</div>').join('') + '</div>' +
+    '<div class="cardbox"><div class="note">This display does not certify \'safe\' - the astronauts decide to depart after reviewing the caution items · on confirm, route, turnaround time and contingency plan are sent to the helmet HUD</div></div>'
   );
-  foot('<button id="backRoute2">← 경로 계획</button><button class="cta" id="goCtrl" ' + (fits && S.emergOk ? '' : 'disabled') + '>탐사 시작 (HUD 전송) →</button>');
+  foot('<button id="backRoute2">← Route plan</button><button class="cta" id="goCtrl" ' + (fits && S.emergOk ? '' : 'disabled') + '>Start Marswalk (send to HUD) →</button>');
   const em = document.getElementById('emBtn');
   if (em) em.onclick = () => { S.emergOk = true; renderCheck(); };
   document.getElementById('backRoute2').onclick = () => { S.screen = 'route'; render(); };
   document.getElementById('goCtrl').onclick = () => {
-    toast('확정 경로 · 복귀 개시 시각 · 비상 분기 → HUD 전송됨');
+    toast('Route · turnaround time · contingency plan → sent to helmet HUD');
     S.screen = 'ctrl'; startSim(); render();
   };
 }
 
-/* ════════ 관제 - 시뮬레이션 (모델 스펙 §1~§6) ════════ */
+/* ════════ Monitoring - simulation (model spec §1-§6) ════════ */
 function segLerp(wp, cum, total, f) {
   const d = f * total;
   for (let i = 1; i < wp.length; i++) if (d <= cum[i]) {
@@ -873,21 +873,21 @@ function startSim() {
     rem, stam: 100, dose: 0, hr: 70, workT: 0,
     speFired: false, commFired: false, eventActive: false, shielded: false, done: false, actual: [], pos: wp[0]
   };
-  addLog('EVA-01 출발 - 목적지 ' + S.site.name + ' · 대원 2인');
+  addLog('EVA-01 departed - destination ' + S.site.name + ' · 2 astronauts');
   routeG.clearLayers(); simG.clearLayers();
-  L.polyline(wp, { color: '#5f7bd6', weight: 2, dashArray: '5 6', opacity: .9 }).bindTooltip('계획 경로').addTo(simG);
+  L.polyline(wp, { color: '#5f7bd6', weight: 2, dashArray: '5 6', opacity: .9 }).bindTooltip('Planned route').addTo(simG);
   if (!S.planB && r.hiddenSeg != null) L.polyline([r.wp[r.hiddenSeg], r.wp[r.hiddenSeg + 1]], { color: '#ff5d6c', weight: 3.5, dashArray: '6 7', opacity: .6 }).addTo(simG);
   S.sim.actualLine = L.polyline([], { color: '#45cfee', weight: 3 }).addTo(simG);
-  S.sim.mA = L.marker(wp[0], { icon: L.divIcon({ className: '', html: '<div class="crewpin" style="background:#f5a623"></div>', iconSize: [15, 15] }) }).bindTooltip('대원 A', { direction: 'right' }).addTo(simG);
-  S.sim.mB = L.marker(wp[0], { icon: L.divIcon({ className: '', html: '<div class="crewpin" style="background:#2b6fd4"></div>', iconSize: [15, 15] }) }).bindTooltip('대원 B', { direction: 'left' }).addTo(simG);
+  S.sim.mA = L.marker(wp[0], { icon: L.divIcon({ className: '', html: '<div class="crewpin" style="background:#f5a623"></div>', iconSize: [15, 15] }) }).bindTooltip('Astronaut A', { direction: 'right' }).addTo(simG);
+  S.sim.mB = L.marker(wp[0], { icon: L.divIcon({ className: '', html: '<div class="crewpin" style="background:#2b6fd4"></div>', iconSize: [15, 15] }) }).bindTooltip('Astronaut B', { direction: 'left' }).addTo(simG);
   map.fitBounds(L.latLngBounds(wp.concat([[BASE.lat, BASE.lon]])).pad(.3));
-  applyLPreset('생명 탐사');
+  applyLPreset('Biosignature');
   S.sim.timer = setInterval(simTick, 550);
 }
 function simTick() {
   const m = S.sim; if (!m || m.done) return;
   if (m.eventActive) { renderKpi(); return; }
-  m.t += 1;   // 1틱 = 1분(모의)
+  m.t += 1;   // 1 tick = 1 min (simulated)
   const cell = cellAt(m.pos[0], m.pos[1]);
   const moving = m.phase !== 'work';
   const MW = moving ? pandolf(cell ? cell.slope_deg : 5, m.phase === 'out') : MODEL.baseMW * 1.15;
@@ -904,10 +904,10 @@ function simTick() {
 
   if (m.phase === 'out') {
     m.f = Math.min(m.t / m.P.move, 1);
-    if (m.f >= 1) { m.phase = 'work'; m.workT = 0; addLog('목적지 도착 - 현장 작업 시작'); }
+    if (m.f >= 1) { m.phase = 'work'; m.workT = 0; addLog('Arrived at destination - field tasks started'); }
   } else if (m.phase === 'work') {
     m.f = 1; m.workT += 1;
-    if (m.workT >= 22) { m.phase = 'ret'; m.retStart = m.t; addLog('작업 완료 - 복귀 개시'); }
+    if (m.workT >= 22) { m.phase = 'ret'; m.retStart = m.t; addLog('Tasks done - return started'); }
   } else {
     const rf = Math.min((m.t - m.retStart) / m.P.ret, 1);
     m.f = (m.retFrom != null ? m.retFrom : 1) * (1 - rf);
@@ -925,7 +925,7 @@ function simTick() {
   wbRing.setRadius(Math.max(walkRadiusM(Math.min(...Object.values(m.rem))), 150));
   renderKpi(); renderEnv(); renderGuideCard();
   const cvs = crewVitals();
-  ['cv0', 'cv1'].forEach((id, i) => { const el = document.getElementById(id); if (el) el.textContent = '심박 ' + cvs[i].hr + ' · O₂ ' + cvs[i].o2 + '%'; });
+  ['cv0', 'cv1'].forEach((id, i) => { const el = document.getElementById(id); if (el) el.textContent = 'HR ' + cvs[i].hr + ' · O₂ ' + cvs[i].o2 + '%'; });
   if (['mon', 'crew'].includes(S.ctrlTab)) renderCtrlPanel();
 }
 function fireEvent(kind) {
@@ -934,17 +934,17 @@ function fireEvent(kind) {
   const ab = document.getElementById('alertbar'); ab.style.display = 'block';
   const sh = document.getElementById('sheet'); sh.style.display = 'block';
   if (kind === 'comm') {
-    ab.textContent = '⚠ 이상 감지 - 교신 두절 · 음영 구간 진입 (최종 수신 3분 전)';
-    sh.innerHTML = '<h3>이상 감지: 교신 두절</h3><div class="note">합의된 분기 - 음영 구간 이탈 후 재연결 시도, 10분 내 실패 시 복귀 · 관제탑은 선택지 산출만, 결정은 현장 대원</div>' +
-      '<div class="opts"><div class="opt" id="optA"><b>권장 · 우회 경로로 재연결</b><small>음영 구간 이탈 · +9분</small></div>' +
-      '<div class="opt" id="optB"><b>즉시 복귀</b><small>작업 기록 보존 · 최단 경로</small></div></div>';
-    addLog('이상 감지 - 교신 두절 (음영 구간)', 'danger');
+    ab.textContent = '⚠ Anomaly - Comm loss · entered shadow segment (last signal 3 min ago)';
+    sh.innerHTML = '<h3>Anomaly: Comm loss</h3><div class="note">Agreed contingency - leave the shadow and reconnect; return if not reconnected within 10 min · habitat only lists options, the astronauts decide</div>' +
+      '<div class="opts"><div class="opt" id="optA"><b>Suggested · reconnect via detour</b><small>Leave shadow segment · +9 min</small></div>' +
+      '<div class="opt" id="optB"><b>Return now</b><small>Task records kept · shortest route</small></div></div>';
+    addLog('Anomaly - Comm loss (shadow segment)', 'danger');
   } else {
-    ab.textContent = '⚠ 이상 감지 - 방사능 폭풍 (SEP) · ' + DONKI.note;
-    sh.innerHTML = '<h3>이상 감지: 방사능 폭풍 (태양입자 유입)</h3><div class="note">예상 추가 피폭 +' + DONKI.spe.spike + ' mSv · 지형 차폐 시 최대 ' + DONKI.spe.shieldPct + '% 감쇠 (RAD 실측) · 피폭 예산 ' + SET.safety.doseBudget + ' mSv</div>' +
-      '<div class="opts"><div class="opt" id="optA"><b>권장 · 차폐 지형 대기</b><small>피폭 −' + DONKI.spe.shieldPct + '% · 이벤트 종료 후 재개</small></div>' +
-      '<div class="opt" id="optB"><b>작업 중단 · 즉시 복귀</b><small>일정 단축 · 피폭 시간 최소화</small></div></div>';
-    addLog('이상 감지 - 방사능 폭풍 경보 (DONKI 리플레이)', 'warn');
+    ab.textContent = '⚠ Anomaly - Radiation storm (SEP) · ' + DONKI.note;
+    sh.innerHTML = '<h3>Anomaly: Radiation storm (solar particle event)</h3><div class="note">Expected extra dose +' + DONKI.spe.spike + ' mSv · terrain shielding cuts up to ' + DONKI.spe.shieldPct + '% (RAD measured) · dose budget ' + SET.safety.doseBudget + ' mSv</div>' +
+      '<div class="opts"><div class="opt" id="optA"><b>Suggested · wait behind terrain shielding</b><small>Dose −' + DONKI.spe.shieldPct + '% · resume after the event</small></div>' +
+      '<div class="opt" id="optB"><b>Stop tasks · return now</b><small>Shorter plan · least exposure time</small></div></div>';
+    addLog('Anomaly - Radiation storm alert (DONKI replay)', 'warn');
   }
   document.getElementById('optA').onclick = () => resolveEvent(kind, 'A');
   document.getElementById('optB').onclick = () => resolveEvent(kind, 'B');
@@ -955,33 +955,33 @@ function resolveEvent(kind, pick) {
   m.eventActive = false;
   document.body.classList.remove('alerting');
   let msg;
-  if (kind === 'sep' && pick === 'A') { m.shielded = true; msg = '차폐 지형 대기 - 피폭 감쇠 적용'; }
+  if (kind === 'sep' && pick === 'A') { m.shielded = true; msg = 'Waiting behind terrain shielding - dose reduction applied'; }
   else if (kind === 'sep') {
-    msg = '작업 중단 · 즉시 복귀';
+    msg = 'Stop tasks · return now';
     if (m.phase === 'out') { m.retFrom = m.f; m.phase = 'ret'; m.retStart = m.t; m.P.ret = Math.max(m.f * m.total / SPEED, 2); }
   }
-  else msg = pick === 'A' ? '우회 경로로 재연결 (+9분)' : '즉시 복귀';
+  else msg = pick === 'A' ? 'Reconnect via detour (+9 min)' : 'Return now';
   document.getElementById('alertbar').style.display = 'none';
   document.getElementById('sheet').style.display = 'none';
-  addLog('대응 적용 - ' + msg);
-  toast('대원 응답 수신 - ' + msg + ' · 기록 갱신');
+  addLog('Response applied - ' + msg);
+  toast('Astronaut response received - ' + msg + ' · log updated');
   S.ctrlTab = 'mon'; renderCtrlPanel();
 }
 function endSim() {
   const m = S.sim; m.done = true; clearInterval(m.timer);
   document.body.classList.remove('alerting');
-  addLog('EVA-01 복귀 완료');
-  const acts = [S.actions.sample && '시료 채취', S.actions.analysis && '현장 분석(Raman/IR)'].filter(Boolean).join(' · ') || '기록 없음';
+  addLog('EVA-01 return complete');
+  const acts = [S.actions.sample && 'Sample collected', S.actions.analysis && 'Field analysis (Raman/IR)'].filter(Boolean).join(' · ') || 'No records';
   S.archive.push({ seq: S.archive.length + 1, site: S.site.name, dist: (m.total * 2 / 1000).toFixed(1), dose: m.dose.toFixed(2), acts });
   document.getElementById('endBox').innerHTML =
-    '<h2 style="color:var(--ok)">EVA-01 복귀 완료</h2>' +
-    '<div class="kv"><span>목적지</span><b>' + S.site.name + '</b></div>' +
-    '<div class="kv"><span>총 이동</span><b>' + (m.total * 2 / 1000).toFixed(1) + ' km</b></div>' +
-    '<div class="kv"><span>수행 기록</span><span>' + acts + '</span></div>' +
-    '<div class="kv"><span>누적 피폭</span><b style="color:' + (m.dose > SET.safety.doseBudget ? 'var(--danger)' : 'inherit') + '">' + m.dose.toFixed(2) + ' / ' + SET.safety.doseBudget.toFixed(1) + ' mSv</b> <span class="note">(흉부 X선 약 ' + Math.round(m.dose / 0.1) + '장' + (m.dose > SET.safety.doseBudget ? ' · 예산 초과 - 보고 필요' : '') + ')</span></div>' +
-    '<div class="kv"><span>소모품 잔여 (최소)</span><b>' + Math.round(Math.min(...Object.values(m.rem))) + '분</b></div>' +
-    '<div class="note" style="margin:10px 0 16px">탐사 기록은 다음 분석의 입력이 됩니다 - 지표 우선순위를 바꾸면 격자 전체가 재채점됩니다</div>' +
-    '<button class="cta" id="againBtn" style="width:100%">새 탐색 시작 (지도 홈)</button>';
+    '<h2 style="color:var(--ok)">EVA-01 return complete</h2>' +
+    '<div class="kv"><span>Destination</span><b>' + S.site.name + '</b></div>' +
+    '<div class="kv"><span>Total distance</span><b>' + (m.total * 2 / 1000).toFixed(1) + ' km</b></div>' +
+    '<div class="kv"><span>Completed tasks</span><span>' + acts + '</span></div>' +
+    '<div class="kv"><span>Total dose</span><b style="color:' + (m.dose > SET.safety.doseBudget ? 'var(--danger)' : 'inherit') + '">' + m.dose.toFixed(2) + ' / ' + SET.safety.doseBudget.toFixed(1) + ' mSv</b> <span class="note">(~' + Math.round(m.dose / 0.1) + ' chest X-rays' + (m.dose > SET.safety.doseBudget ? ' · over budget - report required' : '') + ')</span></div>' +
+    '<div class="kv"><span>Consumables left (min)</span><b>' + Math.round(Math.min(...Object.values(m.rem))) + ' min</b></div>' +
+    '<div class="note" style="margin:10px 0 16px">Marswalk records feed the next analysis - changing the indicator priority rescores the whole grid</div>' +
+    '<button class="cta" id="againBtn" style="width:100%">New search (map home)</button>';
   document.getElementById('endModal').style.display = 'flex';
   document.getElementById('againBtn').onclick = () => {
     document.getElementById('endModal').style.display = 'none';
@@ -995,9 +995,9 @@ function endSim() {
 function renderKpi() {
   const m = S.sim; if (!m) return;
   const st = document.getElementById('kpiState');
-  if (m.eventActive) { st.textContent = '이상 대응 중'; st.className = 'pill danger'; }
-  else if (m.phase === 'work') { st.textContent = '현장 작업 중'; st.className = 'pill warn'; }
-  else { st.textContent = m.phase === 'ret' ? '복귀 중' : '탐사 진행 중'; st.className = 'pill ok'; }
+  if (m.eventActive) { st.textContent = 'Responding to anomaly'; st.className = 'pill danger'; }
+  else if (m.phase === 'work') { st.textContent = 'Field tasks'; st.className = 'pill warn'; }
+  else { st.textContent = m.phase === 'ret' ? 'Returning' : 'Marswalk in progress'; st.className = 'pill ok'; }
   const sec = m.t * 60;
   document.getElementById('kpiElapsed').textContent =
     String(Math.floor(sec / 3600)).padStart(2, '0') + ':' + String(Math.floor(sec / 60) % 60).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
@@ -1005,7 +1005,7 @@ function renderKpi() {
   if (m.phase === 'out') homeMin = (1 - m.f) * m.P.move + 22 + m.P.ret;
   else if (m.phase === 'work') homeMin = (22 - m.workT) + m.P.ret;
   else homeMin = m.f * m.total / SPEED;
-  document.getElementById('kpiHome').textContent = Math.max(Math.round(homeMin), 0) + '분';
+  document.getElementById('kpiHome').textContent = Math.max(Math.round(homeMin), 0) + ' min';
   const traveled = m.phase === 'out' ? m.f * m.total : m.phase === 'work' ? m.total : m.total + (1 - m.f) * m.total;
   const tot = m.total * 2, pct = Math.round(traveled / tot * 100);
   document.getElementById('kpiDist').textContent = (traveled / 1000).toFixed(1) + ' / ' + (tot / 1000).toFixed(1) + ' km (' + pct + '%)';
@@ -1019,29 +1019,29 @@ function renderEnv() {
   const cell = cellAt(m.pos[0], m.pos[1]);
   const sc = cellScore(cell);
   const ec = document.getElementById('envcard'); ec.style.display = 'block';
-  ec.innerHTML = '<h3>현재 위치 (EVA-01) · 격자 실데이터</h3>' +
-    '<div class="kv"><span>생명점수</span><span><b>' + (sc == null ? '-' : sc) + '</b>' + (sc != null ? ' <span class="pill ' + (sc >= 62 ? 'ok' : sc >= 40 ? 'warn' : 'dim') + '">' + (sc >= 62 ? '높음' : sc >= 40 ? '중간' : '낮음') + '</span>' : '') + '</span></div>' +
-    '<div class="kv"><span>경사</span><b>' + (cell ? cell.slope_deg + '°' : '-') + '</b></div>' +
-    '<div class="kv"><span>교신</span><span>' + (cell ? (cell.comm === 'shadow' ? '🔴 음영' : '🟢 양호') : '-') + '</span></div>' +
-    '<div class="kv"><span>암석 피복</span><b>' + (cell ? Math.round((cell.rock || 0) * 100) + '%' : '-') + '</b></div>';
+  ec.innerHTML = '<h3>Current location (EVA-01) · real grid data</h3>' +
+    '<div class="kv"><span>Biosignature potential</span><span><b>' + (sc == null ? '-' : sc) + '</b>' + (sc != null ? ' <span class="pill ' + (sc >= 62 ? 'ok' : sc >= 40 ? 'warn' : 'dim') + '">' + (sc >= 62 ? 'High' : sc >= 40 ? 'Medium' : 'Low') + '</span>' : '') + '</span></div>' +
+    '<div class="kv"><span>Slope</span><b>' + (cell ? cell.slope_deg + '°' : '-') + '</b></div>' +
+    '<div class="kv"><span>Comm link</span><span>' + (cell ? (cell.comm === 'shadow' ? '🔴 Shadow' : '🟢 Good') : '-') + '</span></div>' +
+    '<div class="kv"><span>Rock cover</span><b>' + (cell ? Math.round((cell.rock || 0) * 100) + '%' : '-') + '</b></div>';
 }
 function renderGuideCard() {
   const m = S.sim; if (!m) return;
   const g = document.getElementById('guidecard'); g.style.display = 'flex';
   const remain = m.phase === 'out' ? (1 - m.f) * m.total : 0;
-  g.innerHTML = '<h3>탐사 가이드 · 다음 액션</h3>' +
-    '<div class="act next"><b>◎ ' + (m.phase === 'out' ? '목적지로 이동 중' : m.phase === 'work' ? '현장 작업 수행 중' : '기지로 복귀 중') + '</b>' +
-    '<small>' + (m.phase === 'out' ? '잔여 ' + (remain / 1000).toFixed(1) + ' km · 약 ' + Math.round(remain / SPEED) + '분' :
-      m.phase === 'work' ? S.site.name + ' · 잔여 작업 ' + Math.max(22 - m.workT, 0) + '분(압축)' :
-      '복귀 소요 약 ' + Math.round(m.f * m.total / SPEED) + '분') + '</small></div>' +
-    actCk('sample', '시료 채취 지점 (권장)', '점토광물 노두 · S1=' + (cellAt(S.site.lat, S.site.lon) || {}).S1 + '/4') +
-    actCk('analysis', '현장 분석 수행', '휴대 분석기 (Raman/IR) 권장') +
-    actCk('crew', '대원 상태 확인', '소모품 최소 잔여 ' + Math.round(Math.min(...Object.values(m.rem))) + '분');
+  g.innerHTML = '<h3>Marswalk guide · next action</h3>' +
+    '<div class="act next"><b>◎ ' + (m.phase === 'out' ? 'Moving to destination' : m.phase === 'work' ? 'Doing field tasks' : 'Returning to habitat') + '</b>' +
+    '<small>' + (m.phase === 'out' ? (remain / 1000).toFixed(1) + ' km left · ~' + Math.round(remain / SPEED) + ' min' :
+      m.phase === 'work' ? S.site.name + ' · tasks left ' + Math.max(22 - m.workT, 0) + ' min (compressed)' :
+      'Return ~' + Math.round(m.f * m.total / SPEED) + ' min') + '</small></div>' +
+    actCk('sample', 'Sample collection point (suggested)', 'Clay mineral outcrop · S1=' + (cellAt(S.site.lat, S.site.lon) || {}).S1 + '/4') +
+    actCk('analysis', 'Run field analysis', 'Handheld analyzer (Raman/IR) suggested') +
+    actCk('crew', 'Check astronaut status', 'Lowest consumable left ' + Math.round(Math.min(...Object.values(m.rem))) + ' min');
   ['sample', 'analysis', 'crew'].forEach(k => {
     const el = document.getElementById('ak_' + k);
     if (el) el.onchange = e => {
       S.actions[k] = e.target.checked;
-      if (e.target.checked) addLog('기록 - ' + { sample: '시료 채취 완료', analysis: '현장 분석(Raman/IR) 수행', crew: '대원 상태 점검' }[k]);
+      if (e.target.checked) addLog('Log - ' + { sample: 'Sample collected', analysis: 'Field analysis (Raman/IR) done', crew: 'Astronaut status checked' }[k]);
     };
   });
 }
@@ -1051,32 +1051,32 @@ function actCk(k, t, s) {
 function renderCtrlPanel() {
   const m = S.sim; if (!m) return;
   const cp = document.getElementById('ctrlpanel'); cp.style.display = 'block';
-  const TABS = [['mon', '모니터링'], ['crew', '대원'], ['alert', '이상'], ['scen', '분기'], ['log', '기록']];
+  const TABS = [['mon', 'Monitor'], ['crew', 'Crew'], ['alert', 'Alerts'], ['scen', 'Plans'], ['log', 'Log']];
   let html = '';
   if (S.ctrlTab === 'mon') {
-    html = '<div class="kv"><span>단계</span><span>' + (m.phase === 'out' ? '전진' : m.phase === 'work' ? '현장 작업' : '복귀') + '</span></div>' +
+    html = '<div class="kv"><span>Phase</span><span>' + (m.phase === 'out' ? 'Outbound' : m.phase === 'work' ? 'Field tasks' : 'Return') + '</span></div>' +
       MODEL.consumables.map(c => {
         const pct = Math.max(m.rem[c.key] / c.cap * 100, 0);
-        return '<div class="kv" style="margin-bottom:0"><span>' + c.name + '</span><b>' + Math.round(m.rem[c.key]) + '분</b></div>' +
+        return '<div class="kv" style="margin-bottom:0"><span>' + c.name + '</span><b>' + Math.round(m.rem[c.key]) + ' min</b></div>' +
           '<div class="bar"><div class="fill" style="width:' + pct + '%;background:' + (pct < 25 ? 'var(--danger)' : pct < 50 ? 'var(--warn)' : '#4aa3ff') + '"></div></div>';
       }).join('') +
-      '<div class="kv" style="margin-top:7px"><span>복귀 한계 (최소 소모품)</span><b>' + Math.round(Math.min(...Object.values(m.rem))) + '분</b></div>' +
-      '<div class="kv"><span>누적 피폭 / 예산</span><b style="color:' + (m.dose > SET.safety.doseBudget ? 'var(--danger)' : m.dose > SET.safety.doseBudget * .7 ? 'var(--warn)' : 'inherit') + '">' + m.dose.toFixed(2) + ' / ' + SET.safety.doseBudget.toFixed(1) + ' mSv</b></div>' +
-      '<div class="kv"><span>기상</span><span>' + WEATHER.tempC + '℃ · ' + WEATHER.wind + ' m/s · τ' + WEATHER.tau + '</span></div>' +
-      '<div class="kv"><span>우주기상</span><span class="pill ' + (m.t >= DONKI.spe.onset && m.t < DONKI.spe.onset + DONKI.spe.dur ? 'danger">SEP 활성' : 'warn">주의') + '</span></div>' +
-      '<div class="note" style="margin-top:6px">점선 = 계획 · 실선 = 실측 궤적 · 수치 = 모의값</div>';
+      '<div class="kv" style="margin-top:7px"><span>Return limit (lowest consumable)</span><b>' + Math.round(Math.min(...Object.values(m.rem))) + ' min</b></div>' +
+      '<div class="kv"><span>Dose / budget</span><b style="color:' + (m.dose > SET.safety.doseBudget ? 'var(--danger)' : m.dose > SET.safety.doseBudget * .7 ? 'var(--warn)' : 'inherit') + '">' + m.dose.toFixed(2) + ' / ' + SET.safety.doseBudget.toFixed(1) + ' mSv</b></div>' +
+      '<div class="kv"><span>Weather</span><span>' + WEATHER.tempC + '℃ · ' + WEATHER.wind + ' m/s · τ' + WEATHER.tau + '</span></div>' +
+      '<div class="kv"><span>Space weather</span><span class="pill ' + (m.t >= DONKI.spe.onset && m.t < DONKI.spe.onset + DONKI.spe.dur ? 'danger">SEP active' : 'warn">Caution') + '</span></div>' +
+      '<div class="note" style="margin-top:6px">Dashed = plan · solid = tracked path · values = simulated</div>';
   } else if (S.ctrlTab === 'crew') {
     html = crewRow(SET.crewA.name, m, 1.03) + crewRow(SET.crewB.name, m, 0.97) +
-      '<div class="note">심박 = 70.5 + 113.2×%VO₂ (PhysioNet 992명 보정) · 체력 = W\'BAL</div>';
+      '<div class="note">HR = 70.5 + 113.2×%VO₂ (PhysioNet, 992 people) · stamina = W\'BAL</div>';
   } else if (S.ctrlTab === 'alert') {
     const al = S.log.filter(l => l.lvl !== 'ok');
     html = al.length ? al.map(l => '<div class="kv"><span class="pill ' + l.lvl + '">' + fmtT(540 + l.t) + '</span><span>' + l.msg + '</span></div>').join('') :
-      '<div class="note">감지된 이상 없음 - 교신·소모품·우주기상 상시 감시 중</div>';
+      '<div class="note">No anomaly detected - comm link, consumables and space weather monitored</div>';
   } else if (S.ctrlTab === 'scen') {
-    html = '<div class="note" style="margin-bottom:7px">출발 전 합의된 분기 (HUD 공유됨)</div>' +
-      ['일정 30분 지연 → 작업 일부 생략', '복귀 개시 시각 도달 → 즉시 복귀', '교신 두절 → 음영 이탈·재연결, 10분 내 실패 시 복귀', '방사능 폭풍 → 차폐 대기 또는 복귀'].map(x => '<div class="chk"><span class="ic2 ok">✓</span><span>' + x + '</span></div>').join('');
+    html = '<div class="note" style="margin-bottom:7px">Contingency plans agreed before departure (shared to HUD)</div>' +
+      ['30 min behind plan → skip some tasks', 'Turnaround time reached → return now', 'Comm loss → leave shadow and reconnect; return if not within 10 min', 'Radiation storm → wait behind shielding or return'].map(x => '<div class="chk"><span class="ic2 ok">✓</span><span>' + x + '</span></div>').join('');
   } else {
-    html = S.log.map(l => '<div class="kv"><span style="font-family:var(--mono)">' + fmtT(540 + l.t) + '</span><span>' + l.msg + '</span></div>').join('') || '<div class="note">기록 없음</div>';
+    html = S.log.map(l => '<div class="kv"><span style="font-family:var(--mono)">' + fmtT(540 + l.t) + '</span><span>' + l.msg + '</span></div>').join('') || '<div class="note">No records</div>';
   }
   cp.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px">' +
     TABS.map(([k, t]) => '<button class="sm" style="' + (S.ctrlTab === k ? 'background:var(--ink);color:#fff;border-color:var(--ink)' : '') + '" data-tab="' + k + '">' + t + '</button>').join('') + '</div>' + html;
@@ -1085,40 +1085,40 @@ function renderCtrlPanel() {
 function crewRow(n, m, k) {
   const o2 = Math.min(Math.max(m.rem.o2 / 480 * 100 * k, 0), 100);
   const c = o2 < 30 ? 'danger' : o2 < 55 ? 'warn' : 'ok';
-  return '<div class="cardbox" style="margin-bottom:7px"><div class="kv"><b>' + n + '</b><span class="pill ' + c + '">산소 ' + Math.round(o2) + '%</span></div>' +
-    '<div class="kv"><span>심박</span><b>' + Math.round(m.hr * (k === 1.03 ? 1 : 0.96)) + ' bpm</b></div>' +
-    '<div class="kv"><span>체력</span><b>' + Math.round(m.stam) + '%</b></div>' +
-    '<div class="kv"><span>최종 수신</span><span>' + (m.eventActive && m.kind === 'comm' ? '3분 전 ⚠' : (2 + m.t % 11) + '초 전') + '</span></div></div>';
+  return '<div class="cardbox" style="margin-bottom:7px"><div class="kv"><b>' + n + '</b><span class="pill ' + c + '">O2 ' + Math.round(o2) + '%</span></div>' +
+    '<div class="kv"><span>HR</span><b>' + Math.round(m.hr * (k === 1.03 ? 1 : 0.96)) + ' bpm</b></div>' +
+    '<div class="kv"><span>Stamina</span><b>' + Math.round(m.stam) + '%</b></div>' +
+    '<div class="kv"><span>Last signal</span><span>' + (m.eventActive && m.kind === 'comm' ? '3 min ago ⚠' : (2 + m.t % 11) + ' s ago') + '</span></div></div>';
 }
 
-/* ════════ 상세 설정 (수동 조정 - 영속 저장) ════════ */
+/* ════════ Settings (manual changes - persisted) ════════ */
 function openSettings() {
   const sb = document.getElementById('setBox');
   const un = SET.safety.unlocked;
-  sb.innerHTML = '<h2>상세 설정</h2><div class="note">저장하면 다음 실행에도 유지됩니다 - 매번 조정할 필요 없음</div>' +
-    '<h4>탐색·대원</h4>' +
-    '<div class="set-kv"><span>탐색 범위 (km) <span class="note">최대 ' + FULL_RADIUS_KM.toFixed(1) + ' = 복귀 가능 반경</span></span><input type="number" id="st_range" step="0.5" min="0.5" max="' + FULL_RADIUS_KM.toFixed(1) + '" value="' + SET.rangeKm + '"></div>' +
-    '<div class="note" style="margin:4px 0 2px">대원 이름·체중·하중은 좌측 메뉴 하단 대원 카드에서 개별 수정</div>' +
-    '<h4>지표 우선순위 - 드래그로 순서 변경 (가중치 = ' + SET.formula + ' 공식 자동 계산)</h4>' + renderIndRows() +
-    '<div class="set-kv"><span>가중치 공식</span><span><button class="sm ' + (SET.formula === 'ROC' ? 'pri' : '') + '" id="st_roc">ROC (상위 강조)</button> <button class="sm ' + (SET.formula === 'RS' ? 'pri' : '') + '" id="st_rs">RS (완만)</button></span></div>' +
-    '<h4>안전 기준 🔒</h4>' +
-    '<div class="set-kv"><span>경사 한계 (°)</span><input type="number" id="st_slope" ' + (un ? '' : 'disabled') + ' step="1" min="10" max="30" value="' + SET.safety.slopeMax + '"></div>' +
-    '<div class="set-kv"><span>소모품 예비분 (%)</span><input type="number" id="st_res" ' + (un ? '' : 'disabled') + ' step="5" min="10" max="30" value="' + Math.round(SET.safety.reserve * 100) + '"></div>' +
-    '<div class="set-kv"><span>피폭 예산 (mSv/EVA)</span><input type="number" id="st_dose" ' + (un ? '' : 'disabled') + ' step="0.1" min="0.5" max="2" value="' + SET.safety.doseBudget + '"></div>' +
-    '<label class="set-kv" style="cursor:pointer"><span class="note">안전 기준 수동 조정 활성화 - 권장하지 않음 · 조정 내역이 기록됩니다</span><input type="checkbox" id="st_unlock" ' + (un ? 'checked' : '') + '></label>' +
-    '<div style="display:flex;gap:8px;margin-top:14px"><button id="st_reset">기본값 복원</button><button class="pri" id="st_save" style="flex:1">저장</button></div>';
+  sb.innerHTML = '<h2>Settings</h2><div class="note">Saved settings persist across runs - no need to set them each time</div>' +
+    '<h4>Search · astronauts</h4>' +
+    '<div class="set-kv"><span>Search range (km) <span class="note">max ' + FULL_RADIUS_KM.toFixed(1) + ' = return range</span></span><input type="number" id="st_range" step="0.5" min="0.5" max="' + FULL_RADIUS_KM.toFixed(1) + '" value="' + SET.rangeKm + '"></div>' +
+    '<div class="note" style="margin:4px 0 2px">Edit each astronaut\'s name, mass and load from the crew cards at the bottom of the left menu</div>' +
+    '<h4>Indicator priority - drag to reorder (weights = ' + SET.formula + ' formula, automatic)</h4>' + renderIndRows() +
+    '<div class="set-kv"><span>Weight formula</span><span><button class="sm ' + (SET.formula === 'ROC' ? 'pri' : '') + '" id="st_roc">ROC (top-heavy)</button> <button class="sm ' + (SET.formula === 'RS' ? 'pri' : '') + '" id="st_rs">RS (gentle)</button></span></div>' +
+    '<h4>Safety limits 🔒</h4>' +
+    '<div class="set-kv"><span>Slope limit (°)</span><input type="number" id="st_slope" ' + (un ? '' : 'disabled') + ' step="1" min="10" max="30" value="' + SET.safety.slopeMax + '"></div>' +
+    '<div class="set-kv"><span>Consumables reserve (%)</span><input type="number" id="st_res" ' + (un ? '' : 'disabled') + ' step="5" min="10" max="30" value="' + Math.round(SET.safety.reserve * 100) + '"></div>' +
+    '<div class="set-kv"><span>Dose budget (mSv/EVA)</span><input type="number" id="st_dose" ' + (un ? '' : 'disabled') + ' step="0.1" min="0.5" max="2" value="' + SET.safety.doseBudget + '"></div>' +
+    '<label class="set-kv" style="cursor:pointer"><span class="note">Enable manual safety-limit changes - not recommended · changes are logged</span><input type="checkbox" id="st_unlock" ' + (un ? 'checked' : '') + '></label>' +
+    '<div style="display:flex;gap:8px;margin-top:14px"><button id="st_reset">Restore defaults</button><button class="pri" id="st_save" style="flex:1">Save</button></div>';
   document.getElementById('setModal').style.display = 'flex';
   bindIndRows(openSettings);
   document.getElementById('st_roc').onclick = () => { SET.formula = 'ROC'; SET.preset = null; applyWeights(); saveSet(); openSettings(); };
   document.getElementById('st_rs').onclick = () => { SET.formula = 'RS'; SET.preset = null; applyWeights(); saveSet(); openSettings(); };
   document.getElementById('st_unlock').onchange = e => {
     SET.safety.unlocked = e.target.checked;
-    if (e.target.checked) { addLog('안전 기준 수동 조정 활성화 - 사유 기록 필요', 'warn'); toast('안전 기준 잠금 해제 - 권장하지 않음'); }
+    if (e.target.checked) { addLog('Manual safety-limit changes enabled - reason must be logged', 'warn'); toast('Safety limits unlocked - not recommended'); }
     saveSet(); openSettings();
   };
   document.getElementById('st_reset').onclick = () => {
     SET = JSON.parse(JSON.stringify(SET_DEFAULT)); applyWeights(); saveSet(); openSettings();
-    toast('기본값(안전 권장) 복원됨');
+    toast('Defaults (safety-recommended) restored');
   };
   document.getElementById('st_save').onclick = () => {
     SET.rangeKm = Math.min(+document.getElementById('st_range').value || 3, FULL_RADIUS_KM);
@@ -1130,29 +1130,29 @@ function openSettings() {
     saveSet(); applyWeights();
     wbRing.setRadius(Math.min(SET.rangeKm, FULL_RADIUS_KM) * 1000);
     document.getElementById('setModal').style.display = 'none';
-    toast('설정 저장됨 - 다음 실행에도 유지');
+    toast('Settings saved - kept for next run');
     render();
   };
 }
 
-/* ════════ 가이드 ════════ */
+/* ════════ Guide ════════ */
 function openGuide() {
   const gb = document.getElementById('guideBox');
-  gb.innerHTML = '<h2>지표 · 레이어 가이드</h2>' +
-    [['생명점수', '격자 셀(160m)마다 지표 S1~S5(0~4 증거강도)를 순위 기반 가중치(ROC)로 가중합 → 0~100. 실데이터: CRISM 광물 + USGS 지질. 생명 확률이 아닌 탐사 우선도'],
-     ['가중치', '숫자를 손으로 고르지 않음 - 지표 순위만 정하면 Barron ROC/RS 공식이 계산 (기본 45.7/25.7/15.7/9/4%)'],
-     ['안전 게이트', '복귀 가능 반경(왕복÷2+예비분)·경사 한계·피폭 예산 - 점수에 합산하지 않고 추천을 잠금. 기본 잠금, 해제는 상세 설정에서 명시적 확인'],
-     ['복귀 한계', '소모품 4종(산소·냉각수·CO₂·배터리) 중 가장 먼저 바닥나는 것이 결정 (아폴로 PLSS 실측)'],
-     ['교신 음영', 'DEM 가시선 계산 - 기지에서 지형에 가리는 셀. 측정 전파 아님(참고용)'],
-     ['암석 피복', 'THEMIS 열관성 → 바위밭 비율. 경로 비용에 가중(우회), 통행 차단은 경사가 담당'],
-     ['피폭', '기준 0.64 mSv/sol (Curiosity RAD) + 방사능 폭풍 시 급증 · 지형 차폐 최대 20%'],
-     ['상태 색상', '정상 초록 · 주의 주황 · 위험 빨강 (전 화면 공통)']]
+  gb.innerHTML = '<h2>Indicator · data layer guide</h2>' +
+    [['Potential biosignature score', 'Per grid cell (160 m): indicators S1-S5 (0-4 evidence strength) summed with rank-based weights (ROC) → 0-100. Real data: CRISM minerals + USGS geology. A ranking aid for where to explore, not a detection or a probability of life'],
+     ['Weights', 'Not hand-picked - set the indicator rank and the Barron ROC/RS formula computes them (default 45.7/25.7/15.7/9/4%)'],
+     ['Safety gates', 'Return range (round trip ÷2 + reserve), slope limit, dose budget - never added to the score; they lock suggestions. Locked by default; unlocking needs explicit confirmation in Settings'],
+     ['Return limit', 'Set by whichever of the 4 consumables (O2, cooling water, CO₂, battery) runs out first (Apollo PLSS measured)'],
+     ['Comm shadow', 'DEM line-of-sight calculation - cells hidden from the habitat by terrain. Not a measured radio signal (reference only)'],
+     ['Rock cover', 'THEMIS thermal inertia → boulder-field fraction (obstacles). Adds route cost (detour); slope handles blocking'],
+     ['Radiation dose', 'Baseline 0.64 mSv/sol (Curiosity RAD) + spikes during radiation storms · terrain shielding up to 20%'],
+     ['Status colors', 'Normal green · caution orange · danger red (all screens)']]
     .map(([t, d]) => '<div class="kv" style="align-items:flex-start;gap:12px"><b style="min-width:92px">' + t + '</b><span class="note">' + d + '</span></div>').join('') +
-    '<button class="pri" style="width:100%;margin-top:12px" onclick="document.getElementById(\'guideModal\').style.display=\'none\'">닫기</button>';
+    '<button class="pri" style="width:100%;margin-top:12px" onclick="document.getElementById(\'guideModal\').style.display=\'none\'">Close</button>';
   document.getElementById('guideModal').style.display = 'flex';
 }
 
-/* ════════ 렌더 루트 ════════ */
+/* ════════ Render root ════════ */
 function setTitle(t) { document.getElementById('screenTitle').textContent = t; }
 function head(t, s) { document.getElementById('phTitle').textContent = t; document.getElementById('phSub').textContent = s; }
 function body(h) { document.getElementById('panelBody').innerHTML = h; }
@@ -1177,7 +1177,7 @@ function render() {
   else if (S.screen === 'auto') renderAuto();
   else if (S.screen === 'route') renderRoute();
   else if (S.screen === 'check') renderCheck();
-  else if (S.screen === 'ctrl') { setTitle('실시간 관제'); show('panel', false); renderCtrlPanel(); renderKpi(); renderEnv(); renderGuideCard(); }
+  else if (S.screen === 'ctrl') { setTitle('Live monitor'); show('panel', false); renderCtrlPanel(); renderKpi(); renderEnv(); renderGuideCard(); }
   drawSites();
   renderLayerbox();
 }

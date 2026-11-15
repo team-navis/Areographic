@@ -35,7 +35,7 @@ const params = new URLSearchParams(location.search);
 const api = (window.__mw = { ready: false, mode: 'loading', errors: [] });
 
 /**
- * Intro (2026-11-15): shown from the first moment (logo, one service line, "Enter 눌러서 시작") while the world loads behind it.
+ * Intro (2026-11-15): shown from the first moment (logo, one service line, "Press Enter to start") while the world loads behind it.
  * A loading bar fills while the world loads (stage milestones of boot(), eased between them); Enter / Space / a click starts only once
  * the bar is full and the start button is enabled (2026-11-15 user request). Nothing reaches the scene behind the intro. ?nosplash = the old plain loading screen.
  */
@@ -45,7 +45,7 @@ const intro = (() => {
   let shown = 0, goal = 0, full = false; const bar = $('load-bar'), pct = $('load-pct'), btn = $('start-btn');
   const tick = () => { if (!active) return; const cap = isReady ? 1 : Math.min(goal + 0.06, 0.97); shown += Math.max((cap - shown) * (isReady ? 0.2 : 0.035), isReady ? 0.01 : 0); shown = Math.min(shown, cap);
     bar.style.setProperty('--p', shown.toFixed(4)); bar.setAttribute('aria-valuenow', Math.round(shown * 100)); pct.textContent = Math.round(shown * 100) + '%';
-    if (isReady && shown >= 1 && !full) { full = true; el.classList.add('loaded'); $('load-label').textContent = '준비 완료'; btn.disabled = false; btn.focus({ preventScroll: true }); } if (!full) requestAnimationFrame(tick); };
+    if (isReady && shown >= 1 && !full) { full = true; el.classList.add('loaded'); $('load-label').textContent = 'Ready'; btn.disabled = false; btn.focus({ preventScroll: true }); } if (!full) requestAnimationFrame(tick); };
   const start = () => { if (!active || started) return; if (!full) return; started = true; hide(); };
   if (on) { el.classList.add('intro'); const go = $('start-btn'); el.addEventListener('click', (ev) => { ev.stopPropagation(); ev.preventDefault(); start(); }); requestAnimationFrame(tick); // the starting click never reaches the scene (it would pick a role)
     const isStart = (ev) => ev.key === 'Enter' || ev.code === 'Enter' || ev.code === 'NumpadEnter' || ev.key === ' ' || ev.code === 'Space';
@@ -60,12 +60,12 @@ const intro = (() => {
       if (!on) hide(); },
   };
 })();
-boot().catch((e) => { console.error(e); api.errors.push(String(e)); intro.fail(); $('loading-msg').textContent = '불러오기 실패: ' + e.message; });
+boot().catch((e) => { console.error(e); api.errors.push(String(e)); intro.fail(); $('loading-msg').textContent = 'Loading failed: ' + e.message; });
 
 async function boot() {
   // ---------- renderers ----------
   const probe = document.createElement('canvas');
-  if (!(probe.getContext('webgl2'))) { intro.fail(); $('loading-msg').textContent = '이 브라우저는 WebGL2를 지원하지 않아 3D 데모를 실행할 수 없습니다.'; api.mode = 'unsupported'; return; }
+  if (!(probe.getContext('webgl2'))) { intro.fail(); $('loading-msg').textContent = 'This browser does not support WebGL2, so the 3D demo cannot run.'; api.mode = 'unsupported'; return; }
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); /* perf: the room composer already ran at 1.5; 2 cost ~1.8x the outdoor/visor fill */ renderer.setSize(innerWidth, innerHeight);
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -145,7 +145,7 @@ async function boot() {
   const marker = new THREE.Group(); { const m = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, 1.0, 0.25) }); const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.6, 8), m); pole.position.y = 0.8; const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.2), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, 1.0, 0.25), side: THREE.DoubleSide })); flag.position.set(0.18, 1.48, 0); marker.add(pole, flag); } scene.add(marker);
   const placeMarker = () => { const e = mission.poseAt(st.route.length), lx = e.x - Math.cos(e.yaw) * 1.3, lz = e.z + Math.sin(e.yaw) * 1.3; marker.position.set(lx, terrain.groundY(lx, lz), lz); }; // left of the route; the rover track is on the right
   placeMarker();
-  // v0.2 현장 대조: measured workspace mesh at the destination + pins for added interest points
+  // v0.2 POV match: measured workspace mesh at the destination + pins for added interest points
   const field = await loadFieldSite(terrain); intro.progress(0.72); scene.add(field.group, field.pins); // measured sol 1215 Hazcam workspace mesh, placed by the M20 waypoint 56_0 (site frame origin)
   const routeMesh = await loadRouteMesh(terrain, mission); scene.add(routeMesh.group); // one measured Navcam terrain patch beside the route (lazy)
   const placeField = () => { field.group.visible = st.destKey === REFERENCE.key; marker.visible = !field.group.visible; /* the destination flag would stand inside the measured workspace */ field.place(mission.poseAt(st.route.length), terrain.groundY); }; placeField();
@@ -164,15 +164,15 @@ async function boot() {
   const indoorMats = [...base.interiorMaterials, ...helmet.materials];
 
   // Live textures belong to the real 3D room. The same DOM is used for detailed input.
-  const pad = createPad(mission, terrain); pad.ui.onCrewView = () => goCrew(); /* ⑤ 관제: '대원 시점으로 전환' button and the crew dot on the map */ const fieldPad = installFieldPad(pad, mission, terrain, { defaultTarget: { u: field.points.B.u, v: field.points.B.vImg }, points: field.points, region: field.rockRegion }); const planPad = installPlanPad(pad, mission, fieldPad);
+  const pad = createPad(mission, terrain); pad.ui.onCrewView = () => goCrew(); /* ⑤ Marswalk status: 'switch to astronaut view' button and the crew dot on the map */ const fieldPad = installFieldPad(pad, mission, terrain, { defaultTarget: { u: field.points.B.u, v: field.points.B.vImg }, points: field.points, region: field.rockRegion }); const planPad = installPlanPad(pad, mission, fieldPad);
   const science = createStations(mission, terrain), systems = createStations(mission, terrain);
   science.select('science'); systems.select('systems');
-  // 관제 패드 (team decision 2026-11-15): the controller's screen is the team's control pad (pad/pad.html, a standalone dashboard),
+  // Planning Display (team decision 2026-11-15): the controller's screen is the team's control pad (pad/pad.html, a standalone dashboard),
   // shown in the 3D monitor as a 1280x720 page. It replaces the earlier PAD UI on screen; that PAD is still built (not mounted)
   // because the crew side uses its plan/package preparation and the next-EVA reset. The iframe stays alive between visits.
   const controlPad = (() => { const root = document.createElement('div'); root.className = 'pad-frame'; root.id = 'control-pad'; root.style.display = 'none';
-    const f = document.createElement('iframe'); f.src = assetUrl('/pad/pad.html'); f.title = 'Areographic 관제 패드'; f.setAttribute('loading', 'eager'); root.appendChild(f);
-    const back = document.createElement('button'); back.type = 'button'; back.className = 'pad-back'; back.innerHTML = '← 관제석으로'; back.addEventListener('click', () => returnFromMonitor()); root.appendChild(back); // full-window pad: the way back
+    const f = document.createElement('iframe'); f.src = assetUrl('/pad/pad.html'); f.title = 'Areographic Planning Display'; f.setAttribute('loading', 'eager'); root.appendChild(f);
+    const back = document.createElement('button'); back.type = 'button'; back.className = 'pad-back'; back.innerHTML = '← Back to seat'; back.addEventListener('click', () => returnFromMonitor()); root.appendChild(back); // full-window pad: the way back
     f.addEventListener('load', () => { try { f.contentWindow.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); goLanding(); } }); } catch { /* cross-origin: Esc from the parent still works */ } });
     $('terminal-overlay').appendChild(root); return { root, frame: f, persistent: true }; })();
   // One large control screen (team decision 2026-11-15): the PAD is the controller's only screen. The science/systems stations are still
@@ -183,7 +183,7 @@ async function boot() {
   const padShot = new Image(); padShot.decoding = 'async'; padShot.src = assetUrl('/assets/control/pad-preview.webp'); padShot.onload = () => paintMonitors();
   const drawPreview = (canvas, id) => { if (id === 'planner' && padShot.complete && padShot.naturalWidth) { canvas.getContext('2d').drawImage(padShot, 0, 0, canvas.width, canvas.height); return; } drawMonitorPreview(previewCv, id, { mission, terrain }); const g = canvas.getContext('2d'); g.fillStyle = '#0c191d'; g.fillRect(0, 0, canvas.width, canvas.height); const h = canvas.width * 480 / 1024; g.drawImage(previewCv, 0, (canvas.height - h) / 2, canvas.width, h); };
   const monitors = [
-    { id: 'planner', title: '관제 패드', ui: controlPad },
+    { id: 'planner', title: 'Planning Display', ui: controlPad },
   ].map((s, i) => {
     const canvas = document.createElement('canvas'); canvas.width = 1280; canvas.height = 720;
     const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 4;
@@ -204,12 +204,12 @@ async function boot() {
   let voiceAt = -1e9; // last voice memo start: a pointer-lock loss right after it comes from the mic prompt, not from Esc
   const fx = installFieldHud(hud, mission, {
     voiceStart: () => { voiceAt = performance.now(); },
-    sampleMotion: (done, cancel) => mode === 'hud' && scoop.start(camera, look, field.group.visible ? field.pointWorld('B', V(0, 0, 0)) : null, done, cancel), // 시료 채취 모션
+    sampleMotion: (done, cancel) => mode === 'hud' && scoop.start(camera, look, field.group.visible ? field.pointWorld('B', V(0, 0, 0)) : null, done, cancel), // sample collection motion
     toggleRover: () => { const t = st.transport; toggleRover(); return st.transport !== t; },
     capture: () => { const c = camera.position, inside = c.x > AIRLOCK.x0 - .3 && c.x < ROOM.x1 + .2 && Math.abs(c.z) < ROOM.z1 + .2 && c.y < FY + 3; habitatRenderer.render(inside && !helmet.group.visible, 0); /* same path as the frame loop: room composer indoors, direct render in the visor/outdoors */ capCv.getContext('2d').drawImage(renderer.domElement, 0, 0, capCv.width, capCv.height); return capCv.toDataURL('image/jpeg', 0.72); },
     gazeGround: () => { camera.getWorldDirection(gz); if (gz.y > -0.05) return null; for (let d = 0.5; d <= 40; d += 0.25) { const x = camera.position.x + gz.x * d, y = camera.position.y + gz.y * d, z = camera.position.z + gz.z * d; if (y <= terrain.groundY(x, z)) return { x, z }; } return null; },
   });
-  // 현장 미션 카드 arrow: screen position of the mission target (the measured rock, its estimated sampling point B, or the destination flag elsewhere)
+  // field mission card arrow: screen position of the mission target (the measured rock, its estimated sampling point B, or the destination flag elsewhere)
   const mtv = V(0, 0, 0), missionProj = (kind) => {
     if (field.group.visible) { if (!(kind === 'sample' && field.pointWorld('B', mtv))) field.centreWorld(mtv); } else if (marker.visible) mtv.copy(marker.position); else return null;
     const dist = Math.hypot(camera.position.x - mtv.x, camera.position.z - mtv.z); mtv.y += 0.2; const v = mtv.project(camera);
@@ -268,7 +268,7 @@ async function boot() {
   const clearMovement = () => { held.clear(); mission.setW(false); mission.setS(false); mission.setShift(false); walk.state.moving = false; };
   let unlockExpected = false; // pointer-lock exits we start ourselves (role switch etc.) are not an Esc
   const releasePointer = () => { if (document.pointerLockElement) { unlockExpected = true; document.exitPointerLock(); } };
-  const syncMotion = () => { $('btn-motion').setAttribute('aria-pressed', String(motionEnabled)); $('btn-motion').textContent = '시선 움직임 ' + (motionEnabled ? '켜짐' : '꺼짐'); if (!motionEnabled) { roomPointer.set(0, 0); roomLook.set(0, 0); } };
+  const syncMotion = () => { $('btn-motion').setAttribute('aria-pressed', String(motionEnabled)); $('btn-motion').textContent = 'View motion ' + (motionEnabled ? 'on' : 'off'); if (!motionEnabled) { roomPointer.set(0, 0); roomLook.set(0, 0); } };
   syncMotion();
   camera.position.copy(LAND.pos); camera.quaternion.copy(lookQuat(LAND.pos, LAND.look)); camera.fov = LAND.fov; camera.updateProjectionMatrix();
 
@@ -294,7 +294,7 @@ async function boot() {
     $('btn-focus').classList.toggle('hidden', m !== 'pad');
     $('room-ui').classList.toggle('hidden', m !== 'pad');
     $('walk-ui').classList.toggle('hidden', m !== 'habitat');
-    $('btn-hud').querySelector('span').textContent = st.habitatPose ? '기지 내부 걷기 · WASD' : '외부 탐사 이어가기 · HUD';
+    $('btn-hud').querySelector('span').textContent = st.habitatPose ? 'Walk inside the habitat · WASD' : 'Continue surface exploration · HUD';
     hud.show(m === 'hud');
     if (m !== 'landing') placeWho?.();
     operator.group.visible = ['landing', 'toLanding', 'pad', 'toPad'].includes(m); if (m === 'landing') operator.head.visible = true; else if (m === 'pad') operator.head.visible = false; // seat view is first person: head off, forearms and hands stay on the keyboard
@@ -311,16 +311,16 @@ async function boot() {
     document.querySelectorAll('[data-monitor]').forEach(b => { b.classList.toggle('active', b.dataset.monitor === activeMonitor); b.setAttribute('aria-pressed', String(b.dataset.monitor === activeMonitor)); });
     const chosen = monitors.find(s => s.id === activeMonitor), walking = focusReturn?.mode === 'habitat';
     $('room-title').textContent = chosen?.title ?? 'Areographic';
-    $('room-breadcrumb').textContent = chosen ? '기지 관제실 / ' + chosen.title + ' / 상세 화면' : '기지 관제실 / 관제석';
-    $('room-help').textContent = chosen ? '화면 안의 탭을 선택해 자세히 보기 · Esc 처음 화면' : '마우스로 둘러보기 · 모니터 클릭 · 휠로 접근';
+    $('room-breadcrumb').textContent = chosen ? 'Habitat planning room / ' + chosen.title + ' / Detail' : 'Habitat planning room / Planner seat';
+    $('room-help').textContent = chosen ? 'Choose a tab on the screen for details · Esc start screen' : 'Mouse to look around · click a display · wheel to move closer';
     $('btn-room').classList.toggle('hidden', !activeMonitor);
-    $('btn-room').innerHTML = walking ? '← 서 있던 곳으로' : '← 관제석으로';
-    $('btn-focus').textContent = activeMonitor ? '돌아가기 (F)' : '모니터 확대 (F)';
-    $('btn-eva').textContent = st.habitatPose ? '대원 시점 · 기지 걷기 →' : '대원 시점 · 탐사 계속 →';
+    $('btn-room').innerHTML = walking ? '← Back to where I stood' : '← Back to seat';
+    $('btn-focus').textContent = activeMonitor ? 'Back (F)' : 'Zoom display (F)';
+    $('btn-eva').textContent = st.habitatPose ? 'Astronaut view · walk habitat →' : 'Astronaut view · continue Marswalk →';
     $('room-ui').classList.toggle('is-focused', !!activeMonitor);
     { const i = monitors.findIndex(s => s.id === activeMonitor); // top switcher: which monitor, and ‹ › to the neighbours
-      $('ms-num').textContent = i >= 0 ? `${String(i + 1).padStart(2, '0')} / ${String(monitors.length).padStart(2, '0')}` : '관제석';
-      $('ms-title').textContent = i >= 0 ? monitors[i].title : monitors.length === 1 ? '관제 화면 · 곧 열림' : '‹ › 로 모니터 선택'; if (monitors.length === 1) $('ms-num').textContent = '관제석'; }
+      $('ms-num').textContent = i >= 0 ? `${String(i + 1).padStart(2, '0')} / ${String(monitors.length).padStart(2, '0')}` : 'Planner seat';
+      $('ms-title').textContent = i >= 0 ? monitors[i].title : monitors.length === 1 ? 'Planning Display · opening' : 'Use ‹ › to choose a display'; if (monitors.length === 1) $('ms-num').textContent = 'Planner seat'; }
   }
   /** Step to the previous/next monitor (wraps). From the seat view, › opens the first and ‹ the last. */
   function cycleMonitor(step) {
@@ -351,7 +351,7 @@ async function boot() {
     const fp = focusPose(s);
     director.play([{ name: id, pos: fp.pos, quat: fp.quat, fov: fp.fov, dur: opts.direct || !motionEnabled ? .01 : .8 }], { onDone: () => {
       const f2 = focusPose(s); camera.position.copy(f2.pos); camera.quaternion.copy(f2.quat); camera.fov = f2.fov; camera.updateProjectionMatrix();
-      if (s.ui.persistent) s.ui.root.style.display = ''; else $('terminal-overlay').append(s.ui.root); s.ui.root.classList.add('terminal-active'); if (s.ui.frame) { s.ui.root.classList.add('full'); document.body.classList.add('pad-full'); } /* 관제 패드: after the camera reaches the screen, the pad fills the whole window */ resizeTerminal(); paintMonitors(); syncMonitors();
+      if (s.ui.persistent) s.ui.root.style.display = ''; else $('terminal-overlay').append(s.ui.root); s.ui.root.classList.add('terminal-active'); if (s.ui.frame) { s.ui.root.classList.add('full'); document.body.classList.add('pad-full'); } /* Planning Display: after the camera reaches the screen, the pad fills the whole window */ resizeTerminal(); paintMonitors(); syncMonitors();
       if (s.ui.frame) s.ui.frame.focus(); else s.ui.root.querySelector('button:not(:disabled)')?.focus({ preventScroll: true });
     } });
     syncMonitors();
@@ -410,8 +410,8 @@ async function boot() {
     if (!['landing', 'pad'].includes(mode) || cameraBusy()) return;
     clearMovement(); releasePointer(); dockTerminal(); activeMonitor = null; focusReturn = null;
     if (!st.habitatPose) { goHud(); return; }
-    if (st.phase === 'ended') planPad.nextEva(); // 탐사자 다시 나가기: the finished EVA is archived, the next one starts from the same tasks
-    planPad.ensureDemoPlan(); // 탐사자 바로 시작: no-op when the controller already sent a plan for this version
+    if (st.phase === 'ended') planPad.nextEva(); // astronaut goes out again: the finished EVA is archived, the next one starts from the same tasks
+    planPad.ensureDemoPlan(); // astronaut starts directly: no-op when the controller already sent a plan for this version
     const fromLanding = mode === 'landing'; mission.setControl(mission.autoControl()); setMode('toHabitat');
     const pos = V(walk.state.x, FY + EYE_HEIGHT, walk.state.z), quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(look.pitch, look.yaw, 0, 'YXZ'));
     // from the role selection: stage 1 transition around the standing astronaut (approach -> shoulder -> visor -> inside), then the indoor walk
@@ -443,8 +443,8 @@ async function boot() {
     director.play(keys, { onPhase: n => { $('phase').textContent = n; api.phase = n; }, onDone: () => { $('sheen').style.opacity = '0'; $('phase').textContent = ''; mission.setControl('hud-manual'); setMode('hud'); } });
   }
   // ---------- re-entry (docs/stage3-v02-field.md §10) ----------
-  // 기지 도착 = reaching the ramp (phase 'atBase', unchanged). 임무 종료 = HUD button 1 at the ramp (unchanged) OR passing the inner airlock door on the way in.
-  // W after 기지 도착 follows the fixed indoor leg in reverse; each door must be open before the crew passes it and the doors keep their interlock (base.updateDoors).
+  // Arrived at habitat = reaching the ramp (phase 'atBase', unchanged). End Marswalk = HUD button 1 at the ramp (unchanged) OR passing the inner airlock door on the way in.
+  // W after arriving at the habitat follows the fixed indoor leg in reverse; each door must be open before the crew passes it and the doors keep their interlock (base.updateDoors).
   { const pts = st.route.pts, innerPt = pts.find((q) => q.kind === 'indoor' && q.x <= ROOM.x0 - .05) || pts[0];
     mission.entry = { innerS: innerPt.s - .35, canPass: (a, b) => {
       if (a.x < AIRLOCK.x0 && b.x >= AIRLOCK.x0 - .45) return base.doorState.outer > .92; // outer door plane
@@ -522,7 +522,7 @@ async function boot() {
   const personRay = new THREE.Raycaster(), personNdc = new THREE.Vector2();
   // generous invisible hit volumes: the suit GLB is one large mesh and the controller is small behind the chair
   operator.hit.scale.set(1.5, 1.25, 1.5); astro.hit.scale.set(1.35, 1.1, 1.6);
-  const who2lbl = { pad: null, hud: null }; for (const [k, t] of [['pad', '관제자 · 기지 모니터'], ['hud', '현장 대원 · 헬멧 시야']]) { const d = document.createElement('div'); d.className = 'who-label hidden'; d.id = k === 'pad' ? 'lbl-operator' : 'lbl-astronaut'; d.textContent = t; $('overlay').appendChild(d); who2lbl[k] = d; }
+  const who2lbl = { pad: null, hud: null }; for (const [k, t] of [['pad', 'Habitat Planner · habitat display'], ['hud', 'Surface Astronaut · helmet view']]) { const d = document.createElement('div'); d.className = 'who-label hidden'; d.id = k === 'pad' ? 'lbl-operator' : 'lbl-astronaut'; d.textContent = t; $('overlay').appendChild(d); who2lbl[k] = d; }
   const floorRing = (color) => { const m = new THREE.Mesh(new THREE.RingGeometry(.42, .5, 48), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .35, toneMapped: false, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.visible = false; scene.add(m); return m; };
   const rings = { pad: floorRing(0xffb84a), hud: floorRing(0xffb84a) }; let hoverPerson = null;
   // hover highlight that does not depend on the person's materials (the suit is one baked mesh, the controller shares room materials): an additive amber halo around the hit volume + a brightness lift on the person's own meshes
@@ -532,12 +532,12 @@ async function boot() {
   const setHover = (w) => { if (w === hoverPerson) return; hoverPerson = w; document.body.classList.toggle('person-hover', !!w); for (const k of ['pad', 'hud']) { who2lbl[k].classList.toggle('hot', k === w); rings[k].material.opacity = k === w ? .95 : .35; rings[k].scale.setScalar(k === w ? 1.12 : 1); halos[k].visible = k === w; } lift(astro.model, w === 'hud'); lift(operator.group, w === 'pad'); };
   const whoV = V(0, 0, 0);
   // Landing reflects mission state: once the crew has left (walked out, or the simulated crew is out), nobody stands in the room.
-  // The 'hud' label, floor ring, halo and click volume move to the inner airlock door instead ("현장 대원 · 바깥 탐사 중").
+  // The 'hud' label, floor ring, halo and click volume move to the inner airlock door instead ("Surface Astronaut · on the Marswalk").
   const OUT_SPOT = V(ROOM.x0 + .55, FY, AIRLOCK.doorZ), outHit = new THREE.Mesh(new THREE.BoxGeometry(1.1, 2.2, 1.5), new THREE.MeshBasicMaterial({ visible: false })); outHit.position.set(ROOM.x0 + .35, FY + 1.1, AIRLOCK.doorZ); outHit.name = 'hit-crew-outside'; scene.add(outHit);
   function placeWho() { // floating labels above the heads + floor rings, only on the role-selection view
     const on = mode === 'landing'; for (const k of ['pad', 'hud']) { who2lbl[k].classList.toggle('hidden', !on); rings[k].visible = on; if (!on) halos[k].visible = false; } if (!on) { if (hoverPerson) setHover(null); return; }
     const put = (k, obj, h) => { obj.getWorldPosition(whoV); rings[k].position.set(whoV.x, FY + .012, whoV.z); whoV.y = FY + h; whoV.project(camera); who2lbl[k].style.left = ((whoV.x + 1) / 2) * innerWidth + 'px'; who2lbl[k].style.top = ((1 - whoV.y) / 2) * innerHeight + 'px'; };
-    const out = !st.habitatPose; who2lbl.hud.textContent = out ? '현장 대원 · 바깥 탐사 중' : '현장 대원 · 헬멧 시야'; who2lbl.hud.dataset.where = out ? 'outside' : 'inside'; api.crewMarker = out ? 'outside' : 'inside';
+    const out = !st.habitatPose; who2lbl.hud.textContent = out ? 'Surface Astronaut · on the Marswalk' : 'Surface Astronaut · helmet view'; who2lbl.hud.dataset.where = out ? 'outside' : 'inside'; api.crewMarker = out ? 'outside' : 'inside';
     put('pad', operator.group, 1.62); put('hud', out ? { getWorldPosition: (v) => v.copy(OUT_SPOT) } : astro.group, out ? 2.3 : 2.12);
     halos.pad.position.set(rings.pad.position.x, FY + .82, rings.pad.position.z); halos.hud.position.set(rings.hud.position.x, FY + 1.02, rings.hud.position.z);
   }
@@ -576,8 +576,8 @@ async function boot() {
       else if (ev.code === 'KeyM') mission.toggleMinimap(); // dial press
       else if (ev.code === 'ArrowDown') hud.dial(1); else if (ev.code === 'ArrowUp') hud.dial(-1); // dial turn: down = next item, up = previous (the wheel also works)
       else if (ev.code === 'Digit1' || ev.code === 'Numpad1' || ev.code === 'Enter') hud.button(1); // button 1: confirm / run highlighted item
-      else if (ev.code === 'Digit2' || ev.code === 'Numpad2') hud.button(2); // button 2: fold card / 우주복·임무 상태 layer / declutter
-      else if (ev.code === 'Digit3' || ev.code === 'Numpad3') fx.button3(); else if (ev.code === 'KeyC') fx.photoButton(); // suit camera button: 촬영 · 영상 마킹 (was a menu item)
+      else if (ev.code === 'Digit2' || ev.code === 'Numpad2') hud.button(2); // button 2: fold card / suit and mission status layer / declutter
+      else if (ev.code === 'Digit3' || ev.code === 'Numpad3') fx.button3(); else if (ev.code === 'KeyC') fx.photoButton(); // suit camera button: photo · photo mark (was a menu item)
       else if (ev.code === 'KeyV') fx.memoButton(true); // V = voice memo: hold to dictate, release to save (2026-11-15: voice commands are no longer on V)
       else if (ev.code === 'Backquote' && fx.reviewCommands) fx.reviewCommands(); // ?review only: typed command field for checking (not crew input)
       else used = false;
@@ -600,7 +600,7 @@ async function boot() {
     if (!mine && performance.now() - voiceAt > 6000 && ['habitat', 'hud'].includes(mode)) setTimeout(() => { if (document.hasFocus() && !document.hidden && ['habitat', 'hud'].includes(mode)) goLanding(); }, 150); });
   addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); habitatRenderer.resize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; if (!cameraBusy()) { if (activeMonitor) { const fp = focusPose(monitors.find((m) => m.id === activeMonitor)); camera.position.copy(fp.pos); camera.quaternion.copy(fp.quat); camera.fov = fp.fov; } else camera.fov = atOverview() ? overviewFov() : 62; } camera.updateProjectionMatrix(); resizeTerminal(); });
 
-  // ---------- exit guidance (crew, first person inside the base): "이쪽으로 나가세요" ----------
+  // ---------- exit guidance (crew, first person inside the base): "exit this way" ----------
   // Amber floor chevrons follow the fixed indoor leg (standing spot -> inner door -> airlock -> outer door) and a label marks the
   // airlock. Shown only while walking inside before departure. Presentation cue only; the doors keep their interlock.
   const exitGuide = new THREE.Group(); exitGuide.name = 'exit-guide'; exitGuide.visible = false; scene.add(exitGuide);
@@ -611,7 +611,7 @@ async function boot() {
     for (let i = 1; i < pts.length; i++) { const a = pts[i - 1], b = pts[i], d = Math.hypot(b.x - a.x, b.z - a.z); acc += d; if (acc < .7) continue; acc = 0;
       const m = new THREE.Mesh(geo, mat); m.position.set(b.x, FY + .012, b.z); m.rotation.y = Math.atan2(-(b.x - a.x), -(b.z - a.z)); m.renderOrder = 6; exitGuide.add(m); }
     exitGuide.userData.mat = mat; }
-  const exitLabel = document.createElement('div'); exitLabel.className = 'exit-label hidden'; exitLabel.id = 'exit-label'; exitLabel.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40 L8 22 H18 V8 H30 V22 H40 Z"/></svg>'; exitLabel.setAttribute('aria-label', '에어록 출구 방향'); $('overlay').appendChild(exitLabel); // an arrow only (joint demo feedback): points down at the airlock door, or sideways when the door is off screen
+  const exitLabel = document.createElement('div'); exitLabel.className = 'exit-label hidden'; exitLabel.id = 'exit-label'; exitLabel.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40 L8 22 H18 V8 H30 V22 H40 Z"/></svg>'; exitLabel.setAttribute('aria-label', 'Direction to the airlock exit'); $('overlay').appendChild(exitLabel); // an arrow only (joint demo feedback): points down at the airlock door, or sideways when the door is off screen
   const exitAt = V(AIRLOCK.x0 + .25, FY + 1.9, AIRLOCK.doorZ), exitV = V(0, 0, 0); let guideT = 0;
   function updateExitGuide(dt) {
     const on = mode === 'habitat' && !!st.habitatPose && st.phase !== 'returning'; exitGuide.visible = on; exitLabel.classList.toggle('hidden', !on); if (!on) return;
@@ -653,13 +653,13 @@ async function boot() {
       camera.quaternion.setFromEuler(eul.set(look.pitch, look.yaw, 0));
       pickTime += dt;
       if (pickTime >= .12) { pickTime = 0; hoverMonitor = pickMonitor({ clientX: innerWidth / 2, clientY: innerHeight / 2 }); }
-      $('walk-monitor').classList.toggle('hidden', !hoverMonitor); $('walk-monitor').textContent = 'F · ' + (monitors.find(s => s.id === hoverMonitor)?.title ?? '') + ' 열기';
-      $('walk-location').textContent = p.x < ROOM.x0 ? `AIRLOCK / 에어록 · 안쪽 문 ${base.doorState.inner > 0 ? '열림' : '닫힘'} · 바깥 문 ${base.doorState.outer > 0 ? '열림' : '닫힘'} · 압력 미연결` : '기지 내부 (가상)';
+      $('walk-monitor').classList.toggle('hidden', !hoverMonitor); $('walk-monitor').textContent = 'F · Open ' + (monitors.find(s => s.id === hoverMonitor)?.title ?? '');
+      $('walk-location').textContent = p.x < ROOM.x0 ? `AIRLOCK · inner door ${base.doorState.inner > 0 ? 'open' : 'closed'} · outer door ${base.doorState.outer > 0 ? 'open' : 'closed'} · pressure not connected` : 'Habitat interior (fictional)';
       if (p.exited) { // walking out again after a closed EVA starts the next one (same tasks, fresh clock, consumables, alerts, plan and package; the old records stay archived)
         if (st.phase === 'ended') planPad.nextEva();
         planPad.ensureDemoPlan(); if (mission.departHabitat()) { clearMovement(); goHud(true); } }
     }
-    { const hint = mode !== 'hud' ? '' : (st.phase === 'atBase' || st.phase === 'ended') && st.s > 0 ? (st.transport === 'rover' ? 'E 하차 후 W · 에어록으로 들어가기' : `W · 에어록을 지나 기지 안으로${st.phase === 'atBase' ? ' (안쪽 문을 지나면 임무 종료)' : ''} · 안쪽 문 ${base.doorState.inner > 0 ? '열림' : '닫힘'} · 바깥 문 ${base.doorState.outer > 0 ? '열림' : '닫힘'}`) : ''; if (hint !== entryHint) { entryHint = hint; $('phase').textContent = hint; } }
+    { const hint = mode !== 'hud' ? '' : (st.phase === 'atBase' || st.phase === 'ended') && st.s > 0 ? (st.transport === 'rover' ? 'E to get off, then W · enter the airlock' : `W · through the airlock into the habitat${st.phase === 'atBase' ? ' (passing the inner door ends the Marswalk)' : ''} · inner door ${base.doorState.inner > 0 ? 'open' : 'closed'} · outer door ${base.doorState.outer > 0 ? 'open' : 'closed'}`) : ''; if (hint !== entryHint) { entryHint = hint; $('phase').textContent = hint; } }
     placeRover(); const { p, yaw } = astroPose();
     astro.group.position.set(p.x, p.y, p.z); astro.group.rotation.y = yaw;
     base.updateDoors(dt, p.kind === 'indoor' || p.x > AIRLOCK.x0 - 3.4 ? p.x : null);
@@ -668,7 +668,7 @@ async function boot() {
       camera.position.set(p.x, p.y + EYE_HEIGHT + (st.transport === 'rover' ? 0 : b), p.z).addScaledVector(V(-Math.sin(yaw), 0, -Math.cos(yaw)), .02);
       if (blend > 0) { blend = Math.max(0, blend - dt / .8); camera.position.lerp(blendFrom, blend * blend * (3 - 2 * blend)); }
       camera.quaternion.setFromEuler(eul.set(look.pitch, look.yaw, 0)); if (camera.fov !== 62) { camera.fov = 62; camera.updateProjectionMatrix(); }
-      scoop.update(dt, camera, look); // 시료 채취 모션 (drives the view down to the dig spot while it runs)
+      scoop.update(dt, camera, look); // sample collection motion (drives the view down to the dig spot while it runs)
       if (st.lateralDebug) camera.position.addScaledVector(V(Math.cos(p.yaw), 0, -Math.sin(p.yaw)), st.lateralDebug); // test hook only: no product input leaves the route
       if (!field.loaded && field.group.visible && (st.planTx || st.pkg || st.route.length - st.s < 150)) field.ensure(); // lazy: the measured workspace mesh loads when the plan is confirmed or the crew is within 150 m
       routeMesh.update(camera, true);
@@ -698,7 +698,7 @@ async function boot() {
     const inSig = `${base.doorState.inner},${base.doorState.outer},${astro.model.visible && p.kind === 'indoor' ? `${p.x.toFixed(1)},${p.z.toFixed(1)}` : ''},${operator.group.visible},${operator.head.visible}`;
     if (inSig !== indoorShadowSig) { indoorShadowSig = inSig; base.lights.forEach((l) => { l.shadow.needsUpdate = true; }); }
     instrumentTime += dt;
-    if (instrumentTime > .5) { instrumentTime = 0; science.update(); systems.update(); paintMonitors(); $('room-telemetry').textContent = st.habitatPose ? '기지 내부 · EVA 출발 전' : 'O₂ ' + st.o2.toFixed(1) + '% · ' + (st.transport === 'rover' ? 'ROVER' : 'EVA') + ' · ' + st.s.toFixed(0) + ' / ' + st.route.length.toFixed(0) + ' m'; }
+    if (instrumentTime > .5) { instrumentTime = 0; science.update(); systems.update(); paintMonitors(); $('room-telemetry').textContent = st.habitatPose ? 'Habitat interior · before EVA departure' : 'O₂ ' + st.o2.toFixed(1) + '% · ' + (st.transport === 'rover' ? 'ROVER' : 'EVA') + ' · ' + st.s.toFixed(0) + ' / ' + st.route.length.toFixed(0) + ' m'; }
     base.chair.visible = !(operator.ownChair && operator.group.visible); // the operator mesh brings its own chair
     habitatRenderer.render(inside && !helmet.group.visible, dt); requestAnimationFrame(frame);
   }

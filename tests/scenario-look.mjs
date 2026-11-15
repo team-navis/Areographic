@@ -20,13 +20,13 @@ check('nothing-runs-before-departure', s0.control === 'idle' && s1.sim === s0.si
 await enterPad(page); await page.click('#home-start'); await wait(250); await page.click('#site-next'); await wait(350);
 // blocked start says why next to the button instead of doing nothing
 await page.click('#pp-start'); await wait(300); const why = await page.textContent('#pp-why'), blockedSt = await S();
-check('blocked-start-explains-why', /출발 점검 3건 남음/.test(why) && /결정자 미입력/.test(why) && !blockedSt.plan && !blockedSt.departed, why);
-for (const k of ['route', 'budget', 'branch']) await page.check(`[data-chk="${k}"]`); await page.click('#pp-decider'); await page.keyboard.type('관제자'); await wait(200); const ready = await page.textContent('#pp-why');
+check('blocked-start-explains-why', /3 pre-departure checks left/.test(why) && /no decision maker entered/.test(why) && !blockedSt.plan && !blockedSt.departed, why);
+for (const k of ['route', 'budget', 'branch']) await page.check(`[data-chk="${k}"]`); await page.click('#pp-decider'); await page.keyboard.type('Planner'); await wait(200); const ready = await page.textContent('#pp-why');
 await page.screenshot({ path: `${OUT}/43-pad-final-review.png` });
 await page.click('#pp-start'); await wait(900); const st1 = await S(), sent = st1;
-check('one-action-confirms-sends-and-starts-versions-match', /준비됨/.test(ready) && sent.plan && sent.pkg && sent.plan.v === sent.pkg.v && !sent.pkg.stale && sent.departed, sent);
+check('one-action-confirms-sends-and-starts-versions-match', /Ready/.test(ready) && sent.plan && sent.pkg && sent.plan.v === sent.pkg.v && !sent.pkg.stale && sent.departed, sent);
 await page.click('#pc-warp'); await wait(200);
-check('controller-start-sets-departure-pad-auto', st1.departed && st1.control === 'pad-auto' && (await page.isVisible('#pc-owner')) && /모의 대원/.test(await page.textContent('#pc-owner')), { control: st1.control, owner: await page.textContent('#pc-owner') });
+check('controller-start-sets-departure-pad-auto', st1.departed && st1.control === 'pad-auto' && (await page.isVisible('#pc-owner')) && /Simulated astronaut/.test(await page.textContent('#pc-owner')), { control: st1.control, owner: await page.textContent('#pc-owner') });
 await until(() => { const s = window.__mw.mission.st; return s.planTx.ackAt !== null && s.pkg.ackAt !== null; }, 30000); const ack = await S();
 check('receipts-progress-on-the-pad', ack.plan.rx !== null && ack.plan.ack > ack.plan.rx && ack.pkg.ack !== null && ack.log >= 1 && ack.sim > 2, ack);
 // controller keyboard cannot steer
@@ -34,7 +34,7 @@ const k0 = await S(); await page.keyboard.down('KeyW'); await wait(400); const k
 check('controller-keyboard-cannot-move-crew', k1.wHeld === false && k1.control === 'pad-auto', { wHeld: k1.wHeld });
 // comm loss: the base shows the last received snapshot
 await until(() => window.__mw.mission.st.s > 60); await page.click('#pc-comm-btn'); await wait(300); const c0 = await page.textContent('#pc-pos'); await wait(1500); const c1 = await page.textContent('#pc-pos'), cs = await S(), cv = await mw(() => window.__mw.mission.baseView());
-check('comm-loss-shows-last-received', c0 === c1 && cv.stale && cs.s > cv.s + 3 && /마지막 수신/.test(await page.textContent('#pc-comm')), { shown: c1, actual: cs.s.toFixed(0) });
+check('comm-loss-shows-last-received', c0 === c1 && cv.stale && cs.s > cv.s + 3 && /last received/.test(await page.textContent('#pc-comm')), { shown: c1, actual: cs.s.toFixed(0) });
 await page.click('#pc-comm-btn'); await wait(300);
 // handover to the HUD mid-run: same position/time, script stops, W drives; back to the PAD resumes
 const h0 = await S(); await page.click('#btn-switch'); await mode('landing'); await page.evaluate(() => window.__mw.enterRole('hud')); await mode('hud'); const h1 = await S(); await wait(1500); const h2 = await S();

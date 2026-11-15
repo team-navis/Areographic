@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { assetUrl } from '../util/asset-url.js';
 
 /**
- * Sampling workspace at the destination, from MEASURED data (feature definition v0.2, HUD #1 현장 대조).
+ * Sampling workspace at the destination, from MEASURED data (feature definition v0.2, HUD #1 POV match).
  *
  * Geometry + texture: Mars 2020 front Hazcam workspace mesh of sol 1215 (the coring day), product
  * FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01 (NASA/JPL-Caltech, PDS Imaging Node), cropped to 1.5 m around
@@ -18,7 +18,7 @@ import { assetUrl } from '../util/asset-url.js';
  * geometry and texture coordinates, so the lines register on the real surface by construction (no tracking is claimed).
  */
 export const TOL = { gazeDeg: 4, obliqDeg: 75, distM: 6 }; // alignment tolerances (assumptions)
-export const WORKSPACE = { dir: assetUrl('/data/workspace/'), base: 'fhaz_1215_workspace', id: 'FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01', label: '실측 지형 메시 · Perseverance 전방 Hazcam · sol 1215', credit: 'NASA/JPL-Caltech' };
+export const WORKSPACE = { dir: assetUrl('/data/workspace/'), base: 'fhaz_1215_workspace', id: 'FLF_1215_0774815107M492RAS_N0560000FHAZ02008_0A0095J01', label: 'Measured terrain mesh · Perseverance front Hazcam · sol 1215', credit: 'NASA/JPL-Caltech' };
 const GREEN = new THREE.Color(0x8cff9e), BLEND0 = 1.0, BLEND1 = 1.5, FADE0 = 1.08, FADE1 = 1.46, TINT = [1.02, 0.9, 0.8]; // tint chosen by eye to sit in the surrounding ground colour (assumption)
 
 /**
@@ -66,7 +66,7 @@ async function buildFieldSite(terrain, meta) {
   const markers = new THREE.Group(); markers.visible = false; markers.name = 'sampling-markers'; group.add(markers);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, depthWrite: false, depthTest: false, toneMapped: false, fog: false, side: THREE.DoubleSide });
   const label = (lines, w = 0.5) => { const c = document.createElement('canvas'); c.width = 640; c.height = 44 * lines.length + 12; const g = c.getContext('2d'); g.fillStyle = 'rgba(3,9,5,.9)'; g.fillRect(0, 0, c.width, c.height); lines.forEach((t, i) => { g.font = (i ? '' : '600 ') + (i ? 24 : 30) + 'px system-ui, "Apple SD Gothic Neo", sans-serif'; g.fillStyle = i ? '#8cff9e' : '#e4ffe9'; g.textBaseline = 'middle'; g.fillText(t, 16, 28 + i * 44); }); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, toneMapped: false, depthTest: false, transparent: true, sizeAttenuation: false })); s.scale.set(w, w * c.height / c.width, 1); /* constant on-screen size (billboard) */ s.renderOrder = 8; return s; };
-  const sign = label([WORKSPACE.label, '단일 시점 스테레오 · 축소 메시 · ' + WORKSPACE.credit], 0.34); sign.visible = false; group.add(sign);
+  const sign = label([WORKSPACE.label, 'single-view stereo · reduced mesh · ' + WORKSPACE.credit], 0.34); sign.visible = false; group.add(sign);
   const pins = new THREE.Group(); pins.name = 'interest-pins';
   const P = (i, out = new THREE.Vector3()) => out.set(pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2]);
   /** Surface point for a texture coordinate (u right, v UP): the triangle that contains it in uv space. */
@@ -102,9 +102,9 @@ async function buildFieldSite(terrain, meta) {
       const cN = meta.crop.centre_ne_m[0], cE = meta.crop.centre_ne_m[1], pts = [], N = 96, cellY = new Map(); for (let i = 0; i < n; i++) { const r = Math.hypot(raw[i * 3] - cE, -raw[i * 3 + 2] - cN); if (Math.abs(r - BLEND0) > 0.04) continue; const k = Math.round(Math.atan2(-raw[i * 3 + 2] - cN, raw[i * 3] - cE) / (2 * Math.PI) * N); cellY.set(k, Math.max(cellY.get(k) ?? -1e9, pos[i * 3 + 1])); }
       for (let k = -N / 2; k < N / 2; k++) { if (!cellY.has(k)) continue; const a2 = k / N * 2 * Math.PI; pts.push(new THREE.Vector3(cE + Math.cos(a2) * BLEND0, cellY.get(k) + 0.012, -(cN + Math.sin(a2) * BLEND0))); }
       if (pts.length > 8) { const ring = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineDashedMaterial({ color: 0x63e6ff, dashSize: 0.05, gapSize: 0.05, transparent: true, opacity: 0.7, depthTest: false, toneMapped: false, fog: false })); ring.computeLineDistances(); ring.renderOrder = 7; markers.add(ring);
-        const l1 = label(['바깥 띠(점선 밖) · 접합용 변형', `반경 ${BLEND0.toFixed(1)}~${BLEND1.toFixed(1)} m는 지형에 맞춰 높이를 바꿈 · 원측정 아님`], 0.3); l1.position.copy(pts[Math.floor(pts.length * 0.12)]).add(new THREE.Vector3(0, 0.16, 0)); markers.add(l1);
-        const far = new THREE.Vector3(cE, 0, -cN).normalize(), l2 = label(['뒤쪽 · 미관측 영역', '단일 시점 스테레오라 카메라에서 가려진 면은 자료 없음'], 0.3); l2.position.set(cE + far.x * 0.72, pts[0].y + 0.5, -cN + far.z * 0.72); markers.add(l2); } } for (const k of ['A', 'B']) { const q = points[k], r = ringAt(q.u, q.vImg, k === 'A' ? 0.025 : 0.018, k === 'A' ? 0.029 : 0.022); if (!r) continue; q.world = r.userData.world.p.clone(); markers.add(r);
-    const l = label(k === 'A' ? ['A · 연마 자국 Apollo Temple', q.snapped ? 'raw 메타데이터 기반 추정 → 텍스처의 밝은 자국에 맞춤' : 'raw 메타데이터 기반 추정'] : ['B · 코어 채취 구역 (Sapphire Canyon)', 'raw 메타데이터 기반 추정 · 공식 좌표 아님'], 0.3); l.position.copy(q.world).add(new THREE.Vector3(0, k === 'A' ? 0.42 : 0.2, k === 'A' ? -0.5 : 0.5)); l.userData.label = true; markers.add(l); } }
+        const l1 = label(['Outer band (outside dashes) · blend edit', `radius ${BLEND0.toFixed(1)}–${BLEND1.toFixed(1)} m reshaped to the terrain · not measured`], 0.3); l1.position.copy(pts[Math.floor(pts.length * 0.12)]).add(new THREE.Vector3(0, 0.16, 0)); markers.add(l1);
+        const far = new THREE.Vector3(cE, 0, -cN).normalize(), l2 = label(['Back side · not observed', 'single-view stereo: no data where hidden from the camera'], 0.3); l2.position.set(cE + far.x * 0.72, pts[0].y + 0.5, -cN + far.z * 0.72); markers.add(l2); } } for (const k of ['A', 'B']) { const q = points[k], r = ringAt(q.u, q.vImg, k === 'A' ? 0.025 : 0.018, k === 'A' ? 0.029 : 0.022); if (!r) continue; q.world = r.userData.world.p.clone(); markers.add(r);
+    const l = label(k === 'A' ? ['A · abrasion patch Apollo Temple', q.snapped ? 'estimated from raw metadata → snapped to bright patch' : 'estimated from raw metadata'] : ['B · core sample area (Sapphire Canyon)', 'estimated from raw metadata · not official coordinates'], 0.3); l.position.copy(q.world).add(new THREE.Vector3(0, k === 'A' ? 0.42 : 0.2, k === 'A' ? -0.5 : 0.5)); l.userData.label = true; markers.add(l); } }
   const tmpC = new THREE.Vector3(), tmpN = new THREE.Vector3(), tmpD = new THREE.Vector3(), tmpF = new THREE.Vector3();
   const api = {
     group, face, overlay, rings, markers, pins, sign, TOL, meta, points, droppedTriangles, rockRegion: region, usesPhotoTexture: false, measured: true, placement: null,

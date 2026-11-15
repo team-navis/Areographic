@@ -13,7 +13,7 @@
 .hud.vt kbd { font-family: inherit; font-size: .72em; min-width: 1.45em; padding: .08em .3em; border: 1.5px solid #fff; border-radius: 4px; color: #fff; margin: 0 .1em; }
 .hud.vt .hud-plate { background: none; padding: 0; border-radius: 0; }
 .hud.vt .caution { color: #ffd84d !important; }
-/* the Korean detail and 모의 tags stay in the DOM (cards, checks and the detail layer use them) but are not drawn on the main view */
+/* the secondary detail and simulated tags stay in the DOM (cards, checks and the detail layer use them) but are not drawn on the main view */
 .hud.vt .hud-brand, .hud.vt #hud-comm, .hud.vt #hud-alerts, .hud.vt .hud-k small, .hud.vt .hud-row2 > span small, .hud.vt #hud-clock + small,
 .hud.vt .hud-turn-x, .hud.vt .hud-rad-x, .hud.vt .hud-row2.minor { display: none; }
 .hud.vt .hud-row2.minor.on { display: flex; }

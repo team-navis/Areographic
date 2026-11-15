@@ -28,7 +28,7 @@ function frame(g, id, revision) {
   text(g, `PLAN ${revision}`, 850, 42, 18, C.muted, 145);
   line(g, 30, 64, 994, 64);
   line(g, 30, 414, 994, 414);
-  const footers = { science: '지형 단면 · 관측 정지점 · 출처 보기', planner: '지도 · 탐사 후보 · 임무 계획 열기', systems: '대원 상태 · 로버 · 기지 운영 열기' };
+  const footers = { science: 'Terrain profile · rover stops · sources', planner: 'Open map · candidate sites · plan', systems: 'Open astronaut · rover · habitat' };
   text(g, footers[id], 32, 456, 25, C.sage, 850);
   text(g, '↗', 950, 456, 31, C.sage);
 }
@@ -62,7 +62,7 @@ function drawMap(g, mission, terrain) {
   g.fillStyle = '#081218c9'; g.fillRect(rect.x, rect.y, rect.w, 32); g.fillRect(rect.x, rect.y + rect.h - 32, rect.w, 32);
   text(g, 'HiRISE / ORTHOMOSAIC', rect.x + 14, rect.y + 23, 17, C.ink);
   text(g, 'N ↑', rect.x + rect.w - 55, rect.y + 23, 17, C.ink);
-  text(g, '실제 관측 영상 · 경로는 모의 계획', rect.x + 14, rect.y + rect.h - 10, 16, C.ink);
+  text(g, 'Real orbital image · route is a simulated plan', rect.x + 14, rect.y + rect.h - 10, 16, C.ink);
   g.restore();
 }
 
@@ -70,10 +70,10 @@ function planner(g, mission, terrain) {
   const st = mission.st, route = st.route, name = mission.candidates.find(c => c.key === st.destKey)?.name;
   text(g, 'NEXT EXPEDITION', 32, 118, 28, C.ink, 390, 600);
   text(g, name, 32, 163, 24, C.sage, 385);
-  text(g, '편도 계획 거리', 32, 222, 21, C.muted);
+  text(g, 'Planned one-way distance', 32, 222, 21, C.muted);
   text(g, `${number(route.length)} m`, 32, 281, 55, C.ink, 385, 500);
-  text(g, `경로 최대 경사  ${number(route.stats.maxSlopeDeg, 1)}°`, 32, 334, 22, C.muted, 390);
-  text(g, st.habitatPose ? '기지 내부 · EVA 출발 전' : st.s > .5 ? '탐사 중 · 공유 계획 유지' : '출발 전 · 목적지 선택 가능', 32, 378, 21, C.amber, 390);
+  text(g, `Route max slope  ${number(route.stats.maxSlopeDeg, 1)}°`, 32, 334, 22, C.muted, 390);
+  text(g, st.habitatPose ? 'In habitat · before EVA departure' : st.s > .5 ? 'On Marswalk · shared plan kept' : 'Before departure · destination open', 32, 378, 21, C.amber, 390);
   drawMap(g, mission, terrain);
 }
 
@@ -81,16 +81,16 @@ function science(g, mission, terrain) {
   const route = mission.st.route, pts = route.pts.filter(p => p.kind === 'terrain');
   text(g, 'READ THE TERRAIN', 32, 119, 28, C.ink, 940, 600);
   text(g, `HiRISE DTM ${number(terrain.meta.near.gsd_m)} m`, 32, 167, 26, C.sage, 300);
-  text(g, `${terrain.meta.waypoints.length}개 관측 정지점`, 32, 208, 23, C.muted, 310);
-  text(g, '경로 누적 상승', 32, 271, 20, C.muted);
+  text(g, `${terrain.meta.waypoints.length} rover stops`, 32, 208, 23, C.muted, 310);
+  text(g, 'Route total climb', 32, 271, 20, C.muted);
   text(g, `${number(route.stats.gainM, 1)} m`, 32, 318, 43, C.ink, 300, 500);
-  text(g, '지형 계산 · 세로 과장', 32, 378, 19, C.muted, 300);
-  if (!pts.length) { text(g, '지형 경로 준비 중', 394, 270, 28, C.muted); return; }
+  text(g, 'From terrain · vertical exaggeration', 32, 378, 19, C.muted, 300);
+  if (!pts.length) { text(g, 'Preparing terrain route', 394, 270, 28, C.muted); return; }
   const ys = pts.map(p => p.y), min = Math.floor(Math.min(...ys)) - 1, max = Math.ceil(Math.max(...ys)) + 1;
   const graph = { x: 396, y: 181, w: 594, h: 166 }, first = pts[0].s, last = pts.at(-1).s;
   const X = s => graph.x + (s - first) / Math.max(1, last - first) * graph.w;
   const Y = y => graph.y + graph.h - (y - min) / Math.max(1, max - min) * graph.h;
-  text(g, '원점 기준 고도 / m', graph.x, 151, 19, C.muted);
+  text(g, 'Elevation vs. origin / m', graph.x, 151, 19, C.muted);
   for (let i = 0; i <= 3; i++) {
     const value = min + (max - min) * i / 3, y = Y(value);
     line(g, graph.x, y, graph.x + graph.w, y);
@@ -107,21 +107,21 @@ function science(g, mission, terrain) {
 function systems(g, mission) {
   const st = mission.st, progress = clamp(st.s / Math.max(1, st.route.length) * 100, 0, 100);
   text(g, 'EVA / CREW 01', 32, 119, 28, C.ink, 940, 600);
-  text(g, '산소 잔량 · 모의', 32, 170, 23, C.muted);
+  text(g, 'Oxygen left · simulated', 32, 170, 23, C.muted);
   text(g, `${number(st.o2, 1)}%`, 32, 244, 70, C.ink, 400, 500);
   g.fillStyle = C.panel; g.fillRect(32, 270, 365, 10);
   g.fillStyle = C.sage; g.fillRect(32, 270, 365 * clamp(st.o2, 0, 100) / 100, 10);
-  text(g, `경과 ${number(st.simSeconds / 60, 1)} min`, 32, 332, 27, C.muted, 400);
-  text(g, '브라우저 공유 상태 / 모의 대원', 32, 378, 19, C.muted, 400);
+  text(g, `Elapsed ${number(st.simSeconds / 60, 1)} min`, 32, 332, 27, C.muted, 400);
+  text(g, 'Shared browser state / simulated astronaut', 32, 378, 19, C.muted, 400);
   line(g, 442, 104, 442, 391);
-  text(g, st.habitatPose ? 'HABITAT / 실내 보행' : st.transport === 'rover' ? 'ROVER / 탑승 중' : 'ON FOOT / 도보', 480, 169, 29, C.sage, 510, 500);
-  text(g, st.habitatPose ? '기지 내부 · EVA 출발 전' : st.arrived ? '목적지 도착' : st.moving ? '경로 이동 중' : st.s > .5 ? '현 위치 대기' : '기지 출발 대기', 480, 217, 26, C.ink, 510);
+  text(g, st.habitatPose ? 'HABITAT / walking inside' : st.transport === 'rover' ? 'ROVER / on board' : 'ON FOOT', 480, 169, 29, C.sage, 510, 500);
+  text(g, st.habitatPose ? 'In habitat · before EVA departure' : st.arrived ? 'At destination' : st.moving ? 'Moving on route' : st.s > .5 ? 'Holding position' : 'Waiting to leave habitat', 480, 217, 26, C.ink, 510);
   const current = mission.currentPose();
   text(g, st.habitatPose ? `E ${number(current.x, 1)} / N ${number(-current.z, 1)} m` : `${number(st.s)} / ${number(st.route.length)} m`, 480, 276, st.habitatPose ? 29 : 39, C.ink, 510, 500);
   g.fillStyle = C.panel; g.fillRect(480, 300, 510, 8);
   g.fillStyle = C.amber; g.fillRect(480, 300, 510 * progress / 100, 8);
-  text(g, `차량 경로 위치  ${number(st.roverS)} m`, 480, 354, 21, C.muted, 510);
-  text(g, '대원 02 / 버디 독립 상태 미구현', 480, 388, 18, C.muted, 510);
+  text(g, `Rover route position  ${number(st.roverS)} m`, 480, 354, 21, C.muted, 510);
+  text(g, 'Astronaut 02 / partner state not implemented', 480, 388, 18, C.muted, 510);
 }
 
 /** Paints synchronously. terrain.nearImg is already loaded by loadTerrain(). */

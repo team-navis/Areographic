@@ -147,9 +147,9 @@ body #room-ui #btn-eva:hover { border-color: var(--cx-acc); }
 /* ---------- planning PAD: decluttered view (2026-11-15) ----------
    Shows one thing per line and the numbers that drive decisions. Hidden, not removed: repeated status,
    source fine print, calculation asides and not-yet-available menu items. Provenance stays in the footer
-   and in the 근거 column; disclaimers are kept but trimmed to two lines. */
+   and in the evidence column; disclaimers are kept but trimmed to two lines. */
 body .pad #pad-status { display: none; }                                        /* destination repeats on every page */
-body .pad .pad-navbtn:disabled { display: none; }                               /* 다음 단계 items are not usable yet */
+body .pad .pad-navbtn:disabled { display: none; }                               /* "next step" items are not usable yet */
 body .pad .pad-navbtn { padding: 10px 12px; font-size: 14px; }
 body .pad .pad-note { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 11px; color: var(--cx-faint); }
 body .pad .pad-card h3 small { display: none; }                                 /* long captions after card titles */
@@ -158,8 +158,8 @@ body .pad .pad-card dl { gap: 9px 14px; }
 body .pad .pad-card dd { font-weight: 500; }
 body .pad .site-ev td small, body .pad .pad-cand-n { display: none; }           /* per-row source lines; the tag still shows the evidence level */
 body .pad .site-ev td { padding: 6px 4px; }
-body .pad .pad-foot:not(.open) { display: none; } /* always-on credit line hidden; the strip's 자료·한계 button still opens it */
-/* 홈: keep 목적지 · 계획 · 편도/왕복 · 최대 경사; 이동 수단 and 경로 근거 live on ③ 경로 미리보기 */
+body .pad .pad-foot:not(.open) { display: none; } /* always-on credit line hidden; the strip's Sources & limits button still opens it */
+/* Home: keep destination · plan · one way/round trip · max slope; transport and route basis live on ③ Route preview */
 body .pad #pad-main > .pad-grid2 > .pad-card:first-child dl > dt:nth-of-type(4), body .pad #pad-main > .pad-grid2 > .pad-card:first-child dl > dd:nth-of-type(4),
 body .pad #pad-main > .pad-grid2 > .pad-card:first-child dl > dt:nth-of-type(6), body .pad #pad-main > .pad-grid2 > .pad-card:first-child dl > dd:nth-of-type(6) { display: none; }
 body .pad #home-records td, body .pad #home-records th { padding: 6px 4px; }
@@ -181,5 +181,5 @@ body .monitor-switch .ms-label { min-width: 320px; gap: 3px; }
 body .monitor-switch #ms-num { font-size: 11px; }
 body .monitor-switch #ms-title { font-size: 22px; }
 body #room-ui .monitor-switch button { width: 54px; height: 54px; font-size: 32px; }
-/* station monitors: drop the fixed bottom line ("관측: 보관 지형 · 대원·로버: 모의"); each panel already labels its own data */
+/* station monitors: drop the fixed bottom line ("Observed: archived terrain · astronaut/rover: simulated"); each panel already labels its own data */
 body .station-console .sc-footer { display: none; }
