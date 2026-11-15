@@ -78,7 +78,7 @@ async function boot() {
 
   // ---------- world ----------
   // Load order: everything the landing view needs is requested at once (terrain grids + near ortho, suit model, route); outdoor-only maps follow after the first frame (runDeferred below).
-  const astroLoading = loadAstronaut(), routeLoading = fetch(assetUrl('/data/jezero/route.json')).then((r) => r.json()); astroLoading.catch(() => {}); routeLoading.catch(() => {});
+  const astroLoading = loadAstronaut({ anisotropy: renderer.capabilities.getMaxAnisotropy() }), routeLoading = fetch(assetUrl('/data/jezero/route.json')).then((r) => r.json()); astroLoading.catch(() => {}); routeLoading.catch(() => {});
   intro.progress(0.1); const terrain = await loadTerrain(); intro.progress(0.35); scene.add(terrain.group); scene.fog = terrain.fog;
   const base = buildBase(); const site = base.placeOnTerrain(terrain.groundY); scene.add(base.group);
   const FY = site.floorY;
@@ -259,8 +259,9 @@ async function boot() {
     }
     api.interiorEnv = envTarget.texture; rt.dispose(); operator.group.visible = false; astro.group.visible = true; }
   const irradiance = createHabitatIrradiance({ floorY: FY, room: ROOM, intensity: 1.25, environmentDiffuseWeight: .20 });
-  irradiance.applyToMaterials(base.interiorMaterials);
-  const setAstroEnv = (outdoor) => astro.materials.forEach((m) => { m.envMap = outdoor ? skyEnv : api.interiorEnv; m.envMapIntensity = (outdoor ? 0.85 : 0.6) * (m.userData.visor ? 3 : 1); });
+  const teamSuit = astro.info.kind === 'areographic';
+  irradiance.applyToMaterials([...base.interiorMaterials, ...(teamSuit ? astro.materials.filter((m) => !m.transparent && !(m.transmission > 0) && m.opacity >= 1) : [])]);
+  const setAstroEnv = (outdoor) => astro.materials.forEach((m) => { m.envMap = outdoor ? skyEnv : api.interiorEnv; m.envMapIntensity = teamSuit ? 0.85 : (outdoor ? 0.85 : 0.6) * (m.userData.visor ? 3 : 1); });
 
   // ---------- one room, one camera, two ways to explore it ----------
   const director = new Director(camera);

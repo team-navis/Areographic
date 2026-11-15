@@ -11,7 +11,8 @@ PIA26368 WATSON image: NASA/JPL-Caltech/MSSS.
 PIA26640 PIXL reference image: NASA/JPL-Caltech.
 
 MODELS AND PRESENTATION
-Default astronaut: NASA 3D Resources, Mark III Spacesuit. Credit: NASA/Michael D. Carbajal.
+Default astronaut: team Areographic suit, locally reconstructed from the team's approved generated reference with TRELLIS.2 and refined with Blender/Python. Separate optical visor, integrated cloth logo, no human face or rig. Provenance: models/areographic/provenance.json. This is a fictional visual prototype, not a real or certified suit design.
+Comparison/fallback astronaut (?suit=mark3): NASA 3D Resources, Mark III Spacesuit. Credit: NASA/Michael D. Carbajal.
 https://science.nasa.gov/3d-resources/mark-iii-spacesuit/
 The static Mark III model is a visual reference, not a claim of Mars surface certification or a simulated real suit design. The team removed the dedicated NASA insignia atlas and its embedded images while preserving all 14 mesh buffers.
 Habitat, operator, crew rover, procedural objects, sky and presentation tinting: team-authored demonstration elements. The rover is fictional, not Perseverance and not a real vehicle design.

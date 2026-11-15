@@ -3,6 +3,7 @@ import { assetUrl } from '../util/asset-url.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { loadAreographicAstronaut } from './areographic-suit.js';
 import { ph } from '../util/tex.js';
 
 /** Elliptical loft along a smooth centre line. Used for the provisional procedural operator figure. */
@@ -109,14 +110,17 @@ export async function loadOperator(interiorMaterials) {
 }
 
 /**
- * Suited crew member. The team-supplied "Mars Surface EVA" mesh (EVOVA) was removed from the repo,
- * so the NASA Mark III model (NASA 3D Resources) is the default. `?suit=surface` still tries the
- * surface mesh if a copy is present locally and falls back to Mark III when it is absent.
+ * Team Areographic suit by default; NASA Mark III remains the fallback and
+ * explicit comparison at ?suit=mark3. The removed EVOVA mesh stays local-only.
  */
-export async function loadAstronaut() {
+export async function loadAstronaut(options) {
   const choice = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('suit') : null;
   if (choice === 'surface') return loadSurfaceSuitAstronaut().catch((err) => { console.warn('surface suit mesh unavailable; using the NASA Mark III model', err); return loadMark3Astronaut(); });
-  return loadMark3Astronaut();
+  if (choice === 'mark3') return loadMark3Astronaut();
+  return loadAreographicAstronaut(options).catch((err) => {
+    console.warn('Areographic suit unavailable; using the NASA Mark III model', err);
+    return loadMark3Astronaut();
+  });
 }
 
 /**

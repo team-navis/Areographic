@@ -22,7 +22,7 @@ class HabitatAO extends GTAOPass {
     this.scene.traverse((object) => {
       if (!object.isMesh) return;
       const materials = Array.isArray(object.material) ? object.material : [object.material];
-      if (object.userData.contactShadow || materials.every((m) => !m.visible || m.transparent)) object.visible = false;
+      if (object.userData.contactShadow || materials.every((m) => !m.visible || m.transparent || m.transmission > 0)) object.visible = false;
     });
     // Perf: the room AO needs depth/normals of the room only. Outdoor groups (1.4M terrain triangles, rocks, rover)
     // were re-rendered every frame for an effect that cannot reach them; hide them for this pass (restoreVisibility puts them back).

@@ -1,0 +1,90 @@
+{
+  "url": "http://127.0.0.1:43817/Areographic/",
+  "sha256": "f871f7dfc36b0dd1b2a9fbd24b96be8bbcbda8d5761b0d18e8f91e6570909f80",
+  "bytes": 1066884,
+  "checks": [
+    {
+      "name": "default suit, hover, room optics, first-person entry",
+      "passed": true,
+      "info": {
+        "kind": "areographic",
+        "source": "/Areographic/models/areographic/integrated-suit.glb",
+        "rawSize": [
+          0.7261141240596772,
+          1.9001201260398375,
+          0.5175198614597321
+        ],
+        "scale": 0.9999367797655573,
+        "triangles": 51716,
+        "skinnedMeshes": 0,
+        "animations": 0,
+        "pose": "static standing suit; no face, rig, walk cycle or seated animation"
+      },
+      "meshes": [
+        {
+          "name": "Areographic_|_original_fabric_shell_and_field_suit",
+          "shadow": true,
+          "hoverOwn": true
+        },
+        {
+          "name": "Visor_|_independent_transparent_lens",
+          "shadow": false,
+          "hoverOwn": true
+        },
+        {
+          "name": "Helmet_|_molded_aperture_gasket",
+          "shadow": true,
+          "hoverOwn": true
+        },
+        {
+          "name": "Helmet_|_dark_padded_interior_cup",
+          "shadow": true,
+          "hoverOwn": true
+        }
+      ],
+      "materials": [
+        {
+          "name": "Ivory expedition — reference projection with reconstructed PB",
+          "transmission": 0,
+          "roomBounce": true,
+          "normalColorSpace": "",
+          "envMapIntensity": 0.85
+        },
+        {
+          "name": "Visor | champagne coated optical polycarbonate",
+          "transmission": 0.81,
+          "roomBounce": false,
+          "envMapIntensity": 0.85
+        },
+        {
+          "name": "Helmet | black elastomer lens gasket",
+          "transmission": 0,
+          "roomBounce": true,
+          "envMapIntensity": 0.85
+        },
+        {
+          "name": "Helmet | graphite lining",
+          "transmission": 0,
+          "roomBounce": true,
+          "envMapIntensity": 0.85
+        }
+      ],
+      "failedAssets": [],
+      "errors": []
+    },
+    {
+      "name": "explicit NASA comparison",
+      "passed": true,
+      "expected404": false
+    },
+    {
+      "name": "missing suit fallback",
+      "passed": true,
+      "expected404": true
+    }
+  ],
+  "excluded": [
+    "external fonts",
+    "independent planning display/maps"
+  ]
+}

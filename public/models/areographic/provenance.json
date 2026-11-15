@@ -1,0 +1,15 @@
+{
+  "file": "integrated-suit.glb",
+  "bytes": 1066884,
+  "sha256": "f871f7dfc36b0dd1b2a9fbd24b96be8bbcbda8d5761b0d18e8f91e6570909f80",
+  "triangles": 51716,
+  "meshes": 4,
+  "animations": 0,
+  "format": "glTF 2.0 binary; Draco geometry; embedded JPEG and PNG textures",
+  "source": "Team-requested spacesuit developed from the user-approved generated full-body reference with local TRELLIS.2 reconstruction and Blender/Python refinement. This is not the removed EVOVA asset or the NASA Mark III model.",
+  "processing": "Removed facial geometry and dedicated face images; reconstructed separate visor, gasket and empty dark liner. Blended Areographic pigment into original garment albedo; protected chest UVs during mesh reduction; compressed geometry and textures.",
+  "textures": { "albedo": 3072, "normal": 1024, "occlusionRoughnessMetallic": 384 },
+  "logo": "Areographic artwork used during the team's local suit design session; muted and integrated into the garment color map. No separate patch/background mesh.",
+  "limitations": "Static, unrigged visual prototype. No walking or seated animation. Front reference contains baked illumination; rear/side details are reconstructed, not measured. No human face is included.",
+  "review": "docs/areographic-suit.md"
+}
